@@ -405,12 +405,12 @@
           <p>販売中・商談中の在庫と支払総額を分かりやすく確認できます。</p>
           <span class="quick-link">現在の在庫を見る →</span>
         </a>
-        <button class="quick-card" id="memberButton" type="button">
+        <a class="quick-card" id="memberLink" href="member.html">
           <span class="quick-icon" aria-hidden="true">人</span>
           <h2>マイページ</h2>
           <p>査定、商談、必要書類、納車予定をLINEから確認できます。</p>
           <span class="quick-link">LINE連携して確認 →</span>
-        </button>
+        </a>
       </div>
     </section>
 
@@ -459,8 +459,6 @@
       <div class="dialog-body" id="dialogBody"></div>
     </section>
   </div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
   <noscript><p class="error-panel" style="margin:20px">在庫表示にはJavaScriptが必要です。お電話でお問い合わせください。</p></noscript>
   <script src="config.js"></script>
   <script>
@@ -475,29 +473,17 @@
       const dialog = document.getElementById("vehicleDialog");
       const dialogBody = document.getElementById("dialogBody");
       const dialogTitle = document.getElementById("dialogTitle");
-      const toast = document.getElementById("toast");
       let lastFocused = null;
-      let toastTimer = null;
 
       const sellParams = new URLSearchParams();
       if (demo) sellParams.set("demo", "1");
       if (lineUserId) sellParams.set("line_user_id", lineUserId);
       document.getElementById("sellLink").href = `sell.html${sellParams.size ? `?${sellParams}` : ""}`;
       document.getElementById("buyLink").href = `inventory.html${sellParams.size ? `?${sellParams}` : ""}`;
-
-      document.getElementById("memberButton").addEventListener("click", () => {
-        showToast("マイページはLINE公式アカウントから本人確認後に開けます。");
-      });
+      document.getElementById("memberLink").href = `member.html${sellParams.size ? `?${sellParams}` : ""}`;
       document.getElementById("dialogClose").addEventListener("click", closeDialog);
       dialog.addEventListener("click", (event) => { if (event.target === dialog) closeDialog(); });
       document.addEventListener("keydown", (event) => { if (event.key === "Escape" && dialog.classList.contains("open")) closeDialog(); });
-
-      function showToast(message) {
-        clearTimeout(toastTimer);
-        toast.textContent = message;
-        toast.classList.add("show");
-        toastTimer = setTimeout(() => toast.classList.remove("show"), 3400);
-      }
 
       function money(value) { return new Intl.NumberFormat("ja-JP").format(Number(value || 0)); }
       function text(tag, className, value) { const node = document.createElement(tag); if (className) node.className = className; node.textContent = value; return node; }
