@@ -399,7 +399,7 @@
           <p>買取・下取りを無料査定。店頭、出張、写真から選べます。</p>
           <span class="quick-link">無料査定を申し込む →</span>
         </a>
-        <a class="quick-card" href="#stock">
+        <a class="quick-card" id="buyLink" href="inventory.html">
           <span class="quick-icon" aria-hidden="true">車</span>
           <h2>車を買いたい</h2>
           <p>販売中・商談中の在庫と支払総額を分かりやすく確認できます。</p>
@@ -483,6 +483,7 @@
       if (demo) sellParams.set("demo", "1");
       if (lineUserId) sellParams.set("line_user_id", lineUserId);
       document.getElementById("sellLink").href = `sell.html${sellParams.size ? `?${sellParams}` : ""}`;
+      document.getElementById("buyLink").href = `inventory.html${sellParams.size ? `?${sellParams}` : ""}`;
 
       document.getElementById("memberButton").addEventListener("click", () => {
         showToast("マイページはLINE公式アカウントから本人確認後に開けます。");
@@ -518,7 +519,7 @@
           body.append(text("h3", "", `${vehicle.manufacturer} ${vehicle.car_name} ${vehicle.grade || ""}`.trim()));
           body.append(text("p", "stock-meta", `${vehicle.model_year || "―"}年式 ・ ${money(vehicle.mileage_km)}km ・ ${vehicle.color || "色未登録"}`));
           const price = document.createElement("p"); price.className = "stock-price"; price.append("支払総額 "); price.append(text("strong", "", `${money(vehicle.total_price)}円`)); body.append(price);
-          const button = text("button", "stock-button", "車両情報を見る"); button.type = "button"; button.addEventListener("click", () => openVehicle(vehicle, button)); body.append(button);
+          const button = text("button", "stock-button", vehicle.status === "reserved" ? "商談状況を確認" : "車両詳細・試乗予約"); button.type = "button"; button.addEventListener("click", () => { const vehicleParams = new URLSearchParams(sellParams); vehicleParams.set("slug", vehicle.public_slug); location.href = `vehicle.html?${vehicleParams}`; }); body.append(button);
           article.append(visual, body); stockGrid.append(article);
         });
       }
