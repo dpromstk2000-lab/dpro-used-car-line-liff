@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-6 共通設定
+ * STEP CAR-7 共通設定
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-6-LINE-MEMBER-PAGE-20260716",
+  version: "CAR-7-OWNER-PC-DASHBOARD-20260716",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
