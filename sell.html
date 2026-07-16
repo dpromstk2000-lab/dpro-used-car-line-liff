@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#10243e">
+  <meta name="description" content="DPRO中古車センターの買取・下取り無料査定申込み。店頭、出張、写真概算査定から選べます。">
+  <title>無料査定申込み｜DPRO中古車センター</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy-950:#091522; --navy-900:#10243e; --navy-800:#173452; --navy-700:#214766;
+      --ink:#17202a; --muted:#596575; --amber:#e5a12b; --amber-dark:#aa6508; --amber-soft:#fff3dc;
+      --paper:#fff; --canvas:#f4f2ed; --line:#d8e0e7; --soft:#eef2f5; --success:#157255; --success-soft:#eaf7f1;
+      --danger:#b42318; --danger-soft:#fff0ee; --shadow:0 16px 38px rgba(9,21,34,.11); --radius:20px; --tap:52px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--canvas);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.68;-webkit-text-size-adjust:100%}
+    button,input,select,textarea{font:inherit} button,a,label,input,select,textarea{-webkit-tap-highlight-color:transparent} :focus-visible{outline:4px solid rgba(229,161,43,.44);outline-offset:2px}
+    .topbar{position:sticky;top:0;z-index:30;background:rgba(9,21,34,.97);color:#fff;border-bottom:1px solid rgba(255,255,255,.12);backdrop-filter:blur(12px)}
+    .topbar-inner{width:min(820px,calc(100% - 28px));min-height:68px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}.back-link{min-height:44px;display:inline-flex;align-items:center;gap:7px;color:#fff;text-decoration:none;font-weight:850}.brand{font-weight:900;text-align:right;line-height:1.3}.brand small{display:block;color:#c4d0dc;font-size:12px;font-weight:650}
+    .hero{background:linear-gradient(145deg,var(--navy-950),var(--navy-800));color:#fff}.hero-inner{width:min(820px,calc(100% - 28px));margin:auto;padding:37px 0 58px}.eyebrow{margin:0 0 6px;color:#ffd88d;font-size:14px;font-weight:900;letter-spacing:.08em}.hero h1{margin:0;font-size:clamp(31px,7vw,45px);line-height:1.25;letter-spacing:-.03em}.hero p{margin:11px 0 0;color:#d8e2ec;font-size:16px}.safe-note{display:inline-flex;align-items:center;gap:7px;margin-top:15px;padding:6px 10px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);font-size:13px;color:#edf4f9}
+    .page{width:min(820px,calc(100% - 28px));margin:-28px auto 70px;position:relative;z-index:2}.wizard{overflow:hidden;border:1px solid var(--line);border-radius:25px;background:#fff;box-shadow:var(--shadow)}
+    .progress{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);background:#f8fafb}.progress-item{position:relative;padding:15px 5px;text-align:center;color:#7b8794;font-size:13px;font-weight:800}.progress-item::after{content:"";position:absolute;bottom:-1px;left:12%;right:12%;height:4px;border-radius:9px 9px 0 0;background:transparent}.progress-item.active{color:var(--navy-900)}.progress-item.active::after{background:var(--amber)}.progress-item.done{color:var(--success)}.progress-item b{display:block;margin:auto auto 3px;width:27px;height:27px;line-height:27px;border-radius:50%;background:#e8edf1;color:#667380}.progress-item.active b{background:var(--amber);color:var(--navy-950)}.progress-item.done b{background:var(--success);color:#fff}
+    form{margin:0}.step{display:none;padding:31px}.step.active{display:block}.step-head{margin-bottom:26px}.step-kicker{margin:0;color:var(--amber-dark);font-size:13px;font-weight:900;letter-spacing:.08em}.step h2{margin:3px 0 7px;font-size:27px;line-height:1.35}.step-head p{margin:0;color:var(--muted);font-size:15px}
+    .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.choice-grid.three{grid-template-columns:repeat(3,1fr)}.choice{position:relative;display:block}.choice input{position:absolute;opacity:0;pointer-events:none}.choice-box{height:100%;min-height:116px;display:flex;flex-direction:column;gap:4px;padding:18px;border:2px solid var(--line);border-radius:17px;background:#fff;cursor:pointer;transition:.16s ease}.choice-box strong{font-size:19px}.choice-box span{color:var(--muted);font-size:14px;line-height:1.55}.choice input:checked+.choice-box{border-color:var(--amber);background:var(--amber-soft);box-shadow:0 0 0 3px rgba(229,161,43,.14)}.choice input:focus-visible+.choice-box{outline:4px solid rgba(229,161,43,.38);outline-offset:2px}
+    .subhead{margin:31px 0 13px;padding-bottom:8px;border-bottom:2px solid #edf0f2;font-size:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}.field label,.field-label{font-weight:850;font-size:15px}.required{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:5px;background:#ffebe8;color:#9c241b;font-size:11px;vertical-align:2px}.optional{color:#778391;font-size:12px;font-weight:650}
+    input:not([type=radio]):not([type=checkbox]),select,textarea{width:100%;min-height:var(--tap);border:2px solid #cbd4dc;border-radius:13px;background:#fff;color:var(--ink);padding:11px 13px;font-size:17px}textarea{min-height:108px;resize:vertical}input::placeholder,textarea::placeholder{color:#8b96a1}input:focus,select:focus,textarea:focus{border-color:var(--navy-700);outline:3px solid rgba(33,71,102,.12)}.help{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+    .inline-options{display:flex;flex-wrap:wrap;gap:9px}.pill{position:relative}.pill input{position:absolute;opacity:0}.pill span{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:8px 15px;border:2px solid #cbd4dc;border-radius:999px;background:#fff;font-size:15px;font-weight:800;cursor:pointer}.pill input:checked+span{border-color:var(--navy-700);background:var(--navy-900);color:#fff}.pill input:focus-visible+span{outline:4px solid rgba(229,161,43,.4)}
+    .returning{display:none;margin:0 0 22px;padding:16px;border:1px solid #a9ddc9;border-radius:15px;background:var(--success-soft)}.returning.show{display:block}.returning strong{display:block;color:#0d5f46}.returning p{margin:3px 0 0;color:#376b5d;font-size:14px}.returning.loading{display:block;border-color:#ccd5dc;background:#f3f5f7}.returning.loading strong{color:var(--navy-800)}
+    .existing-vehicle{display:none;margin-bottom:22px;padding:17px;border:1px solid #b9cedd;border-radius:16px;background:#eef6fb}.existing-vehicle.show{display:block}.existing-vehicle h3{margin:0 0 9px;font-size:17px}.existing-vehicle p{margin:7px 0 0;color:var(--muted);font-size:13px}
+    .check-row{display:flex;gap:11px;align-items:flex-start;padding:13px 0}.check-row input{width:23px;height:23px;flex:0 0 auto;margin:2px 0 0;accent-color:var(--navy-800)}.check-row label{cursor:pointer;font-weight:750}.check-row small{display:block;color:var(--muted);font-weight:500}
+    .schedule-panel{padding:18px;border:1px solid #c9d6df;border-radius:16px;background:#f5f8fa}.closed-warning{display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--danger-soft);color:var(--danger);font-size:14px;font-weight:800}.closed-warning.show{display:block}
+    .purchase-context{display:none;margin-bottom:19px;padding:15px;border-left:5px solid var(--amber);border-radius:10px;background:var(--amber-soft)}.purchase-context.show{display:block}.purchase-context b{display:block}.purchase-context span{font-size:14px;color:#6f5018}
+    .photo-intro{margin:0 0 13px;color:var(--muted);font-size:14px}.photo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}.photo-card{position:relative;min-height:105px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;padding:14px;border:2px dashed #b7c2cc;border-radius:15px;background:#fafbfc;text-align:center;cursor:pointer}.photo-card.has-file{border-style:solid;border-color:var(--success);background:var(--success-soft)}.photo-card input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.photo-card strong{font-size:15px}.photo-card span{color:var(--muted);font-size:12px;line-height:1.35;word-break:break-all}.photo-card.has-file span{color:var(--success);font-weight:800}
+    .privacy{margin-top:24px;padding:17px;border-radius:15px;background:#f0f3f5}.privacy .check-row{padding:0}.privacy a{color:var(--navy-700);font-weight:850}
+    .summary{margin-top:25px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#fafbfc}.summary h3{margin:0 0 10px;font-size:18px}.summary dl{display:grid;grid-template-columns:130px 1fr;gap:8px 12px;margin:0}.summary dt{color:var(--muted);font-size:14px}.summary dd{margin:0;font-weight:750;word-break:break-word}
+    .error-box{display:none;margin:0 31px 4px;padding:14px 16px;border:1px solid #efb0a9;border-radius:13px;background:var(--danger-soft);color:#8f1d14;font-weight:800}.error-box.show{display:block}.error-box:focus{outline:4px solid rgba(180,35,24,.18)}
+    .actions{display:flex;justify-content:space-between;gap:12px;padding:20px 31px calc(20px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fafbfc}.button{min-height:var(--tap);display:inline-flex;align-items:center;justify-content:center;padding:10px 24px;border-radius:13px;font-weight:900;cursor:pointer}.button.secondary{border:1px solid #c6d0d8;background:#fff;color:var(--navy-800)}.button.primary{margin-left:auto;border:0;background:var(--amber);color:var(--navy-950);box-shadow:0 8px 18px rgba(189,119,18,.2)}.button[disabled]{cursor:not-allowed;opacity:.55}.button .spinner{display:none;width:21px;height:21px;margin-right:9px;border:3px solid rgba(9,21,34,.22);border-top-color:var(--navy-950);border-radius:50%;animation:spin .7s linear infinite}.button.loading .spinner{display:inline-block}@keyframes spin{to{transform:rotate(360deg)}}
+    .success-view{display:none;padding:38px 30px 42px;text-align:center}.success-view.show{display:block}.success-icon{width:72px;height:72px;display:grid;place-items:center;margin:0 auto 15px;border-radius:50%;background:var(--success);color:#fff;font-size:38px;font-weight:900}.success-view h2{margin:0;font-size:29px}.success-view>p{color:var(--muted)}.case-number{margin:22px 0;padding:18px;border:2px solid var(--amber);border-radius:16px;background:var(--amber-soft)}.case-number small{display:block;color:#74531b}.case-number strong{display:block;font-size:25px;letter-spacing:.02em;word-break:break-all}.success-details{text-align:left;padding:18px;border-radius:16px;background:#f2f5f7}.success-details p{margin:4px 0}.success-warning{display:none;margin-top:14px;padding:13px;border-radius:12px;background:#fff4df;color:#79550d;text-align:left}.success-warning.show{display:block}.success-actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:24px}.success-actions a{min-height:var(--tap);display:flex;align-items:center;justify-content:center;border-radius:13px;text-decoration:none;font-weight:900}.success-actions .home{background:var(--navy-900);color:#fff}.success-actions .call{border:1px solid #c6d0d8;background:#fff;color:var(--navy-800)}
+    .footer-note{width:min(820px,calc(100% - 28px));margin:24px auto 50px;color:var(--muted);font-size:13px;text-align:center}
+    @media(max-width:650px){.hero-inner,.page,.topbar-inner,.footer-note{width:min(100% - 20px,820px)}.brand{font-size:14px}.brand small{display:none}.hero-inner{padding-top:29px}.page{margin-top:-22px}.progress-item{font-size:11px;padding-inline:1px}.step{padding:25px 18px}.step h2{font-size:25px}.choice-grid,.choice-grid.three,.form-grid{grid-template-columns:1fr}.choice-box{min-height:96px}.actions{position:sticky;bottom:0;z-index:10;padding:14px 18px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -8px 24px rgba(9,21,34,.08)}.button{padding-inline:19px}.error-box{margin-inline:18px}.photo-grid{grid-template-columns:1fr 1fr}.summary dl{grid-template-columns:1fr;gap:1px}.summary dd{margin-bottom:8px}.success-actions{grid-template-columns:1fr}}
+    @media(max-width:390px){.photo-grid{grid-template-columns:1fr}.progress-item span{display:none}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="topbar-inner"><a class="back-link" id="backLink" href="index.html">← 総合入口へ</a><div class="brand">無料査定申込み<small>DPRO中古車センター</small></div></div></header>
+  <section class="hero"><div class="hero-inner"><p class="eyebrow">FREE APPRAISAL</p><h1>買取・下取り査定</h1><p>店頭・出張・写真から、ご都合に合う方法を選べます。</p><span class="safe-note">🔒 入力内容と査定写真は公開されません</span></div></section>
+
+  <main class="page">
+    <div class="wizard" id="wizard">
+      <div class="progress" aria-label="入力の進み具合">
+        <div class="progress-item active" data-progress="1"><b>1</b><span>査定方法</span></div><div class="progress-item" data-progress="2"><b>2</b><span>お客様情報</span></div><div class="progress-item" data-progress="3"><b>3</b><span>車両情報</span></div><div class="progress-item" data-progress="4"><b>4</b><span>希望・写真</span></div>
+      </div>
+
+      <form id="appraisalForm" novalidate>
+        <section class="step active" data-step="1">
+          <div class="step-head"><p class="step-kicker">STEP 1</p><h2>ご相談内容を選択</h2><p>買い替え予定がある場合は「下取り」をお選びください。</p></div>
+          <h3 class="subhead">買取・下取り</h3>
+          <div class="choice-grid">
+            <label class="choice"><input type="radio" name="case_type" value="purchase" required checked><span class="choice-box"><strong>買取査定</strong><span>現在の車を売りたい</span></span></label>
+            <label class="choice"><input type="radio" name="case_type" value="trade_in" required><span class="choice-box"><strong>下取り査定</strong><span>次の車への買い替えも相談したい</span></span></label>
+          </div>
+          <h3 class="subhead">査定方法</h3>
+          <div class="choice-grid three">
+            <label class="choice"><input type="radio" name="appraisal_method" value="store" required checked><span class="choice-box"><strong>店頭査定</strong><span>店舗へ車を持ち込む</span></span></label>
+            <label class="choice"><input type="radio" name="appraisal_method" value="visit" required><span class="choice-box"><strong>出張査定</strong><span>ご指定場所へ伺う</span></span></label>
+            <label class="choice"><input type="radio" name="appraisal_method" value="photo" required><span class="choice-box"><strong>写真概算</strong><span>まず写真で相談する</span></span></label>
+          </div>
+        </section>
+
+        <section class="step" data-step="2">
+          <div class="step-head"><p class="step-kicker">STEP 2</p><h2>お客様情報</h2><p>2回目以降は、LINE連携済みの情報を自動で表示します。</p></div>
+          <div class="returning" id="returningBanner"><strong id="returningTitle">既存のお客様情報を確認しています</strong><p id="returningText">LINE連携情報を安全に取得しています。</p></div>
+          <div class="form-grid">
+            <div class="field"><label for="customerName">お名前<span class="required">必須</span></label><input id="customerName" name="customer_name" type="text" maxlength="60" autocomplete="name" placeholder="例：鈴木 太郎" required></div>
+            <div class="field"><label for="customerKana">フリガナ <span class="optional">任意</span></label><input id="customerKana" name="customer_name_kana" type="text" maxlength="80" placeholder="例：スズキ タロウ"></div>
+            <div class="field"><label for="phone">電話番号<span class="required">必須</span></label><input id="phone" name="phone" type="tel" maxlength="40" inputmode="tel" autocomplete="tel" placeholder="例：090-1234-5678" required><p class="help">ハイフンあり・なし、全角、+81形式でも同じ番号として扱います。</p></div>
+            <div class="field"><label for="email">メールアドレス <span class="optional">任意</span></label><input id="email" name="email" type="email" maxlength="160" inputmode="email" autocomplete="email" placeholder="例：car@example.com"></div>
+            <div class="field full"><span class="field-label">希望する連絡方法</span><div class="inline-options">
+              <label class="pill"><input type="radio" name="preferred_contact" value="line" checked><span>LINE</span></label><label class="pill"><input type="radio" name="preferred_contact" value="phone"><span>電話</span></label><label class="pill"><input type="radio" name="preferred_contact" value="email"><span>メール</span></label>
+            </div></div>
+          </div>
+        </section>
+
+        <section class="step" data-step="3">
+          <div class="step-head"><p class="step-kicker">STEP 3</p><h2>査定するお車</h2><p>分かる範囲で入力してください。ナンバーと車台番号は任意です。</p></div>
+          <div class="existing-vehicle" id="existingVehiclePanel"><h3>登録済みのお車から選ぶ</h3><select id="existingVehicle"><option value="">新しい車を入力する</option></select><p>選択すると、登録済みの内容が自動入力されます。</p></div>
+          <div class="form-grid">
+            <div class="field"><label for="manufacturer">メーカー<span class="required">必須</span></label><input id="manufacturer" name="manufacturer" type="text" maxlength="60" list="manufacturerList" placeholder="例：トヨタ" required><datalist id="manufacturerList"><option value="トヨタ"><option value="ホンダ"><option value="日産"><option value="ダイハツ"><option value="スズキ"><option value="マツダ"><option value="スバル"><option value="三菱"><option value="レクサス"><option value="輸入車"></datalist></div>
+            <div class="field"><label for="carName">車名<span class="required">必須</span></label><input id="carName" name="car_name" type="text" maxlength="80" placeholder="例：プリウス" required></div>
+            <div class="field"><label for="grade">グレード <span class="optional">任意</span></label><input id="grade" name="grade" type="text" maxlength="80" placeholder="例：S ツーリング"></div>
+            <div class="field"><label for="modelCode">型式 <span class="optional">任意</span></label><input id="modelCode" name="model_code" type="text" maxlength="40" placeholder="例：ZVW51"></div>
+            <div class="field"><label for="modelYear">年式 <span class="optional">任意</span></label><input id="modelYear" name="model_year" type="number" inputmode="numeric" min="1950" max="2100" placeholder="例：2019"></div>
+            <div class="field"><label for="registrationMonth">初度登録月 <span class="optional">任意</span></label><select id="registrationMonth" name="first_registration_month"><option value="">選択してください</option></select></div>
+            <div class="field"><label for="mileage">走行距離（km） <span class="optional">任意</span></label><input id="mileage" name="mileage_km" type="number" inputmode="numeric" min="0" max="3000000" step="100" placeholder="例：68500"></div>
+            <div class="field"><label for="color">色 <span class="optional">任意</span></label><input id="color" name="color" type="text" maxlength="60" placeholder="例：ホワイトパール"></div>
+            <div class="field"><label for="inspectionExpiry">車検期限 <span class="optional">任意</span></label><input id="inspectionExpiry" name="inspection_expiry" type="date"></div>
+            <div class="field"><label for="registrationNumber">ナンバー <span class="optional">任意</span></label><input id="registrationNumber" name="registration_number" type="text" maxlength="60" placeholder="例：福岡 330 あ 12-34"></div>
+            <div class="field full"><label for="chassisNumber">車台番号 <span class="optional">任意</span></label><input id="chassisNumber" name="chassis_number" type="text" maxlength="80" placeholder="例：ZVW51-6123456"><p class="help">車検証に記載されています。分からない場合は空欄で構いません。</p></div>
+            <div class="field full"><span class="field-label">修復歴</span><div class="inline-options"><label class="pill"><input type="radio" name="repair_history" value="none"><span>なし</span></label><label class="pill"><input type="radio" name="repair_history" value="yes"><span>あり</span></label><label class="pill"><input type="radio" name="repair_history" value="unknown" checked><span>分からない</span></label></div></div>
+            <div class="field full"><div class="check-row"><input id="loanBalance" name="loan_balance" type="checkbox"><label for="loanBalance">ローン残債がある、または残っている可能性がある<small>残債があっても査定できます。手続き方法をご案内します。</small></label></div></div>
+            <div class="field"><label for="ownershipName">所有者名義 <span class="optional">任意</span></label><input id="ownershipName" name="ownership_name" type="text" maxlength="80" placeholder="例：本人、ローン会社"></div>
+            <div class="field"><label for="vehicleNote">車両について <span class="optional">任意</span></label><input id="vehicleNote" name="vehicle_note" type="text" maxlength="300" placeholder="例：傷あり、禁煙車"></div>
+          </div>
+        </section>
+
+        <section class="step" data-step="4">
+          <div class="step-head"><p class="step-kicker">STEP 4</p><h2>希望日時・写真</h2><p>写真は任意です。登録すると、より具体的な相談ができます。</p></div>
+          <div class="purchase-context" id="purchaseContext"><b>購入と下取りをまとめて相談</b><span id="desiredVehicleText"></span></div>
+          <div class="schedule-panel" id="schedulePanel">
+            <h3 class="subhead" style="margin-top:0">査定希望日時</h3>
+            <div class="form-grid">
+              <div class="field"><label for="appointmentDate">希望日<span class="required">必須</span></label><input id="appointmentDate" type="date"></div>
+              <div class="field"><label for="appointmentTime">希望時間<span class="required">必須</span></label><select id="appointmentTime"><option value="">選択してください</option></select></div>
+              <div class="field full" id="visitAddressField" hidden><label for="visitAddress">出張査定先の住所<span class="required">必須</span></label><textarea id="visitAddress" maxlength="240" autocomplete="street-address" placeholder="郵便番号、住所、建物名、駐車場所など"></textarea></div>
+            </div>
+            <p class="help">営業時間 9:00〜18:00／30分単位／水曜定休／60日先まで</p><div class="closed-warning" id="closedWarning">水曜日は定休日です。別の日を選択してください。</div>
+          </div>
+
+          <h3 class="subhead">売却希望・ご要望</h3>
+          <div class="form-grid">
+            <div class="field"><label for="desiredSaleDate">売却希望日 <span class="optional">任意</span></label><input id="desiredSaleDate" name="desired_sale_date" type="date"></div>
+            <div class="field"><label for="expectedPrice">希望金額（円） <span class="optional">任意</span></label><input id="expectedPrice" name="customer_expected_price" type="number" inputmode="numeric" min="0" max="1000000000" step="10000" placeholder="例：1500000"></div>
+            <div class="field full"><label for="publicNote">ご要望・連絡しやすい時間 <span class="optional">任意</span></label><textarea id="publicNote" name="public_note" maxlength="500" placeholder="例：平日17時以降は電話可能です。傷の部分を重点的に見てほしいです。"></textarea></div>
+          </div>
+
+          <h3 class="subhead">査定写真 <span class="optional">任意・最大8枚</span></h3>
+          <p class="photo-intro">1枚5MBまで。JPEG・PNG・WebP・HEICに対応しています。車検証写真も非公開で保存します。</p>
+          <div class="photo-grid" id="photoGrid">
+            <label class="photo-card"><input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" data-category="front"><strong>車の前</strong><span>撮影・選択</span></label>
+            <label class="photo-card"><input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" data-category="rear"><strong>車の後ろ</strong><span>撮影・選択</span></label>
+            <label class="photo-card"><input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" data-category="left"><strong>左側面</strong><span>撮影・選択</span></label>
+            <label class="photo-card"><input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" data-category="right"><strong>右側面</strong><span>撮影・選択</span></label>
+            <label class="photo-card"><input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" data-category="interior"><strong>車内</strong><span>撮影・選択</span></label>
+            <label class="photo-card"><input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" data-category="odometer"><strong>メーター</strong><span>撮影・選択</span></label>
+            <label class="photo-card"><input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" data-category="vehicle_registration"><strong>車検証</strong><span>撮影・選択</span></label>
+            <label class="photo-card"><input type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" data-category="damage"><strong>傷・へこみ</strong><span>撮影・選択</span></label>
+          </div>
+
+          <div class="privacy"><div class="check-row"><input id="privacyConsent" type="checkbox" required><label for="privacyConsent">個人情報と写真の取扱いに同意します<span class="required">必須</span><small>入力内容は査定、連絡、店舗業務のために使用し、査定写真を公開在庫へ自動掲載しません。</small></label></div></div>
+          <div class="summary" id="summary"><h3>申込み内容</h3><dl id="summaryList"></dl></div>
+        </section>
+
+        <div class="error-box" id="errorBox" role="alert" tabindex="-1"></div>
+        <div class="actions"><button class="button secondary" id="backButton" type="button" hidden>戻る</button><button class="button primary" id="nextButton" type="button">次へ</button><button class="button primary" id="submitButton" type="submit" hidden><span class="spinner" aria-hidden="true"></span><span class="button-label">無料査定を申し込む</span></button></div>
+      </form>
+
+      <section class="success-view" id="successView" aria-live="polite">
+        <div class="success-icon">✓</div><h2>お申込みを受け付けました</h2><p>担当者が内容を確認し、ご希望の方法でご連絡します。</p>
+        <div class="case-number"><small>査定受付番号</small><strong id="caseNumber">―</strong></div>
+        <div class="success-details" id="successDetails"></div><div class="success-warning" id="successWarning"></div>
+        <div class="success-actions"><a class="home" id="successHome" href="index.html">総合入口へ戻る</a><a class="call" href="tel:0920001234">電話で確認する</a></div>
+      </section>
+    </div>
+  </main>
+  <p class="footer-note">入力した個人情報をこの端末のlocalStorageには保存しません。<br>DPRO中古車センター 福岡東店　092-000-1234</p>
+
+  <script src="config.js"></script>
+  <script>
+    (() => {
+      "use strict";
+      const config = window.DPRO_CAR_CONFIG;
+      const params = new URLSearchParams(location.search);
+      const demo = params.get("demo") === "1";
+      const lineUserId = params.get("line_user_id") || (demo ? config.defaultLineUserId : "");
+      const desiredVehicle = (params.get("desired_vehicle") || "").slice(0, 160);
+      let currentStep = 1;
+      let returningVehicles = [];
+      let submitting = false;
+
+      const form = document.getElementById("appraisalForm");
+      const errorBox = document.getElementById("errorBox");
+      const backButton = document.getElementById("backButton");
+      const nextButton = document.getElementById("nextButton");
+      const submitButton = document.getElementById("submitButton");
+      const appointmentDate = document.getElementById("appointmentDate");
+      const appointmentTime = document.getElementById("appointmentTime");
+      const schedulePanel = document.getElementById("schedulePanel");
+      const visitAddressField = document.getElementById("visitAddressField");
+      const visitAddress = document.getElementById("visitAddress");
+      const closedWarning = document.getElementById("closedWarning");
+
+      const homeParams = new URLSearchParams(); if (demo) homeParams.set("demo","1"); if (lineUserId) homeParams.set("line_user_id",lineUserId);
+      const homeUrl = `index.html${homeParams.size ? `?${homeParams}` : ""}`;
+      document.getElementById("backLink").href = homeUrl; document.getElementById("successHome").href = homeUrl;
+
+      for (let month=1; month<=12; month+=1) document.getElementById("registrationMonth").add(new Option(`${month}月`, String(month)));
+      for (let hour=9; hour<18; hour+=1) for (const minute of [0,30]) { const value=`${String(hour).padStart(2,"0")}:${String(minute).padStart(2,"0")}`; appointmentTime.add(new Option(value,value)); }
+      const today = jstDate(new Date()); const maxDate = jstDate(new Date(Date.now()+config.reservationDaysAhead*86400000)); appointmentDate.min=today; appointmentDate.max=maxDate; document.getElementById("desiredSaleDate").min=today;
+
+      if (params.get("case_type") === "trade_in") form.elements.case_type.value = "trade_in";
+      if (desiredVehicle) { document.getElementById("purchaseContext").classList.add("show"); document.getElementById("desiredVehicleText").textContent = desiredVehicle; }
+
+      document.querySelectorAll('input[name="appraisal_method"]').forEach(input => input.addEventListener("change", updateMethodFields));
+      appointmentDate.addEventListener("change", checkClosedDay);
+      nextButton.addEventListener("click", () => { if (validateStep(currentStep)) showStep(currentStep+1); });
+      backButton.addEventListener("click", () => showStep(currentStep-1));
+      form.addEventListener("submit", submitAppraisal);
+      document.querySelectorAll('.photo-card input[type="file"]').forEach(input => input.addEventListener("change", handlePhotoSelection));
+      document.getElementById("existingVehicle").addEventListener("change", selectExistingVehicle);
+      document.querySelectorAll("input,select,textarea").forEach(input => input.addEventListener("input", clearError));
+
+      function jstDate(date) { const shifted=new Date(date.getTime()+9*3600000); return shifted.toISOString().slice(0,10); }
+      function selected(name) { return form.elements[name]?.value || ""; }
+      function setValue(id,value) { const field=document.getElementById(id); if(field) field.value=value ?? ""; }
+      function formatMoney(value) { return value ? `${new Intl.NumberFormat("ja-JP").format(Number(value))}円` : "未入力"; }
+      function methodLabel(value) { return {store:"店頭査定",visit:"出張査定",photo:"写真概算査定"}[value] || value; }
+      function caseLabel(value) { return value === "trade_in" ? "下取り査定" : "買取査定"; }
+
+      function showStep(step) {
+        currentStep=Math.min(4,Math.max(1,step));
+        document.querySelectorAll(".step").forEach(node => node.classList.toggle("active",Number(node.dataset.step)===currentStep));
+        document.querySelectorAll(".progress-item").forEach(node => { const number=Number(node.dataset.progress); node.classList.toggle("active",number===currentStep); node.classList.toggle("done",number<currentStep); node.querySelector("b").textContent=number<currentStep?"✓":String(number); });
+        backButton.hidden=currentStep===1; nextButton.hidden=currentStep===4; submitButton.hidden=currentStep!==4;
+        if(currentStep===4){ updateMethodFields(); renderSummary(); }
+        clearError(); document.getElementById("wizard").scrollIntoView({behavior:"smooth",block:"start"});
+      }
+
+      function validateStep(step) {
+        clearError();
+        const section=document.querySelector(`.step[data-step="${step}"]`);
+        const fields=[...section.querySelectorAll("input,select,textarea")].filter(field=>!field.disabled&&!field.closest("[hidden]"));
+        for(const field of fields){ if(!field.checkValidity()){ field.reportValidity(); field.focus(); return false; } }
+        if(step===2 && selected("preferred_contact")==="email" && !document.getElementById("email").value.trim()){ showError("メール連絡を希望する場合は、メールアドレスを入力してください。"); document.getElementById("email").focus(); return false; }
+        if(step===4){
+          const method=selected("appraisal_method");
+          if(method!=="photo" && (!appointmentDate.value||!appointmentTime.value)){ showError("査定希望日と希望時間を選択してください。"); return false; }
+          if(method!=="photo" && checkClosedDay()){ showError("水曜日は定休日です。別の日を選択してください。"); return false; }
+          if(method==="visit" && !visitAddress.value.trim()){ showError("出張査定先の住所を入力してください。"); visitAddress.focus(); return false; }
+          if(!document.getElementById("privacyConsent").checked){ showError("個人情報と写真の取扱いへの同意が必要です。"); document.getElementById("privacyConsent").focus(); return false; }
+        }
+        return true;
+      }
+
+      function updateMethodFields() {
+        const method=selected("appraisal_method");
+        schedulePanel.hidden=method==="photo"; visitAddressField.hidden=method!=="visit";
+        appointmentDate.required=method!=="photo"; appointmentTime.required=method!=="photo"; visitAddress.required=method==="visit";
+      }
+      function checkClosedDay(){ const date=appointmentDate.value?new Date(`${appointmentDate.value}T00:00:00+09:00`):null; const isWednesday=date?new Date(date.getTime()+9*3600000).getUTCDay()===3:false; closedWarning.classList.toggle("show",isWednesday); return isWednesday; }
+
+      function showError(message){ errorBox.textContent=message; errorBox.classList.add("show"); errorBox.focus(); }
+      function clearError(){ errorBox.classList.remove("show"); errorBox.textContent=""; }
+
+      function handlePhotoSelection(event){
+        const input=event.currentTarget; const card=input.closest(".photo-card"); const label=card.querySelector("span"); const file=input.files[0];
+        card.classList.remove("has-file"); label.textContent="撮影・選択";
+        if(!file) return;
+        if(file.size>config.maxPhotoSizeBytes){ input.value=""; showError(`${card.querySelector("strong").textContent}の写真は5MB以下にしてください。`); return; }
+        const allowed=["image/jpeg","image/png","image/webp","image/heic","image/heif"];
+        if(file.type&&!allowed.includes(file.type.toLowerCase())){ input.value=""; showError("JPEG・PNG・WebP・HEICの写真を選択してください。"); return; }
+        card.classList.add("has-file"); label.textContent=`${file.name}（${(file.size/1024/1024).toFixed(1)}MB）`;
+      }
+
+      function renderSummary(){
+        const list=document.getElementById("summaryList"); list.replaceChildren();
+        const appointment=selected("appraisal_method")==="photo"?"写真送信後に店舗から連絡":`${appointmentDate.value||"未選択"} ${appointmentTime.value||""}`;
+        [["申込み",caseLabel(selected("case_type"))],["査定方法",methodLabel(selected("appraisal_method"))],["お名前",document.getElementById("customerName").value||"未入力"],["お車",`${document.getElementById("manufacturer").value} ${document.getElementById("carName").value}`.trim()||"未入力"],["希望日時",appointment],["希望金額",formatMoney(document.getElementById("expectedPrice").value)],["写真",`${[...document.querySelectorAll('.photo-card input[type="file"]')].filter(i=>i.files[0]).length}枚`]].forEach(([term,value])=>{const dt=document.createElement("dt");dt.textContent=term;const dd=document.createElement("dd");dd.textContent=value;list.append(dt,dd);});
+      }
+
+      async function loadReturningCustomer(){
+        if(!demo||!lineUserId) return;
+        const banner=document.getElementById("returningBanner"); banner.className="returning loading";
+        try{
+          const query=new URLSearchParams({demo:"1",line_user_id:lineUserId}); const response=await fetch(`${config.apiBase}/api/public/returning-customer?${query}`,{headers:{Accept:"application/json"}}); const data=await response.json();
+          if(!response.ok||!data.ok) throw new Error(data?.error?.message||"既存情報を取得できませんでした。");
+          if(!data.found){ banner.className="returning"; return; }
+          setValue("customerName",data.customer.customer_name);setValue("customerKana",data.customer.customer_name_kana);setValue("phone",data.customer.phone);setValue("email",data.customer.email);form.elements.preferred_contact.value=data.customer.preferred_contact||"line";
+          document.getElementById("returningTitle").textContent=`${data.customer.customer_name}様の登録情報を取得しました`;document.getElementById("returningText").textContent=`顧客番号 ${data.customer.customer_code}／変更がある項目は上書きできます。`;banner.className="returning show";
+          returningVehicles=Array.isArray(data.vehicles)?data.vehicles:[]; if(returningVehicles.length){const select=document.getElementById("existingVehicle");returningVehicles.forEach((vehicle,index)=>select.add(new Option(`${vehicle.manufacturer} ${vehicle.car_name} ${vehicle.grade||""}`.trim(),String(index))));document.getElementById("existingVehiclePanel").classList.add("show");}
+        }catch(error){document.getElementById("returningTitle").textContent="既存情報を自動取得できませんでした";document.getElementById("returningText").textContent="初回と同じように入力しても、電話番号を正規化して店舗側で重複を確認します。";banner.className="returning show";}
+      }
+
+      function selectExistingVehicle(event){const index=event.currentTarget.value;if(index==="")return;const v=returningVehicles[Number(index)];if(!v)return;setValue("manufacturer",v.manufacturer);setValue("carName",v.car_name);setValue("grade",v.grade);setValue("modelCode",v.model_code);setValue("modelYear",v.model_year);setValue("registrationMonth",v.first_registration_month);setValue("color",v.color);setValue("mileage",v.mileage_km);setValue("inspectionExpiry",v.inspection_expiry);setValue("registrationNumber",v.registration_number);form.elements.repair_history.value=v.repair_history||"unknown";document.getElementById("loanBalance").checked=Boolean(v.loan_balance);setValue("ownershipName",v.ownership_name);}
+
+      function payloadFromForm(){
+        const method=selected("appraisal_method"); let appointmentStartAt=null;
+        if(method!=="photo"&&appointmentDate.value&&appointmentTime.value) appointmentStartAt=new Date(`${appointmentDate.value}T${appointmentTime.value}:00+09:00`).toISOString();
+        const value=id=>document.getElementById(id).value.trim()||null; const integer=id=>document.getElementById(id).value===""?null:Number(document.getElementById(id).value);
+        return {line_user_id:lineUserId||null,customer_name:value("customerName"),customer_name_kana:value("customerKana"),phone:value("phone"),email:value("email"),preferred_contact:selected("preferred_contact"),case_type:selected("case_type"),appraisal_method:method,manufacturer:value("manufacturer"),car_name:value("carName"),grade:value("grade"),model_code:value("modelCode"),model_year:integer("modelYear"),first_registration_month:document.getElementById("registrationMonth").value?Number(document.getElementById("registrationMonth").value):null,color:value("color"),mileage_km:integer("mileage"),inspection_expiry:value("inspectionExpiry"),registration_number:value("registrationNumber"),chassis_number:value("chassisNumber"),repair_history:selected("repair_history"),loan_balance:document.getElementById("loanBalance").checked,ownership_name:value("ownershipName"),vehicle_note:value("vehicleNote"),desired_sale_date:value("desiredSaleDate"),customer_expected_price:integer("expectedPrice"),appointment_start_at:appointmentStartAt,visit_address:method==="visit"?value("visitAddress"):null,public_note:value("publicNote"),desired_vehicle:desiredVehicle||null,privacy_consent:document.getElementById("privacyConsent").checked};
+      }
+
+      async function submitAppraisal(event){
+        event.preventDefault(); if(submitting||!validateStep(4))return; submitting=true;submitButton.disabled=true;submitButton.classList.add("loading");submitButton.querySelector(".button-label").textContent="送信しています";
+        try{
+          const response=await fetch(`${config.apiBase}/api/public/appraisals`,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(payloadFromForm())}); const data=await response.json();
+          if(!response.ok||!data.ok)throw new Error(data?.error?.message||"査定申込みを登録できませんでした。");
+          const photoInputs=[...document.querySelectorAll('.photo-card input[type="file"]')].filter(input=>input.files[0]); let uploaded=0; const photoErrors=[];
+          for(const input of photoInputs){try{submitButton.querySelector(".button-label").textContent=`写真を送信中 ${uploaded+1}/${photoInputs.length}`;const body=new FormData();body.append("file",input.files[0]);body.append("category",input.dataset.category);const photoResponse=await fetch(`${config.apiBase}/api/public/appraisals/${encodeURIComponent(data.appraisal.case_number)}/photos`,{method:"POST",headers:{Authorization:`Bearer ${data.photo_upload.token}`,Accept:"application/json"},body});const photoData=await photoResponse.json();if(!photoResponse.ok||!photoData.ok)throw new Error(photoData?.error?.message||"写真を保存できませんでした。");uploaded+=1;}catch(photoError){photoErrors.push(photoError.message);}}
+          showSuccess(data,uploaded,photoInputs.length,photoErrors);
+        }catch(error){showError(error.message);submitting=false;submitButton.disabled=false;submitButton.classList.remove("loading");submitButton.querySelector(".button-label").textContent="無料査定を申し込む";}
+      }
+
+      function showSuccess(data,uploaded,total,photoErrors){
+        form.hidden=true;document.querySelector(".progress").hidden=true;const view=document.getElementById("successView");view.classList.add("show");document.getElementById("caseNumber").textContent=data.appraisal.case_number;
+        const details=document.getElementById("successDetails");details.replaceChildren();const rows=[["査定方法",methodLabel(data.appraisal.appraisal_method)],["受付状況",data.appraisal.status==="appointment_set"?"日時受付済み":"内容確認待ち"]];if(data.reservation)rows.push(["希望日時",new Intl.DateTimeFormat("ja-JP",{timeZone:"Asia/Tokyo",dateStyle:"long",timeStyle:"short"}).format(new Date(data.reservation.start_at))]);rows.push(["写真",total?`${uploaded}/${total}枚を保存` : "写真なし"]);rows.forEach(([label,value])=>{const p=document.createElement("p");const b=document.createElement("b");b.textContent=`${label}：`;p.append(b,document.createTextNode(value));details.append(p);});
+        const warning=document.getElementById("successWarning");if(photoErrors.length){warning.textContent=`査定申込みは完了しましたが、${photoErrors.length}枚の写真を保存できませんでした。担当者からの連絡時に再送できます。`;warning.classList.add("show");}
+        view.scrollIntoView({behavior:"smooth",block:"start"});
+      }
+
+      updateMethodFields(); loadReturningCustomer();
+    })();
+  </script>
+</body>
+</html>
