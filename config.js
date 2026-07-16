@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-9 共通設定
+ * STEP CAR-10 共通設定
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-9-SYSTEM-CHECK-DEMO-PREPARE-20260716",
+  version: "CAR-10-INVENTORY-CONTENT-SETTINGS-COMPLETE-20260716",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
