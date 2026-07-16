@@ -26,7 +26,7 @@
   </style>
 </head>
 <body>
-  <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
+  <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
 
   <main class="gate-wrap" id="gateView">
     <section class="gate" aria-labelledby="gateTitle"><div class="gate-head"><p class="gate-kicker">OWNER CONTROL CENTER</p><h1 id="gateTitle">買取から納車後まで、一元管理。</h1><p>査定・在庫・商談・試乗・契約・書類・納車フォローを同じ画面で確認します。</p></div><div class="gate-body"><form id="loginForm"><label class="field-label" for="adminCode">管理コード</label><div class="code-row"><input class="code-input" id="adminCode" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="管理コードを入力"><button class="button" id="clearCode" type="button">削除</button></div><p class="gate-note">管理コードはこの画面の通信中だけ使用し、端末内へ保存しません。営業デモURLではデモ用コードを自動設定します。</p><div class="gate-actions"><button class="button primary" id="loginButton" type="submit">管理画面を開く</button><a class="button" href="index.html">総合入口へ戻る</a></div><div class="form-message" id="loginError" hidden></div><div class="loading-line" id="loginLoading" hidden>Supabaseから最新情報を取得しています…</div></form></div></section>
@@ -114,7 +114,7 @@
       async function reloadOverview(){if(state.busy)return;state.busy=true;try{state.data=await api("/api/admin/overview");renderAll()}finally{state.busy=false}}
       async function login(){const key=adminInput.value.trim();if(!key){loginError.textContent="管理コードを入力してください。";loginError.hidden=false;adminInput.focus();return}state.adminKey=key;loginError.hidden=true;loginLoading.hidden=false;loginButton.disabled=true;try{await reloadOverview();gate.hidden=true;app.hidden=false;topLogout.hidden=false;showToast("最新の管理情報を取得しました。") }catch(error){state.adminKey="";loginError.textContent=error.message;loginError.hidden=false;adminInput.focus()}finally{loginLoading.hidden=true;loginButton.disabled=false}}
       function logout(){state.adminKey="";state.data=null;adminInput.value="";app.hidden=true;gate.hidden=false;topLogout.hidden=true;loginError.hidden=true;adminInput.focus();showToast("管理コードを消去しました。")}
-      document.getElementById("loginForm").addEventListener("submit",e=>{e.preventDefault();login()});document.getElementById("clearCode").addEventListener("click",()=>{adminInput.value="";loginError.hidden=true;adminInput.focus()});topLogout.addEventListener("click",logout);
+      document.getElementById("loginForm").addEventListener("submit",e=>{e.preventDefault();login()});document.getElementById("clearCode").addEventListener("click",()=>{adminInput.value="";loginError.hidden=true;adminInput.focus()});topLogout.addEventListener("click",logout);document.getElementById("ipadLink").href=`owner-ipad.html${isDemo?"?demo=1":""}`;
       if(isDemo){adminInput.value="1234";setTimeout(login,120)}else{adminInput.focus()}
     })();
   </script>
