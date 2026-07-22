@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-10 共通設定
+ * STEP CAR-12 オーナーPC NEXT共通設定
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-10-INVENTORY-CONTENT-SETTINGS-COMPLETE-20260716",
+  version: "CAR-12-OWNER-PC-NEXT-20260722",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -12,4 +12,9 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   slotMinutes: 30,
   maxPhotoCount: 8,
   maxPhotoSizeBytes: 5 * 1024 * 1024,
+  appraisalPhotoMaxCount: 8,
+  listingPhotoMaxCount: 12,
+  ownerSimpleMode: true,
+  ownerDetailPanel: true,
+  ownerLazyRender: true,
 });
