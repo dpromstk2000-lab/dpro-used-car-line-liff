@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111d29">
   <meta name="description" content="DPRO中古車センターのオーナーPC管理画面。査定、在庫、商談、試乗、契約、納車、顧客検索を一元管理します。">
-  <title>オーナーPC管理 CAR-16｜DPRO中古車センター</title>
+  <title>オーナーPC管理 CAR-17｜DPRO中古車センター</title>
   <style>
     :root{--navy:#10243e;--navy2:#173858;--charcoal:#111d29;--amber:#e5a12b;--amber2:#fff1d2;--green:#117b61;--green2:#e2f3ed;--red:#b44235;--red2:#fff0ed;--canvas:#f4f2ed;--paper:#fff;--soft:#eef2f5;--line:#d5dee5;--ink:#102033;--muted:#617083;--shadow:0 15px 38px rgba(15,35,56,.11);--tap:52px;--side:244px}
     *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.68;-webkit-text-size-adjust:100%}button,input,select,textarea,a{font:inherit}button,a{touch-action:manipulation}:focus-visible{outline:4px solid rgba(229,161,43,.42);outline-offset:2px}a{color:inherit}
@@ -155,9 +155,21 @@
     @media(max-width:900px){.sales-stages{grid-template-columns:repeat(2,1fr)}.sales-summary-grid{grid-template-columns:1fr 1fr}.sales-pipeline-summary{grid-template-columns:1fr 1fr}}
     @media(max-width:650px){.detail-drawer.sales-journey{height:min(94dvh,980px)}.sales-stages,.sales-summary-grid,.sales-form-grid{grid-template-columns:1fr}.sales-field.full,.sales-options,.sales-form-actions{grid-column:auto}.sales-reservation{grid-template-columns:1fr}.sales-pipeline-summary{grid-template-columns:1fr 1fr}.sales-form-actions .button{width:100%;min-width:0}}
 
+
+
+    /* DPRO CAR STEP CAR-17 SALE CONTRACT / DELIVERY LIFECYCLE */
+    .detail-drawer.delivery-journey{width:min(940px,100%)}
+    .delivery-hero{padding:18px;border-radius:17px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff}.delivery-hero h3{margin:0;font-size:26px}.delivery-hero p{margin:3px 0 0;color:#d5e1eb}
+    .delivery-stages{margin-top:14px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.delivery-stage{padding:11px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.08)}.delivery-stage.done{border-color:#8fd0bb;background:#eaf7f2;color:var(--ink)}.delivery-stage.current{border-color:#f0be5a;background:#fff6df;color:var(--ink)}.delivery-stage span{display:block;font-size:11px;font-weight:900;opacity:.8}.delivery-stage strong{display:block;font-size:15px}.delivery-stage small{display:block;font-size:11px;opacity:.75}
+    .delivery-section{margin-top:15px;padding:17px;border:1px solid var(--line);border-radius:15px;background:#fff}.delivery-section h3{margin:0 0 11px;font-size:20px}.delivery-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.delivery-summary-grid div{padding:10px 12px;border-radius:10px;background:var(--soft)}.delivery-summary-grid span{display:block;color:var(--muted);font-size:12px;font-weight:800}.delivery-summary-grid strong{display:block;overflow-wrap:anywhere}
+    .delivery-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.delivery-field{display:grid;gap:5px}.delivery-field.full{grid-column:1/-1}.delivery-field label{font-size:13px;font-weight:900}.delivery-field input,.delivery-field select,.delivery-field textarea{width:100%;min-height:48px;padding:9px 11px;border:1px solid #b9c6d0;border-radius:10px;background:#fff;color:var(--ink)}.delivery-field textarea{min-height:92px;resize:vertical}.delivery-form-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}.delivery-form-actions .button{min-width:210px}
+    .delivery-list{display:grid;gap:8px}.delivery-row{padding:11px 12px;border-radius:11px;background:var(--soft);display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,auto);gap:9px;align-items:center}.delivery-row strong{display:block}.delivery-row span{display:block;color:var(--muted);font-size:13px}.delivery-row-action{display:grid;grid-template-columns:1fr auto;gap:6px}.delivery-row-action select{min-height:42px;padding:6px 8px;border:1px solid #bdc9d2;border-radius:9px;background:#fff}
+    .delivery-warning{padding:12px 14px;border-left:5px solid var(--amber);border-radius:0 11px 11px 0;background:#fff7e5;color:#68490e}.delivery-ready{padding:12px 14px;border-radius:11px;background:#eaf7f2;color:#14634e;font-weight:850}.delivery-actions{display:grid;gap:9px}.delivery-actions .button{width:100%}.delivery-open{width:100%;margin-top:10px;border-color:#d7a43d;background:#fff8e6}.delivery-pipeline-summary{margin-bottom:17px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.delivery-pipeline-metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#fff}.delivery-pipeline-metric.warn{border-color:#e4bb69;background:#fffaf0}.delivery-pipeline-metric.good{border-color:#90cdbb;background:#effaf6}.delivery-pipeline-metric span{display:block;color:var(--muted);font-size:13px;font-weight:800}.delivery-pipeline-metric strong{display:block;font-size:28px}
+    @media(max-width:900px){.delivery-stages{grid-template-columns:repeat(2,1fr)}.delivery-summary-grid{grid-template-columns:1fr 1fr}.delivery-pipeline-summary{grid-template-columns:1fr 1fr}}@media(max-width:650px){.detail-drawer.delivery-journey{height:min(94dvh,980px)}.delivery-stages,.delivery-summary-grid,.delivery-form-grid{grid-template-columns:1fr}.delivery-field.full,.delivery-form-actions{grid-column:auto}.delivery-row{grid-template-columns:1fr}.delivery-form-actions .button{width:100%;min-width:0}}
+
   </style>
-  <!-- CAR-16-R1-SALES-JOURNEY-CLARITY-20260723 -->
-  <!-- CAR-16-R1-SALES-JOURNEY-CLARITY-20260723 -->
+  <!-- CAR-17-SALE-CONTRACT-DELIVERY-LIFECYCLE-20260723 -->
+  <!-- CAR-17-SALE-CONTRACT-DELIVERY-LIFECYCLE-20260723 -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
@@ -168,7 +180,7 @@
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-16-R1-SALES-JOURNEY-CLARITY-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-17-SALE-CONTRACT-DELIVERY-LIFECYCLE-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -294,7 +306,7 @@
     };
     const isToday=value=>jstDateKey(value)===jstDateKey(new Date());
     function openDetail({title,number,resource,item,items=[],priceTitle,priceValue,note}){
-      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");drawer.classList.remove("customer-360","vehicle-lifecycle","sales-journey");
+      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");drawer.classList.remove("customer-360","vehicle-lifecycle","sales-journey","delivery-journey");
       document.getElementById("detailTitle").textContent=title||"詳細情報";
       document.getElementById("detailSubtitle").textContent=number||"";
       clear(body);
@@ -579,78 +591,48 @@
     }
 
 
-    function renderContracts(){
-      const root=document.getElementById("view-contracts");
-      clear(root);
-      const purchase=state.data.purchase_contracts||[],sale=state.data.sale_contracts||[],documents=state.data.documents||[];
-      root.append(sectionHeader("契約・必要書類","買取契約・販売契約・不足書類をまとめて確認",purchase.length+sale.length+documents.length));
-      root.append(subhead("買取契約",purchase.length));
-      const purchaseGrid=el("div","record-grid");
-      purchase.forEach(x=>purchaseGrid.append(recordCard({
-        title:vehicleName(x.vehicle),number:`${x.contract_number}／${customerName(x.customer)}`,
-        resource:"purchase_contract",item:x,
-        items:[["査定受付",x.appraisal_case_number],["契約日",date(x.contract_date)],["引取予定",dateTime(x.pickup_at)],["書類",x.documents_complete?"確認済み":"確認中"],["支払方法",x.payment_method||"未設定"]],
-        priceTitle:"買取金額",priceValue:x.purchase_price,note:x.note,
-        attention:["draft","documents_waiting","payment_pending"].includes(x.status)
-      })));
-      if(!purchaseGrid.children.length)purchaseGrid.append(empty("買取契約はありません。"));
-      root.append(purchaseGrid,subhead("販売契約",sale.length));
-      const saleGrid=el("div","record-grid");
-      sale.forEach(x=>saleGrid.append(recordCard({
-        title:vehicleName(x.inventory),number:`${x.contract_number}／${customerName(x.customer)}`,
-        resource:"sale_contract",item:x,
-        items:[["契約日",date(x.contract_date)],["納車予定",dateTime(x.delivery_scheduled_at)],["書類",x.documents_complete?"確認済み":"確認中"],["ローン",x.financing_requested?x.loan_status:"利用なし"],["入金額",money(x.deposit_amount)]],
-        priceTitle:"契約総額",priceValue:x.total_price,note:x.note,
-        attention:["draft","loan_review","documents_waiting"].includes(x.status)
-      })));
-      if(!saleGrid.children.length)saleGrid.append(empty("販売契約はありません。"));
-      root.append(saleGrid,subhead("必要書類",documents.length));
-      const documentGrid=el("div","record-grid");
-      documents.forEach(x=>documentGrid.append(recordCard({
-        title:x.document_label,number:customerName(x.customer),
-        resource:"document",item:x,
-        items:[["期限",date(x.due_date)],["受領",dateTime(x.received_at)],["確認",dateTime(x.verified_at)],["区分",x.document_type]],
-        note:x.note,attention:["missing","requested","rejected"].includes(x.status)
-      })));
-      if(!documentGrid.children.length)documentGrid.append(empty("必要書類はありません。"));
-      root.append(documentGrid);
-    }
 
-    function renderDelivery(){
-      const root=document.getElementById("view-delivery");
-      clear(root);
-      const deliveryContracts=(state.data.sale_contracts||[]).filter(x=>["delivery_preparing","delivery_scheduled","delivered"].includes(x.status));
-      const deliveryReservations=(state.data.reservations||[]).filter(x=>x.reservation_type==="delivery"&&!["cancelled","no_show"].includes(x.status));
-      const followups=state.data.followups||[];
-      root.append(sectionHeader("納車・フォロー","納車準備から納車後の連絡まで確認",deliveryContracts.length+deliveryReservations.length+followups.length));
-      root.append(subhead("納車準備・納車予定",deliveryContracts.length+deliveryReservations.length));
-      const deliveryGrid=el("div","record-grid");
-      deliveryContracts.forEach(x=>deliveryGrid.append(recordCard({
-        title:vehicleName(x.inventory),number:`${x.contract_number}／${customerName(x.customer)}`,
-        resource:"sale_contract",item:x,
-        items:[["納車予定",dateTime(x.delivery_scheduled_at)],["書類",x.documents_complete?"確認済み":"確認中"],["入金額",money(x.deposit_amount)]],
-        priceTitle:"契約総額",priceValue:x.total_price,note:x.note,
-        attention:["delivery_preparing","delivery_scheduled"].includes(x.status)
-      })));
-      deliveryReservations.forEach(x=>deliveryGrid.append(recordCard({
-        title:"納車予約",number:`${x.reservation_number}／${customerName(x.customer)}`,
-        resource:"reservation",item:x,
-        items:[["日時",dateTime(x.start_at)],["車両",vehicleName(x.inventory)],["担当",x.assigned_staff?.staff_name||"未設定"],["店舗",x.store?.store_name||"未設定"]],
-        note:x.internal_note||x.customer_note,
-        attention:["reserved","confirmed"].includes(x.status)
-      })));
-      if(!deliveryGrid.children.length)deliveryGrid.append(empty("納車準備・納車予定はありません。"));
-      root.append(deliveryGrid,subhead("納車後フォロー",followups.length));
-      const followGrid=el("div","record-grid");
-      followups.forEach(x=>followGrid.append(recordCard({
-        title:typeLabels.followup_type[x.followup_type]||x.followup_type,
-        number:customerName(x.customer),resource:"followup",item:x,
-        items:[["予定日",date(x.scheduled_date)],["車両",vehicleName(x.inventory||x.vehicle)],["担当",x.assigned_staff?.staff_name||"未設定"]],
-        note:x.message_text||x.note,attention:["pending","prepared"].includes(x.status)
-      })));
-      if(!followGrid.children.length)followGrid.append(empty("納車後フォローはありません。"));
-      root.append(followGrid);
+    function deliveryLocalDateTime(value){return salesLocalDateTime(value)}
+    function deliveryJourneyButton(contractId,labelText="販売契約→納車360度"){
+      const button=el("button","button delivery-open",labelText);button.type="button";button.addEventListener("click",()=>openDeliveryJourney(contractId));return button
     }
+    async function openDeliveryJourney(contractId){
+      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");
+      drawer.classList.remove("customer-360","vehicle-lifecycle","sales-journey","delivery-journey");drawer.classList.add("delivery-journey");
+      document.getElementById("detailTitle").textContent="販売契約から納車まで360度";document.getElementById("detailSubtitle").textContent="入金・書類・登録・車両準備・納車・フォローを一体管理";
+      clear(body);body.append(el("div","customer360-loading","販売契約と納車準備を取得しています…"));overlay.hidden=false;drawer.hidden=false;requestAnimationFrame(()=>{overlay.classList.add("open");drawer.classList.add("open")});document.body.style.overflow="hidden";
+      try{const data=await api(`/api/admin/sale-contracts/${encodeURIComponent(contractId)}/delivery-360`);renderDeliveryJourney(body,data)}catch(error){clear(body);body.append(empty(error.message));showToast(error.message,true)}
+    }
+    function renderDeliveryJourney(root,data){
+      clear(root);const c=data.contract,customer=data.customer||{},inventory=data.inventory||{},ready=data.readiness||{},summary=data.summary||{};
+      const hero=el("section","delivery-hero");hero.append(el("h3","",`${customer.customer_name||"顧客未設定"}／${vehicleName(inventory)}`),el("p","",`${c.contract_number}／${label("sale_contract",c.status)}`));
+      const stages=el("div","delivery-stages"),contractDone=!['draft','cancelled'].includes(c.status),fundsDocs=ready.documents_ready&&ready.funds_ready,registrationDone=ready.registration_ready,preparationDone=ready.preparation_ready,delivered=c.status==='delivered',current=delivered?'':!fundsDocs?'funds':!registrationDone?'registration':!preparationDone?'preparation':'delivery';
+      const stage=(number,title,done,key)=>{const card=el("article",`delivery-stage${done?" done":""}${current===key?" current":""}`);card.append(el("span","",number),el("strong","",title),el("small","",done?"完了・確認済み":current===key?"次に対応":"待機中"));return card};
+      stages.append(stage('01','販売契約',contractDone,'contract'),stage('02','入金・書類',fundsDocs,'funds'),stage('03','名義変更・登録',registrationDone,'registration'),stage('04','点検・納車準備',preparationDone,'preparation'),stage('05','納車',delivered,'delivery'));hero.append(stages);root.append(hero);
+      const summarySection=el("section","delivery-section");summarySection.append(el("h3","","契約・お客様・車両"));const grid=el("div","delivery-summary-grid");[["お客様",customer.customer_name||"未設定"],["電話番号",customer.phone||"未設定"],["車両",vehicleName(inventory)],["在庫番号",inventory.inventory_code||"未設定"],["契約総額",money(c.total_price)],["入金済額",money(summary.paid_amount)],["残額",money(summary.balance_amount)],["納車日時",c.delivery_scheduled_at?dateTime(c.delivery_scheduled_at):"未設定"],["未完了タスク",`${summary.open_tasks||0}件`]].forEach(([key,value])=>{const box=el("div");box.append(el("span","",key),el("strong","",String(value)));grid.append(box)});summarySection.append(grid);root.append(summarySection);
+      const edit=el("section","delivery-section");edit.append(el("h3","","入金・登録・納車準備を編集"));const form=el("form","delivery-form-grid");
+      const field=(labelText,name,value,type="text",full=false)=>{const wrap=el("div",`delivery-field${full?" full":""}`),labelNode=el("label","",labelText);let input;if(type==='textarea')input=document.createElement('textarea');else if(type==='select')input=document.createElement('select');else{input=document.createElement('input');input.type=type}input.name=name;if(type!=='select')input.value=value??'';wrap.append(labelNode,input);return{wrap,input}};
+      const status=field('契約状況','status','','select');(data.status_options?.sale_contract||[]).filter(x=>x!=='delivered').forEach(value=>{const o=el('option','',label('sale_contract',value));o.value=value;o.selected=value===c.status;status.input.append(o)});
+      const paid=field('入金済額（円）','paid_amount',c.paid_amount,'number'),payment=field('入金状況','payment_status','','select');[['unpaid','未入金'],['partial','一部入金'],['paid','入金済み']].forEach(([value,text])=>{const o=el('option','',text);o.value=value;o.selected=value===c.payment_status;payment.input.append(o)});
+      const paymentDue=field('入金期限','payment_due_date',c.payment_due_date,'date'),loan=field('ローン状況','loan_status','','select');[['','利用なし・未設定'],['pending','審査中'],['approved','承認'],['rejected','否決'],['cancelled','取消']].forEach(([value,text])=>{const o=el('option','',text);o.value=value;o.selected=value===(c.loan_status||'');loan.input.append(o)});
+      const registration=field('名義変更・登録','registration_status','','select');[['not_started','未着手'],['documents_waiting','書類待ち'],['submitted','申請済み'],['processing','手続き中'],['completed','完了']].forEach(([value,text])=>{const o=el('option','',text);o.value=value;o.selected=value===c.registration_status;registration.input.append(o)});const registrationDue=field('登録期限','registration_due_date',c.registration_due_date,'date');
+      const preparation=field('点検・整備・清掃','preparation_status','','select');[['not_started','未着手'],['inspection','点検中'],['repair','整備中'],['cleaning','清掃中'],['completed','完了']].forEach(([value,text])=>{const o=el('option','',text);o.value=value;o.selected=value===c.preparation_status;preparation.input.append(o)});const preparationDue=field('車両準備期限','preparation_due_date',c.preparation_due_date,'date');
+      const finalCheck=field('納車前最終確認','delivery_check_status','','select');[['not_started','未着手'],['in_progress','確認中'],['completed','完了']].forEach(([value,text])=>{const o=el('option','',text);o.value=value;o.selected=value===c.delivery_check_status;finalCheck.input.append(o)});const schedule=field('納車日時','delivery_scheduled_at',deliveryLocalDateTime(c.delivery_scheduled_at),'datetime-local');
+      const staff=field('納車担当','delivery_staff_id','','select');const none=el('option','','未設定');none.value='';staff.input.append(none);(data.staff||[]).forEach(item=>{const o=el('option','',item.staff_name);o.value=item.id;o.selected=item.id===c.delivery_staff_id;staff.input.append(o)});const note=field('契約メモ','note',c.note,'textarea',true),deliveryNote=field('納車時の引継ぎ・説明メモ','delivery_note',c.delivery_note,'textarea',true);
+      paid.input.min='0';paid.input.max=String(c.total_price||1000000000);const actions=el('div','delivery-form-actions'),sync=el('button','button','必要タスクを同期'),save=el('button','button amber','納車準備を保存');sync.type='button';save.type='submit';actions.append(sync,save);form.append(status.wrap,paid.wrap,payment.wrap,paymentDue.wrap,loan.wrap,registration.wrap,registrationDue.wrap,preparation.wrap,preparationDue.wrap,finalCheck.wrap,schedule.wrap,staff.wrap,note.wrap,deliveryNote.wrap,actions);edit.append(form);root.append(edit);
+      const refresh=async result=>{await reloadOverview();renderDeliveryJourney(root,result.journey)};
+      sync.addEventListener('click',async()=>{sync.disabled=true;try{const result=await api(`/api/admin/sale-contracts/${encodeURIComponent(c.id)}/sync-delivery-tasks`,{method:'POST',body:'{}'});showToast(result.message);await refresh(result)}catch(error){showToast(error.message,true)}finally{sync.disabled=false}});
+      form.addEventListener('submit',async event=>{event.preventDefault();save.disabled=true;const fd=new FormData(form),iso=value=>value?new Date(value).toISOString():null;try{const result=await api(`/api/admin/sale-contracts/${encodeURIComponent(c.id)}`,{method:'PATCH',body:JSON.stringify({status:fd.get('status'),paid_amount:salesNumber(fd.get('paid_amount')),payment_status:fd.get('payment_status'),payment_due_date:fd.get('payment_due_date')||null,loan_status:fd.get('loan_status')||null,registration_status:fd.get('registration_status'),registration_due_date:fd.get('registration_due_date')||null,preparation_status:fd.get('preparation_status'),preparation_due_date:fd.get('preparation_due_date')||null,delivery_check_status:fd.get('delivery_check_status'),delivery_scheduled_at:iso(fd.get('delivery_scheduled_at')),delivery_staff_id:fd.get('delivery_staff_id')||null,note:fd.get('note'),delivery_note:fd.get('delivery_note')})});showToast(result.message);await refresh(result)}catch(error){showToast(error.message,true)}finally{save.disabled=false}});
+      const docs=el('section','delivery-section');docs.append(el('h3','',`必要書類（${(data.documents||[]).length}件）`));const docList=el('div','delivery-list');(data.documents||[]).forEach(documentItem=>{const row=el('article','delivery-row'),copy=el('div');copy.append(el('strong','',documentItem.document_label),el('span','',`期限 ${documentItem.due_date||'未設定'}／${label('document',documentItem.status)}`));const action=el('div','delivery-row-action'),select=document.createElement('select'),button=el('button','button small primary','更新');(data.status_options?.document||[]).forEach(value=>{const o=el('option','',label('document',value));o.value=value;o.selected=value===documentItem.status;select.append(o)});button.type='button';button.addEventListener('click',async()=>{button.disabled=true;try{await api('/api/admin/status',{method:'POST',body:JSON.stringify({resource:'document',id:documentItem.id,status:select.value})});const result=await api(`/api/admin/sale-contracts/${encodeURIComponent(c.id)}/sync-delivery-tasks`,{method:'POST',body:'{}'});showToast('書類状況を更新しました。');await refresh(result)}catch(error){showToast(error.message,true)}finally{button.disabled=false}});action.append(select,button);row.append(copy,action);docList.append(row)});if(!docList.children.length)docList.append(empty('必要書類はありません。'));docs.append(docList);root.append(docs);
+      const tasks=el('section','delivery-section');tasks.append(el('h3','',`納車タスク（${(data.tasks||[]).length}件）`));const taskList=el('div','delivery-list');(data.tasks||[]).forEach(task=>{const row=el('article','delivery-row'),copy=el('div');copy.append(el('strong','',task.title),el('span','',`${label('task',task.status)}／期限 ${task.due_at?dateTime(task.due_at):'未設定'}`));row.append(copy);taskList.append(row)});if(!taskList.children.length)taskList.append(empty('納車タスクはありません。'));tasks.append(taskList);root.append(tasks);
+      const complete=el('section','delivery-section');complete.append(el('h3','','納車完了'));if(c.status==='delivered')complete.append(el('div','delivery-ready','納車完了済みです。納車後フォローが自動作成されています。'));else if(ready.can_complete_delivery){const box=el('div','delivery-actions');box.append(el('div','delivery-ready','入金・書類・登録・車両準備・最終確認が完了しています。'));const button=el('button','button amber','納車完了を記録');button.type='button';button.addEventListener('click',async()=>{if(!confirm(`${c.contract_number}を納車完了にしますか？
+在庫・商談・納車予約も完了へ更新し、納車後フォローを作成します。`))return;button.disabled=true;try{const result=await api(`/api/admin/sale-contracts/${encodeURIComponent(c.id)}/complete-delivery`,{method:'POST',body:JSON.stringify({confirm:true})});showToast(result.message);await refresh(result)}catch(error){showToast(error.message,true)}finally{button.disabled=false}});box.append(button);complete.append(box)}else complete.append(el('div','delivery-warning',`納車完了前の確認：${(ready.completion_missing||[]).join('、')||'進行状況を確認してください。'}`));root.append(complete);
+      if((data.followups||[]).length){const follow=el('section','delivery-section');follow.append(el('h3','',`納車後フォロー（${data.followups.length}件）`));const list=el('div','delivery-list');data.followups.forEach(item=>{const row=el('article','delivery-row'),copy=el('div');copy.append(el('strong','',typeLabels.followup_type[item.followup_type]||item.followup_type),el('span','',`${item.scheduled_date||'日付未設定'}／${label('followup',item.status)}`));row.append(copy);list.append(row)});follow.append(list);root.append(follow)}
+      const timelineSection=el('section','delivery-section');timelineSection.append(el('h3','',`契約・納車タイムライン（${(data.timeline||[]).length}件）`));const timeline=el('div','delivery-list');(data.timeline||[]).forEach(item=>{const row=el('article','delivery-row'),copy=el('div');copy.append(el('strong','',`${item.label}　${item.at?dateTime(item.at):''}`),el('span','',item.detail||''));row.append(copy);timeline.append(row)});if(!timeline.children.length)timeline.append(empty('履歴はありません。'));timelineSection.append(timeline);root.append(timelineSection)
+    }
+    function saleContractCard(x){const card=recordCard({title:vehicleName(x.inventory),number:`${x.contract_number}／${customerName(x.customer)}`,resource:'sale_contract',item:x,items:[["契約日",date(x.contract_date)],["入金",x.payment_status==='paid'?`入金済 ${money(x.paid_amount)}`:`${money(x.paid_amount)}／${money(x.total_price)}`],["書類",x.documents_complete?'確認済み':'確認中'],["登録",x.registration_status||'未着手'],["車両準備",x.preparation_status||'未着手'],["納車予定",dateTime(x.delivery_scheduled_at)]],priceTitle:'契約総額',priceValue:x.total_price,note:x.delivery_note||x.note,attention:x.status!=='delivered'});card.append(deliveryJourneyButton(x.id));return card}
+    function renderContracts(){const root=document.getElementById('view-contracts');clear(root);const purchase=state.data.purchase_contracts||[],sale=state.data.sale_contracts||[],documents=state.data.documents||[],active=sale.filter(x=>!['delivered','cancelled'].includes(x.status)),pendingDocs=documents.filter(x=>x.sale_contract_id&&['missing','requested','rejected'].includes(x.status)),paymentPending=active.filter(x=>x.payment_status!=='paid'),ready=active.filter(x=>x.documents_complete&&x.payment_status==='paid'&&x.registration_status==='completed'&&x.preparation_status==='completed');root.append(sectionHeader('契約・入金・必要書類','買取契約と販売契約、入金、書類、登録、納車準備をまとめて確認',purchase.length+sale.length+documents.length));const metrics=el('div','delivery-pipeline-summary');[["進行中販売契約",active.length,''],["必要書類待ち",pendingDocs.length,pendingDocs.length?'warn':''],["入金確認待ち",paymentPending.length,paymentPending.length?'warn':''],["納車準備完了",ready.length,ready.length?'good':'']].forEach(([t,v,k])=>{const box=el('article',`delivery-pipeline-metric ${k}`);box.append(el('span','',t),el('strong','',String(v)));metrics.append(box)});root.append(metrics,subhead('買取契約',purchase.length));const purchaseGrid=el('div','record-grid');purchase.forEach(x=>purchaseGrid.append(recordCard({title:vehicleName(x.vehicle),number:`${x.contract_number}／${customerName(x.customer)}`,resource:'purchase_contract',item:x,items:[["査定受付",x.appraisal_case_number],["契約日",date(x.contract_date)],["引取予定",dateTime(x.pickup_at)],["書類",x.documents_complete?'確認済み':'確認中'],["支払方法",x.payment_method||'未設定']],priceTitle:'買取金額',priceValue:x.purchase_price,note:x.note,attention:['draft','documents_waiting','payment_pending'].includes(x.status)})));if(!purchaseGrid.children.length)purchaseGrid.append(empty('買取契約はありません。'));root.append(purchaseGrid,subhead('販売契約',sale.length));const saleGrid=el('div','record-grid');sale.forEach(x=>saleGrid.append(saleContractCard(x)));if(!saleGrid.children.length)saleGrid.append(empty('販売契約はありません。'));root.append(saleGrid,subhead('必要書類',documents.length));const documentGrid=el('div','record-grid');documents.forEach(x=>documentGrid.append(recordCard({title:x.document_label,number:customerName(x.customer),resource:'document',item:x,items:[["期限",date(x.due_date)],["受領",dateTime(x.received_at)],["確認",dateTime(x.verified_at)],["区分",x.document_type]],note:x.note,attention:['missing','requested','rejected'].includes(x.status)})));if(!documentGrid.children.length)documentGrid.append(empty('必要書類はありません。'));root.append(documentGrid)}
+    function renderDelivery(){const root=document.getElementById('view-delivery');clear(root);const contracts=(state.data.sale_contracts||[]).filter(x=>!['cancelled'].includes(x.status)),active=contracts.filter(x=>x.status!=='delivered'),scheduled=active.filter(x=>x.delivery_scheduled_at),delivered=contracts.filter(x=>x.status==='delivered'),followups=state.data.followups||[];root.append(sectionHeader('納車・フォロー','販売契約から納車完了、納車後連絡まで一体管理',contracts.length+followups.length));const metrics=el('div','delivery-pipeline-summary');[["納車準備中",active.length,''],["納車日時設定済み",scheduled.length,scheduled.length?'good':''],["納車完了",delivered.length,'good'],["納車後フォロー",followups.filter(x=>['pending','prepared'].includes(x.status)).length,'']].forEach(([t,v,k])=>{const box=el('article',`delivery-pipeline-metric ${k}`);box.append(el('span','',t),el('strong','',String(v)));metrics.append(box)});root.append(metrics,subhead('販売契約・納車進行',contracts.length));const grid=el('div','record-grid');contracts.forEach(x=>grid.append(saleContractCard(x)));if(!grid.children.length)grid.append(empty('販売契約・納車予定はありません。'));root.append(grid,subhead('納車後フォロー',followups.length));const followGrid=el('div','record-grid');followups.forEach(x=>followGrid.append(recordCard({title:typeLabels.followup_type[x.followup_type]||x.followup_type,number:customerName(x.customer),resource:'followup',item:x,items:[["予定日",date(x.scheduled_date)],["車両",vehicleName(x.inventory||x.vehicle)],["担当",x.assigned_staff?.staff_name||'未設定']],note:x.message_text||x.note,attention:['pending','prepared'].includes(x.status)})));if(!followGrid.children.length)followGrid.append(empty('納車後フォローはありません。'));root.append(followGrid)}
 
       function renderWork(){const root=document.getElementById("view-work");clear(root);root.append(sectionHeader("未完了タスク","期限と担当者を確認",state.data.tasks.length));const tasks=el("div","record-grid");state.data.tasks.forEach(x=>tasks.append(recordCard({title:x.title,number:`${typeLabels.priority[x.priority]||x.priority}／${x.assigned_staff?.staff_name||"担当未設定"}`,resource:"task",item:x,items:[["期限",dateTime(x.due_at)],["査定番号",x.appraisal_case_number],["在庫",x.inventory?.inventory_code]],note:x.detail,attention:["open","in_progress"].includes(x.status)})));if(!tasks.children.length)tasks.append(empty("タスクはありません。"));root.append(tasks,subhead("必要書類",state.data.documents.length));const docs=el("div","record-grid");state.data.documents.forEach(x=>docs.append(recordCard({title:x.document_label,number:customerName(x.customer),resource:"document",item:x,items:[["期限",date(x.due_date)],["受領",dateTime(x.received_at)],["確認",dateTime(x.verified_at)],["区分",x.document_type]],note:x.note,attention:["missing","requested","rejected"].includes(x.status)})));if(!docs.children.length)docs.append(empty("書類情報はありません。"));root.append(docs,subhead("問い合わせ",state.data.inquiries.length));const inquiries=el("div","record-grid");state.data.inquiries.forEach(x=>inquiries.append(recordCard({title:x.subject,number:`${x.inquiry_number}／${customerName(x.customer)}`,resource:"inquiry",item:x,items:[["受付",dateTime(x.created_at)],["担当",x.assigned_staff?.staff_name||"未設定"],["車両",vehicleName(x.inventory)]],note:x.message,attention:["new","in_progress"].includes(x.status)})));if(!inquiries.children.length)inquiries.append(empty("問い合わせはありません。"));root.append(inquiries,subhead("納車後フォロー",state.data.followups.length));const followups=el("div","record-grid");state.data.followups.forEach(x=>followups.append(recordCard({title:typeLabels.followup_type[x.followup_type]||x.followup_type,number:customerName(x.customer),resource:"followup",item:x,items:[["予定日",date(x.scheduled_date)],["車両",vehicleName(x.inventory||x.vehicle)],["担当",x.assigned_staff?.staff_name||"未設定"]],note:x.message_text||x.note,attention:["pending","prepared"].includes(x.status)})));if(!followups.children.length)followups.append(empty("納車後フォローはありません。"));root.append(followups)}
 

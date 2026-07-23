@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-16-R1 商談進捗表示・既存タスク補完
+ * STEP CAR-17 販売契約から納車までの進行管理
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-16-R1-SALES-JOURNEY-CLARITY-20260723",
+  version: "CAR-17-SALE-CONTRACT-DELIVERY-LIFECYCLE-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -38,4 +38,9 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   ownerSalesContractAutocreate: true,
   ownerSalesNextActionTask: true,
   ownerSalesLostReason: true,
+  ownerSaleContractDelivery360: true,
+  ownerSaleContractEdit: true,
+  ownerDeliveryTaskSync: true,
+  ownerDeliveryCompletionGuard: true,
+  ownerDeliveryFollowupAutocreate: true,
 });
