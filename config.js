@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-18 納車後フォロー・点検・車検・整備・乗り換え管理
+ * STEP CAR-19 経営ダッシュボード・在庫回転・粗利・成約率管理
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-18-AFTERCARE-MAINTENANCE-RETENTION-20260723",
+  version: "CAR-19-MANAGEMENT-ANALYTICS-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -51,4 +51,10 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   ownerReplacementProspect: true,
   memberAftercareSchedule: true,
   memberServiceHistory: true,
+  ownerManagementDashboard: true,
+  ownerManagementTargets: true,
+  ownerInventoryTurnover: true,
+  ownerGrossProfit: true,
+  ownerConversionMetrics: true,
+  ownerStaffPerformance: true,
 });
