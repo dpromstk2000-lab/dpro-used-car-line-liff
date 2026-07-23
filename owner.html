@@ -100,8 +100,8 @@
     @media(max-width:760px){.customer-recent-grid{grid-template-columns:1fr}.customer360-summary{grid-template-columns:1fr 1fr}.customer360-fields{grid-template-columns:1fr}.customer360-field.full{grid-column:auto}.timeline360-item{grid-template-columns:1fr;gap:2px}}
 
   </style>
-  <!-- CAR-13-CUSTOMER-VEHICLE-360-20260723 -->
-  <!-- CAR-13-CUSTOMER-VEHICLE-360-20260723 -->
+  <!-- CAR-13-R1-CUSTOMER-SUMMARY-FIX-20260723 -->
+  <!-- CAR-13-R1-CUSTOMER-SUMMARY-FIX-20260723 -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
@@ -112,7 +112,7 @@
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-13-CUSTOMER-VEHICLE-360-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-13-R1-CUSTOMER-SUMMARY-FIX-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -473,7 +473,7 @@
       clear(root);const customer=data.customer,summary=data.summary||{},hero=el("section","customer360-hero");
       hero.append(el("h3","",customer.customer_name),el("p","",`${customer.customer_code}／${customer.phone||"電話未設定"}／${customer.email||"メール未設定"}`));
       const summaryGrid=el("div","customer360-summary");
-      [["現在車両",summary.owned_vehicles||0],["査定中",summary.active_appraisals||0],["購入車",summary.purchased_vehicles||0],["要対応",Number(summary.pending_documents||0)+Number(summary.open_tasks||0)]].forEach(([labelText,value])=>{const box=el("div");box.append(el("span","",labelText),el("strong","",String(value)));summaryGrid.append(box)});
+      [["登録車両",summary.customer_vehicles||0],["進行中査定",summary.active_appraisals||0],["購入車",summary.purchased_vehicles||0],["要対応",Number(summary.pending_documents||0)+Number(summary.open_tasks||0)]].forEach(([labelText,value])=>{const box=el("div");box.append(el("span","",labelText),el("strong","",String(value)));summaryGrid.append(box)});
       hero.append(summaryGrid);root.append(hero);
       if((data.duplicate_candidates||[]).length)root.append(el("div","customer360-alert",`重複候補が${data.duplicate_candidates.length}件あります。電話番号・LINE・メールの一致を確認してください。`));
 
