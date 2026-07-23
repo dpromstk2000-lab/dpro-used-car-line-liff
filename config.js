@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-17-R1 契約・入金・納車画面の表示名統一
+ * STEP CAR-18 納車後フォロー・点検・車検・整備・乗り換え管理
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-17-R1-CONTRACT-DELIVERY-HEADER-ALIGNMENT-20260723",
+  version: "CAR-18-AFTERCARE-MAINTENANCE-RETENTION-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -43,4 +43,12 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   ownerDeliveryTaskSync: true,
   ownerDeliveryCompletionGuard: true,
   ownerDeliveryFollowupAutocreate: true,
+  ownerAftercareOverview: true,
+  ownerAftercare360: true,
+  ownerAftercareProfileEdit: true,
+  ownerAftercarePlanSync: true,
+  ownerServiceHistory: true,
+  ownerReplacementProspect: true,
+  memberAftercareSchedule: true,
+  memberServiceHistory: true,
 });
