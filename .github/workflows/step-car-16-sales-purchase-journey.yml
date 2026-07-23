@@ -1,0 +1,289 @@
+name: DPRO CAR STEP CAR-16 Sales Test Drive Purchase Journey
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/step-car-16-sales-purchase-journey.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dpro-car-step-car-16
+  cancel-in-progress: false
+
+jobs:
+  update-sales-purchase-journey:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify CAR-16 SQL and Worker deployment
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import time
+          import urllib.error
+          import urllib.request
+
+          url = "https://dpro-used-car-line-api.dpromstk2000.workers.dev/api/health"
+          expected = "CAR-16-WORKER-SALES-TESTDRIVE-PURCHASE-JOURNEY-COMPLETE-20260723"
+          headers = {
+              "User-Agent": (
+                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/150.0.0.0 Safari/537.36"
+              ),
+              "Accept": "application/json,text/plain,*/*",
+              "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+              "Origin": "https://dpromstk2000-lab.github.io",
+              "Referer": "https://dpromstk2000-lab.github.io/",
+              "Cache-Control": "no-cache",
+              "Pragma": "no-cache",
+          }
+
+          data = None
+          last_error = None
+          for attempt in range(1, 4):
+              request = urllib.request.Request(
+                  f"{url}?github_actions_check={int(time.time())}",
+                  headers=headers,
+                  method="GET",
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      body = response.read().decode("utf-8", errors="replace")
+                      data = json.loads(body)
+                      break
+              except urllib.error.HTTPError as error:
+                  body = error.read().decode("utf-8", errors="replace")
+                  last_error = RuntimeError(
+                      f"Worker確認HTTPエラー status={error.code} body={body[:500]}"
+                  )
+              except Exception as error:
+                  last_error = error
+              if attempt < 3:
+                  time.sleep(3)
+
+          if data is None:
+              raise SystemExit(f"Cloudflare Workerの確認に失敗しました: {last_error}")
+          if data.get("version") != expected:
+              raise SystemExit(
+                  f"Cloudflare WorkerがCAR-16ではありません。expected={expected} actual={data.get('version')}"
+              )
+
+          required = [
+              "owner_sales_lead_360_api_ready",
+              "owner_sales_lead_update_api_ready",
+              "owner_sales_contract_autocreate_ready",
+              "sales_lead_next_action_task_ready",
+              "sales_contract_idempotency_ready",
+              "sales_lost_reason_guard_ready",
+              "car16_sales_journey_schema",
+          ]
+          checks = data.get("checks") or {}
+          missing = [key for key in required if checks.get(key) is not True]
+          if missing:
+              raise SystemExit(
+                  f"CAR-16 SQLまたはWorkerの機能確認に失敗しました: {missing}"
+              )
+          schema = (data.get("configuration") or {}).get("sales_journey_schema_version")
+          if schema != "CAR-16-SALES-JOURNEY-SCHEMA-20260723":
+              raise SystemExit(f"CAR-16安全SQLを確認できません。actual={schema}")
+
+          print("CAR-16 SQL and Worker deployment: OK")
+          print(f"version: {data.get('version')}")
+          print(f"schema: {schema}")
+          PY
+
+      - name: Apply CAR-16 owner and system-check update
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          import re
+
+          OWNER = Path("owner.html")
+          CONFIG = Path("config.js")
+          SYSTEM = Path("system-check.html")
+          OLD_VERSION = "CAR-15-PUBLIC-INVENTORY-CATALOG-DETAIL-20260723"
+          VERSION = "CAR-16-SALES-TESTDRIVE-PURCHASE-JOURNEY-20260723"
+
+          for path in (OWNER, CONFIG, SYSTEM):
+              if not path.exists():
+                  raise SystemExit(f"{path.name} が見つかりません。")
+
+          owner = OWNER.read_text(encoding="utf-8")
+          if OLD_VERSION not in owner:
+              raise SystemExit("CAR-15完成版owner.htmlを確認できません。")
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: 置換対象が{count}件でした。")
+              return text.replace(old, new, 1)
+
+          css = '\n    /* DPRO CAR STEP CAR-16 SALES / TEST DRIVE / PURCHASE JOURNEY */\n    .detail-drawer.sales-journey{width:min(900px,100%)}\n    .sales-hero{padding:18px;border-radius:17px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff}\n    .sales-hero h3{margin:0;font-size:26px}.sales-hero p{margin:3px 0 0;color:#d5e1eb}\n    .sales-stages{margin-top:14px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}\n    .sales-stage{padding:11px;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.08)}\n    .sales-stage.done{border-color:#8fd0bb;background:#eaf7f2;color:var(--ink)}.sales-stage.current{border-color:#f0be5a;background:#fff6df;color:var(--ink)}\n    .sales-stage span{display:block;font-size:11px;font-weight:900;opacity:.8}.sales-stage strong{display:block;font-size:15px}.sales-stage small{display:block;font-size:11px;opacity:.75}\n    .sales-overdue{margin-top:12px;padding:11px 13px;border-left:5px solid var(--red);border-radius:0 10px 10px 0;background:#fff0ed;color:#8d2b22;font-weight:850}\n    .sales-section{margin-top:15px;padding:17px;border:1px solid var(--line);border-radius:15px;background:#fff}.sales-section h3{margin:0 0 11px;font-size:20px}\n    .sales-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.sales-summary-grid div{padding:10px 12px;border-radius:10px;background:var(--soft)}\n    .sales-summary-grid span{display:block;color:var(--muted);font-size:12px;font-weight:800}.sales-summary-grid strong{display:block;overflow-wrap:anywhere}\n    .sales-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.sales-field{display:grid;gap:5px}.sales-field.full{grid-column:1/-1}.sales-field label{font-size:13px;font-weight:900}\n    .sales-field input,.sales-field select,.sales-field textarea{width:100%;min-height:48px;padding:9px 11px;border:1px solid #b9c6d0;border-radius:10px;background:#fff;color:var(--ink)}.sales-field textarea{min-height:92px;resize:vertical}\n    .sales-options{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}.sales-option{min-height:45px;padding:8px 12px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:var(--soft);font-weight:800}.sales-option input{width:20px;height:20px;accent-color:var(--navy)}\n    .sales-form-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px}.sales-form-actions .button{min-width:220px}\n    .sales-reservation-list,.sales-task-list,.sales-timeline{display:grid;gap:8px}.sales-reservation,.sales-task,.sales-timeline-item{padding:11px 12px;border-radius:11px;background:var(--soft)}\n    .sales-reservation{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,auto);gap:9px;align-items:center}.sales-reservation strong,.sales-task strong,.sales-timeline-item strong{display:block}.sales-reservation span,.sales-task span,.sales-timeline-item span{display:block;color:var(--muted);font-size:13px}\n    .sales-reservation-action{display:grid;grid-template-columns:1fr auto;gap:6px}.sales-reservation-action select{min-height:42px;padding:6px 8px;border:1px solid #bdc9d2;border-radius:9px;background:#fff}\n    .sales-contract-box{padding:14px;border:1px solid #e3bd71;border-radius:13px;background:#fff8e7}.sales-contract-box p{margin:4px 0;color:var(--muted)}.sales-contract-box .button{width:100%;margin-top:10px}\n    .sales-warning{padding:12px 14px;border-left:5px solid var(--amber);border-radius:0 11px 11px 0;background:#fff7e5;color:#68490e}\n    .sales-open{width:100%;margin-top:10px;border-color:#d7a43d;background:#fff8e6}\n    .sales-pipeline-summary{margin-bottom:17px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.sales-pipeline-metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#fff}.sales-pipeline-metric.warn{border-color:#e4bb69;background:#fffaf0}.sales-pipeline-metric.danger{border-color:#dfa9a2;background:#fff4f2}.sales-pipeline-metric span{display:block;color:var(--muted);font-size:13px;font-weight:800}.sales-pipeline-metric strong{display:block;font-size:28px}\n    @media(max-width:900px){.sales-stages{grid-template-columns:repeat(2,1fr)}.sales-summary-grid{grid-template-columns:1fr 1fr}.sales-pipeline-summary{grid-template-columns:1fr 1fr}}\n    @media(max-width:650px){.detail-drawer.sales-journey{height:min(94dvh,980px)}.sales-stages,.sales-summary-grid,.sales-form-grid{grid-template-columns:1fr}.sales-field.full,.sales-options,.sales-form-actions{grid-column:auto}.sales-reservation{grid-template-columns:1fr}.sales-pipeline-summary{grid-template-columns:1fr 1fr}.sales-form-actions .button{width:100%;min-width:0}}\n'
+          functions = '\n    function salesLocalDateTime(value){\n      if(!value)return"";\n      const date=new Date(value);if(Number.isNaN(date.getTime()))return"";\n      const local=new Date(date.getTime()-date.getTimezoneOffset()*60000);\n      return local.toISOString().slice(0,16)\n    }\n    function salesNumber(value){return value===null||value===undefined||value===""?null:Number(value)}\n    function salesJourneyButton(leadId,labelText="商談360度を開く"){\n      const button=el("button","button sales-open",labelText);button.type="button";\n      button.addEventListener("click",()=>openSalesJourney(leadId));return button\n    }\n    async function openSalesJourney(leadId){\n      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");\n      drawer.classList.remove("customer-360","vehicle-lifecycle");drawer.classList.add("sales-journey");\n      document.getElementById("detailTitle").textContent="商談・試乗・購入検討360度";\n      document.getElementById("detailSubtitle").textContent="問合せから試乗、見積、ローン、下取り、購入判断まで一体管理";\n      clear(body);body.append(el("div","customer360-loading","商談情報を取得しています…"));overlay.hidden=false;drawer.hidden=false;\n      requestAnimationFrame(()=>{overlay.classList.add("open");drawer.classList.add("open")});document.body.style.overflow="hidden";\n      try{const data=await api(`/api/admin/sales-leads/${encodeURIComponent(leadId)}/360`);renderSalesJourney(body,data)}\n      catch(error){clear(body);body.append(empty(error.message));showToast(error.message,true)}\n    }\n    function renderSalesJourney(root,data){\n      clear(root);const lead=data.lead,customer=data.customer||{},inventory=data.inventory||{},ready=data.readiness||{},summary=data.summary||{};\n      const hero=el("section","sales-hero");hero.append(el("h3","",`${customer.customer_name||"顧客未設定"}／${vehicleName(inventory)}`),el("p","",`${lead.lead_number}／${typeLabels.source[lead.source]||lead.source||"受付経路未設定"}`));\n      const stages=el("div","sales-stages"),visitDone=Boolean(ready.completed_test_drive)||["visited","negotiating","estimate_presented","loan_review","agreed","documents_waiting","delivery_preparing","delivery_scheduled","delivered"].includes(lead.status);\n      const stage=(number,title,done,current)=>{const card=el("article",`sales-stage${done?" done":""}${current?" current":""}`);card.append(el("span","",number),el("strong","",title),el("small","",done?"完了・確認済み":current?"次に対応":"準備待ち"));return card};\n      stages.append(\n        stage("01","相談受付",true,false),\n        stage("02","来店・試乗",visitDone,!visitDone),\n        stage("03","見積・相談",Boolean(ready.estimate_ready),visitDone&&!ready.estimate_ready),\n        stage("04","購入判断",Boolean(ready.purchase_decided),ready.estimate_ready&&!ready.purchase_decided),\n        stage("05","販売契約",Boolean(ready.sale_contract_created),ready.purchase_decided&&!ready.sale_contract_created)\n      );hero.append(stages);if(ready.next_action_overdue)hero.append(el("div","sales-overdue",`次回対応期限を過ぎています：${dateTime(lead.next_action_at)}`));root.append(hero);\n\n      const summarySection=el("section","sales-section");summarySection.append(el("h3","","お客様・購入検討車両"));const grid=el("div","sales-summary-grid");\n      [["お客様",customer.customer_name||"未設定"],["電話番号",customer.phone||"未設定"],["希望連絡",customer.preferred_contact||"未設定"],["車両",vehicleName(inventory)],["在庫番号",inventory.inventory_code||"未設定"],["担当",data.assigned_staff?.staff_name||"未設定"],["見積総額",summary.estimate_total?money(summary.estimate_total):"未設定"],["次回対応",lead.next_action_at?dateTime(lead.next_action_at):"未設定"],["未完了タスク",`${summary.open_tasks||0}件`]].forEach(([key,value])=>{const box=el("div");box.append(el("span","",key),el("strong","",String(value)));grid.append(box)});summarySection.append(grid);root.append(summarySection);\n\n      const editSection=el("section","sales-section");editSection.append(el("h3","","商談・見積・次回対応を編集"));const form=el("form","sales-form-grid");\n      const field=(labelText,name,value,type="text",full=false)=>{const wrap=el("div",`sales-field${full?" full":""}`),labelNode=el("label","",labelText);let input;if(type==="textarea"){input=document.createElement("textarea")}else if(type==="select"){input=document.createElement("select")}else{input=document.createElement("input");input.type=type}input.name=name;if(type!=="select")input.value=value??"";wrap.append(labelNode,input);return{wrap,input}};\n      const statusField=field("商談状況","status","","select");(data.status_options?.sales_lead||state.data.status_options?.sales_lead||[]).forEach(value=>{const option=el("option","",label("sales_lead",value));option.value=value;option.selected=value===lead.status;statusField.input.append(option)});\n      const staffField=field("担当者","assigned_staff_id","","select");const noStaff=el("option","","未設定");noStaff.value="";staffField.input.append(noStaff);(state.data.staff||[]).filter(item=>item.is_active!==false).forEach(item=>{const option=el("option","",item.staff_name);option.value=item.id;option.selected=item.id===lead.assigned_staff_id;staffField.input.append(option)});\n      const budgetMin=field("予算下限（円）","budget_min",lead.budget_min,"number"),budgetMax=field("予算上限（円）","budget_max",lead.budget_max,"number"),estimate=field("見積総額（円）","estimate_total",lead.estimate_total,"number"),nextAction=field("次回対応日時","next_action_at",salesLocalDateTime(lead.next_action_at),"datetime-local"),lastContact=field("最終連絡日時","last_contact_at",salesLocalDateTime(lead.last_contact_at),"datetime-local"),publicNote=field("お客様へ共有できるメモ","public_note",lead.public_note,"textarea",true),internalNote=field("店舗内メモ","internal_note",lead.internal_note,"textarea",true),lostReason=field("失注理由（失注時は必須）","lost_reason",lead.lost_reason,"textarea",true);\n      [budgetMin.input,budgetMax.input,estimate.input].forEach(input=>{input.min="0";input.max="1000000000"});\n      const options=el("div","sales-options");[["financing_requested","ローン相談",lead.financing_requested],["test_drive_requested","試乗希望",lead.test_drive_requested],["trade_in_requested","下取り相談",lead.trade_in_requested]].forEach(([name,textValue,checked])=>{const labelNode=el("label","sales-option"),input=document.createElement("input");input.type="checkbox";input.name=name;input.checked=Boolean(checked);labelNode.append(input,document.createTextNode(textValue));options.append(labelNode)});\n      const actions=el("div","sales-form-actions"),touch=el("button","button","連絡済みとして現在時刻を記録"),save=el("button","button amber","商談内容を保存");touch.type="button";save.type="submit";actions.append(touch,save);\n      form.append(statusField.wrap,staffField.wrap,budgetMin.wrap,budgetMax.wrap,estimate.wrap,nextAction.wrap,lastContact.wrap,options,publicNote.wrap,internalNote.wrap,lostReason.wrap,actions);editSection.append(form);root.append(editSection);\n      let touchContact=false;touch.addEventListener("click",()=>{touchContact=true;lastContact.input.value=salesLocalDateTime(new Date());showToast("保存時に最終連絡日時を更新します。");});\n      form.addEventListener("submit",async event=>{event.preventDefault();save.disabled=true;const fd=new FormData(form),iso=value=>value?new Date(value).toISOString():null;try{const result=await api(`/api/admin/sales-leads/${encodeURIComponent(lead.id)}`,{method:"PATCH",body:JSON.stringify({status:fd.get("status"),assigned_staff_id:fd.get("assigned_staff_id")||null,budget_min:salesNumber(fd.get("budget_min")),budget_max:salesNumber(fd.get("budget_max")),estimate_total:salesNumber(fd.get("estimate_total")),financing_requested:fd.get("financing_requested")==="on",test_drive_requested:fd.get("test_drive_requested")==="on",trade_in_requested:fd.get("trade_in_requested")==="on",next_action_at:iso(fd.get("next_action_at")),last_contact_at:iso(fd.get("last_contact_at")),touch_contact:touchContact,public_note:fd.get("public_note"),internal_note:fd.get("internal_note"),lost_reason:fd.get("lost_reason")})});touchContact=false;showToast(result.message||"商談内容を保存しました。");await reloadOverview();renderSalesJourney(root,result.journey)}catch(error){showToast(error.message,true)}finally{save.disabled=false}});\n\n      const reservationSection=el("section","sales-section");reservationSection.append(el("h3","",`来店・試乗予約（${(data.reservations||[]).length}件）`));const reservationList=el("div","sales-reservation-list");\n      (data.reservations||[]).forEach(reservation=>{const row=el("article","sales-reservation"),copy=el("div");copy.append(el("strong","",`${typeLabels.reservation_type[reservation.reservation_type]||reservation.reservation_type}\u3000${dateTime(reservation.start_at)}`),el("span","",`${reservation.reservation_number}／${label("reservation",reservation.status)}`));const action=el("div","sales-reservation-action"),select=document.createElement("select"),button=el("button","button small primary","更新");(data.status_options?.reservation||state.data.status_options?.reservation||[]).forEach(value=>{const option=el("option","",label("reservation",value));option.value=value;option.selected=value===reservation.status;select.append(option)});button.type="button";button.addEventListener("click",async()=>{if(select.value===reservation.status){showToast("予約状況は変更されていません。");return}if(!confirm(`${label("reservation",reservation.status)} から ${label("reservation",select.value)} へ更新しますか？`)){select.value=reservation.status;return}button.disabled=true;try{await api("/api/admin/status",{method:"POST",body:JSON.stringify({resource:"reservation",id:reservation.id,status:select.value})});showToast("予約状況を更新しました。");await reloadOverview();const refreshed=await api(`/api/admin/sales-leads/${encodeURIComponent(lead.id)}/360`);renderSalesJourney(root,refreshed)}catch(error){showToast(error.message,true);select.value=reservation.status}finally{button.disabled=false}});action.append(select,button);row.append(copy,action);reservationList.append(row)});if(!reservationList.children.length)reservationList.append(empty("来店・試乗予約はありません。"));reservationSection.append(reservationList);root.append(reservationSection);\n\n      if(lead.trade_in_requested||data.trade_in_appraisal){const tradeSection=el("section","sales-section");tradeSection.append(el("h3","","下取り相談"));if(data.trade_in_appraisal){const a=data.trade_in_appraisal,box=el("div","sales-contract-box");box.append(el("strong","",`${a.case_number}／${label("appraisal",a.status)}`),el("p","",a.agreed_price||a.presented_price?`査定額 ${money(a.agreed_price||a.presented_price)}`:"査定額は未提示"));tradeSection.append(box)}else tradeSection.append(el("div","sales-warning","下取り相談ありですが、下取り査定案件がまだ関連付いていません。"));root.append(tradeSection)}\n\n      const contractSection=el("section","sales-section");contractSection.append(el("h3","","購入判断・販売契約"));if(data.sale_contract){const c=data.sale_contract,box=el("div","sales-contract-box");box.append(el("strong","",`${c.contract_number}／${label("sale_contract",c.status)}`),el("p","",`契約総額 ${money(c.total_price)}／申込金 ${money(c.deposit_amount)}`),el("p","",`必要書類 ${summary.pending_documents||0}件対応待ち`));contractSection.append(box)}else if(ready.can_create_sale_contract){const box=el("div","sales-contract-box");box.append(el("strong","","販売契約を作成できます"),el("p","",`見積総額 ${money(summary.estimate_total)}`));const create=el("button","button amber","商談情報から販売契約を作成");create.type="button";create.addEventListener("click",async()=>{if(!confirm(`${lead.lead_number}から販売契約を作成しますか？\\n見積総額：${money(summary.estimate_total)}\\n販売車両は商談中として確保されます。`))return;create.disabled=true;try{const result=await api(`/api/admin/sales-leads/${encodeURIComponent(lead.id)}/create-sale-contract`,{method:"POST",body:"{}"});showToast(result.message||"販売契約を作成しました。");await reloadOverview();renderSalesJourney(root,result.journey)}catch(error){showToast(error.message,true)}finally{create.disabled=false}});box.append(create);contractSection.append(box)}else contractSection.append(el("div","sales-warning",`販売契約作成前の確認：${(ready.sale_contract_missing||[]).join("、")||"購入判断を確認してください。"}`));root.append(contractSection);\n\n      if((data.tasks||[]).length){const taskSection=el("section","sales-section");taskSection.append(el("h3","",`商談タスク（${data.tasks.length}件）`));const list=el("div","sales-task-list");data.tasks.forEach(task=>{const row=el("article","sales-task");row.append(el("strong","",task.title),el("span","",`${label("task",task.status)}／期限 ${task.due_at?dateTime(task.due_at):"未設定"}`));list.append(row)});taskSection.append(list);root.append(taskSection)}\n      const timelineSection=el("section","sales-section");timelineSection.append(el("h3","",`商談タイムライン（${(data.timeline||[]).length}件）`));const timeline=el("div","sales-timeline");(data.timeline||[]).slice(0,40).forEach(event=>{const row=el("article","sales-timeline-item");row.append(el("strong","",`${event.label}\u3000${event.at?dateTime(event.at):""}`),el("span","",[event.number,event.status,event.detail].filter(Boolean).join("／")));timeline.append(row)});if(!timeline.children.length)timeline.append(empty("履歴はありません。"));timelineSection.append(timeline);root.append(timelineSection)\n    }\n    function salesLeadCard(x){\n      const overdue=x.next_action_at&&Date.parse(x.next_action_at)<Date.now()&&![\'delivered\',\'lost\',\'cancelled\'].includes(x.status),card=el("article",`record-card${overdue||[\'inquiry\',\'appointment_set\',\'negotiating\',\'loan_review\'].includes(x.status)?" attention":""}`),top=el("div","record-top"),head=el("div","record-title");head.append(el("h3","",vehicleName(x.inventory)),el("p","",`${x.lead_number}／${customerName(x.customer)}`));top.append(head,el("span",`badge ${badgeClass("sales_lead",x.status)}`,label("sales_lead",x.status)));card.append(top);meta(card,[["受付",typeLabels.source[x.source]||x.source],["担当",x.assigned_staff?.staff_name||"未設定"],["試乗",x.test_drive_requested?"希望あり":"なし"],["下取り",x.trade_in_requested?"相談あり":"なし"],["ローン",x.financing_requested?"相談あり":"なし"],["次回対応",x.next_action_at?dateTime(x.next_action_at):"未設定"]]);moneyBox(card,"見積総額",x.estimate_total);if(x.internal_note)card.append(el("p","internal-note",x.internal_note));if(x.status===\'lost\'&&x.lost_reason)card.append(el("p","internal-note",`失注理由：${x.lost_reason}`));card.append(salesJourneyButton(x.id));return card\n    }\n    function renderSales(){\n      const root=document.getElementById("view-sales");clear(root);const leads=state.data.sales_leads||[],active=leads.filter(x=>!["delivered","lost","cancelled"].includes(x.status)),now=Date.now(),upcoming=(state.data.reservations||[]).filter(x=>x.reservation_type==="test_drive"&&![\'cancelled\',\'no_show\',\'completed\'].includes(x.status)&&Date.parse(x.start_at)>=now),estimate=leads.filter(x=>[\'negotiating\',\'estimate_presented\',\'loan_review\'].includes(x.status)),overdue=active.filter(x=>x.next_action_at&&Date.parse(x.next_action_at)<now);\n      root.append(sectionHeader("商談・試乗・購入検討","問合せから試乗、見積、ローン、下取り、購入判断まで一体管理",leads.length));const metrics=el("div","sales-pipeline-summary");[["進行中商談",active.length,""],["今後の試乗",upcoming.length,""],["見積・ローン中",estimate.length,estimate.length?"warn":""],["期限超過",overdue.length,overdue.length?"danger":""]].forEach(([labelText,value,kind])=>{const box=el("article",`sales-pipeline-metric ${kind}`);box.append(el("span","",labelText),el("strong","",String(value)));metrics.append(box)});root.append(metrics);\n      const sorted=[...leads].sort((a,b)=>{const activeA=[\'delivered\',\'lost\',\'cancelled\'].includes(a.status)?1:0,activeB=[\'delivered\',\'lost\',\'cancelled\'].includes(b.status)?1:0;if(activeA!==activeB)return activeA-activeB;const dateA=Date.parse(a.next_action_at||\'2999-12-31\'),dateB=Date.parse(b.next_action_at||\'2999-12-31\');return dateA-dateB});const grid=el("div","record-grid");sorted.forEach(x=>grid.append(salesLeadCard(x)));if(!grid.children.length)grid.append(empty("購入商談はありません。"));root.append(grid);\n      const linkedReservations=(state.data.reservations||[]).filter(x=>x.sales_lead_id).sort((a,b)=>Date.parse(b.start_at)-Date.parse(a.start_at)).slice(0,8);root.append(subhead("直近の来店・試乗",linkedReservations.length));const reservationGrid=el("div","record-grid");linkedReservations.forEach(x=>reservationGrid.append(recordCard({title:typeLabels.reservation_type[x.reservation_type]||x.reservation_type,number:`${x.reservation_number}／${customerName(x.customer)}`,resource:"reservation",item:x,items:[["日時",dateTime(x.start_at)],["車両",vehicleName(x.inventory)],["担当",x.assigned_staff?.staff_name||"未設定"]],note:x.internal_note||x.customer_note,attention:["reserved","confirmed"].includes(x.status)&&Date.parse(x.start_at)>=Date.now()})));if(!reservationGrid.children.length)reservationGrid.append(empty("商談に関連する予約はありません。"));root.append(reservationGrid)\n    }\n'
+
+          if VERSION not in owner:
+              owner = replace_once(
+                  owner,
+                  "  </style>",
+                  css + "\n  </style>",
+                  "CAR-16 CSS追加",
+              )
+              pattern = r'      function renderSales\(\)\{.*?\}\n\n    function renderContracts\(\)\{'
+              replacement = functions + '\n\n    function renderContracts(){'
+              owner, count = re.subn(pattern, replacement, owner, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f"商談画面の置換対象が{count}件でした。")
+
+          owner = owner.replace(
+              'drawer.classList.remove("customer-360","vehicle-lifecycle")',
+              'drawer.classList.remove("customer-360","vehicle-lifecycle","sales-journey")',
+          )
+          owner = owner.replace(OLD_VERSION, VERSION)
+          owner = owner.replace(
+              '<title>オーナーPC管理 CAR-15｜DPRO中古車センター</title>',
+              '<title>オーナーPC管理 CAR-16｜DPRO中古車センター</title>',
+              1,
+          )
+          owner = owner.replace(
+              'title:"購入商談・予約",description:"購入相談、見積、ローン、来店・試乗予約を確認します。"',
+              'title:"商談・試乗・購入検討",description:"問合せから試乗、見積、ローン、下取り、購入判断まで一体管理します。"',
+              1,
+          )
+
+          required_owner = [
+              VERSION,
+              "商談・試乗・購入検討360度",
+              "function openSalesJourney",
+              "function renderSalesJourney",
+              "function salesLeadCard",
+              "商談情報から販売契約を作成",
+              "失注理由（失注時は必須）",
+              "/api/admin/sales-leads/",
+          ]
+          missing = [value for value in required_owner if value not in owner]
+          if missing:
+              raise SystemExit(f"owner.html検査失敗: {missing}")
+
+          ids = re.findall(r'\bid="([^"]+)"', owner)
+          duplicate_ids = sorted({item for item in ids if ids.count(item) > 1})
+          if duplicate_ids:
+              raise SystemExit(f"owner.htmlに重複IDがあります: {duplicate_ids}")
+
+          config = base64.b64decode("LyoqCiAqIERQUk8g5Lit5Y+k6LuK6LK35Y+W44O76LKp5aOyIExJTkUKICogU1RFUCBDQVItMTYg5ZWG6KuH44O76Kmm5LmX44O76LO85YWl5qSc6KiO5LiA5L2T566h55CGCiAqLwp3aW5kb3cuRFBST19DQVJfQ09ORklHID0gT2JqZWN0LmZyZWV6ZSh7CiAgdmVyc2lvbjogIkNBUi0xNi1TQUxFUy1URVNURFJJVkUtUFVSQ0hBU0UtSk9VUk5FWS0yMDI2MDcyMyIsCiAgYXBpQmFzZTogImh0dHBzOi8vZHByby11c2VkLWNhci1saW5lLWFwaS5kcHJvbXN0azIwMDAud29ya2Vycy5kZXYiLAogIGNvbXBhbnlDb2RlOiAiZHByb191c2VkX2Nhcl9kZW1vIiwKICBsaWZmSWQ6ICIiLAogIGRlZmF1bHRMaW5lVXNlcklkOiAiZGVtb19jYXJfbGluZV8wMDEiLAogIHJlc2VydmF0aW9uRGF5c0FoZWFkOiA2MCwKICBzbG90TWludXRlczogMzAsCiAgbWF4UGhvdG9Db3VudDogOCwKICBtYXhQaG90b1NpemVCeXRlczogNSAqIDEwMjQgKiAxMDI0LAogIGFwcHJhaXNhbFBob3RvTWF4Q291bnQ6IDgsCiAgbGlzdGluZ1Bob3RvTWF4Q291bnQ6IDEyLAogIG93bmVyU2ltcGxlTW9kZTogdHJ1ZSwKICBvd25lckRldGFpbFBhbmVsOiB0cnVlLAogIG93bmVyTGF6eVJlbmRlcjogdHJ1ZSwKICBvd25lckN1c3RvbWVyVmVoaWNsZTM2MDogdHJ1ZSwKICBvd25lckN1c3RvbWVyRWRpdDogdHJ1ZSwKICBvd25lckN1c3RvbWVyVmVoaWNsZUVkaXQ6IHRydWUsCiAgb3duZXJEdXBsaWNhdGVDYW5kaWRhdGVDaGVjazogdHJ1ZSwKICBvd25lckFwcHJhaXNhbExpZmVjeWNsZTogdHJ1ZSwKICBvd25lclB1cmNoYXNlQ29udHJhY3RBdXRvY3JlYXRlOiB0cnVlLAogIG93bmVySW52ZW50b3J5Q29udmVyc2lvbjogdHJ1ZSwKICBvd25lckludmVudG9yeVRhc2tBdXRvY3JlYXRlOiB0cnVlLAogIHByaXZhdGVBcHByYWlzYWxQaG90b0F1dG9QdWJsaXNoOiBmYWxzZSwKICBwdWJsaWNJbnZlbnRvcnlQYWdlU2l6ZTogMjQsCiAgcHVibGljSW52ZW50b3J5TWF4UGFnZVNpemU6IDQ4LAogIHB1YmxpY0ludmVudG9yeVVybFN0YXRlOiB0cnVlLAogIHB1YmxpY0ludmVudG9yeUFkdmFuY2VkRmlsdGVyczogdHJ1ZSwKICBwdWJsaWNWZWhpY2xlU2hhcmU6IHRydWUsCiAgb3duZXJJbnZlbnRvcnlQdWJsaXNoUmVhZGluZXNzOiB0cnVlLAogIG93bmVySW52ZW50b3J5UHVibGljUHJldmlldzogdHJ1ZSwKICBvd25lclNhbGVzSm91cm5leTM2MDogdHJ1ZSwKICBvd25lclNhbGVzTGVhZEVkaXQ6IHRydWUsCiAgb3duZXJTYWxlc0NvbnRyYWN0QXV0b2NyZWF0ZTogdHJ1ZSwKICBvd25lclNhbGVzTmV4dEFjdGlvblRhc2s6IHRydWUsCiAgb3duZXJTYWxlc0xvc3RSZWFzb246IHRydWUsCn0pOwo=").decode("utf-8")
+          system = base64.b64decode("PCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9ImphIj4KPGhlYWQ+CiAgPG1ldGEgY2hhcnNldD0idXRmLTgiPgogIDxtZXRhIG5hbWU9InZpZXdwb3J0IiBjb250ZW50PSJ3aWR0aD1kZXZpY2Utd2lkdGgsaW5pdGlhbC1zY2FsZT0xLHZpZXdwb3J0LWZpdD1jb3ZlciI+CiAgPG1ldGEgbmFtZT0idGhlbWUtY29sb3IiIGNvbnRlbnQ9IiMxMDI0M2UiPgogIDxtZXRhIG5hbWU9ImRlc2NyaXB0aW9uIiBjb250ZW50PSJEUFJP5Lit5Y+k6LuK6LK35Y+W44O76LKp5aOyTElOReOBruWWtualreWJjeOCt+OCueODhuODoOODgeOCp+ODg+OCr+OAgiI+CiAgPHRpdGxlPuOCt+OCueODhuODoOeiuuiqjSBDQVItMTbvvZxEUFJP5Lit5Y+k6LuK44K744Oz44K/44O8PC90aXRsZT4KICA8c3R5bGU+CiAgICA6cm9vdHstLW5hdnk6IzEwMjQzZTstLW5hdnkyOiMxNzM4NTg7LS1pbms6IzEyMjAzMzstLW11dGVkOiM1ZDZjN2Q7LS1hbWJlcjojZTVhMTJiOy0tYW1iZXIyOiNmZmYxZDI7LS1jYW52YXM6I2Y0ZjJlZDstLXBhcGVyOiNmZmY7LS1zb2Z0OiNlZWYyZjU7LS1saW5lOiNkNWRlZTU7LS1ncmVlbjojMTE3YjYxOy0tZ3JlZW4yOiNlNWY1ZWY7LS1yZWQ6I2I0NDIzNTstLXJlZDI6I2ZmZjBlZDstLXNoYWRvdzowIDE0cHggMzRweCByZ2JhKDksMjEsMzQsLjEwKTstLXRhcDo1MnB4fQogICAgKntib3gtc2l6aW5nOmJvcmRlci1ib3h9W2hpZGRlbl17ZGlzcGxheTpub25lIWltcG9ydGFudH1ib2R5e21hcmdpbjowO2JhY2tncm91bmQ6dmFyKC0tY2FudmFzKTtjb2xvcjp2YXIoLS1pbmspO2ZvbnQtZmFtaWx5OnN5c3RlbS11aSwtYXBwbGUtc3lzdGVtLEJsaW5rTWFjU3lzdGVtRm9udCwiU2Vnb2UgVUkiLHNhbnMtc2VyaWY7Zm9udC1zaXplOjE3cHg7bGluZS1oZWlnaHQ6MS42OH1idXR0b24saW5wdXQsYXtmb250OmluaGVyaXR9OmZvY3VzLXZpc2libGV7b3V0bGluZTo0cHggc29saWQgcmdiYSgyMjksMTYxLDQzLC40Mik7b3V0bGluZS1vZmZzZXQ6MnB4fQogICAgLnRvcGJhcntiYWNrZ3JvdW5kOiMwOTE1MjI7Y29sb3I6I2ZmZn0udG9wYmFyLWlubmVye3dpZHRoOm1pbigxMTgwcHgsY2FsYygxMDAlIC0gMzJweCkpO21pbi1oZWlnaHQ6NzBweDttYXJnaW46YXV0bztkaXNwbGF5OmZsZXg7YWxpZ24taXRlbXM6Y2VudGVyO2p1c3RpZnktY29udGVudDpzcGFjZS1iZXR3ZWVuO2dhcDoxNHB4fS50b3BiYXIgYXtjb2xvcjojZmZmO3RleHQtZGVjb3JhdGlvbjpub25lO2ZvbnQtd2VpZ2h0Ojg1MH0uYnJhbmR7Zm9udC13ZWlnaHQ6OTAwfS5icmFuZCBzbWFsbHtkaXNwbGF5OmJsb2NrO2NvbG9yOiNiZWNiZDc7Zm9udC1zaXplOjEycHh9CiAgICAuZ2F0ZS13cmFwe21pbi1oZWlnaHQ6Y2FsYygxMDB2aCAtIDcwcHgpO3BhZGRpbmc6NTBweCAxNnB4O2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDEzNWRlZywjMDkxNTIyLHZhcigtLW5hdnkyKSk7ZGlzcGxheTpncmlkO3BsYWNlLWl0ZW1zOnN0YXJ0IGNlbnRlcn0uZ2F0ZXt3aWR0aDptaW4oNjUwcHgsMTAwJSk7b3ZlcmZsb3c6aGlkZGVuO2JvcmRlci1yYWRpdXM6MjJweDtiYWNrZ3JvdW5kOiNmZmY7Ym94LXNoYWRvdzowIDI0cHggNzBweCByZ2JhKDAsMCwwLC4yOCl9LmdhdGUtaGVhZHtwYWRkaW5nOjMwcHg7YmFja2dyb3VuZDp2YXIoLS1uYXZ5KTtjb2xvcjojZmZmfS5nYXRlLWhlYWQgaDF7bWFyZ2luOjA7Zm9udC1zaXplOjMycHh9LmdhdGUtaGVhZCBwe21hcmdpbjo2cHggMCAwO2NvbG9yOiNkOWU0ZWR9LmdhdGUtYm9keXtwYWRkaW5nOjI4cHh9LmNvZGUtcm93e2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIGF1dG87Z2FwOjlweH0uY29kZS1yb3cgaW5wdXR7bWluLWhlaWdodDp2YXIoLS10YXApO3BhZGRpbmc6MTBweCAxM3B4O2JvcmRlcjoycHggc29saWQgI2M4ZDJkYTtib3JkZXItcmFkaXVzOjEycHh9LmJ1dHRvbnttaW4taGVpZ2h0OnZhcigtLXRhcCk7cGFkZGluZzo5cHggMThweDtib3JkZXI6MXB4IHNvbGlkICNjNGNmZDg7Ym9yZGVyLXJhZGl1czoxMnB4O2JhY2tncm91bmQ6I2ZmZjtjb2xvcjp2YXIoLS1uYXZ5KTtmb250LXdlaWdodDo5MDA7Y3Vyc29yOnBvaW50ZXJ9LmJ1dHRvbi5wcmltYXJ5e2JvcmRlci1jb2xvcjp2YXIoLS1hbWJlcik7YmFja2dyb3VuZDp2YXIoLS1hbWJlcik7Y29sb3I6IzE0MjYzYX0uYnV0dG9uLmRhbmdlcntjb2xvcjp2YXIoLS1yZWQpfS5ub3Rle21hcmdpbjoxM3B4IDAgMDtjb2xvcjp2YXIoLS1tdXRlZCk7Zm9udC1zaXplOjE0cHh9LmVycm9ye21hcmdpbi10b3A6MTRweDtwYWRkaW5nOjEycHg7Ym9yZGVyLXJhZGl1czoxMXB4O2JhY2tncm91bmQ6dmFyKC0tcmVkMik7Y29sb3I6IzhmMWQxNDtmb250LXdlaWdodDo4MDB9CiAgICAucGFnZXt3aWR0aDptaW4oMTE4MHB4LGNhbGMoMTAwJSAtIDMycHgpKTttYXJnaW46MjhweCBhdXRvIDcwcHh9LmhlYWR7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmZsZXgtc3RhcnQ7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47Z2FwOjE0cHh9LmhlYWQgaDF7bWFyZ2luOjA7Zm9udC1zaXplOjM2cHh9LmhlYWQgcHttYXJnaW46NXB4IDAgMDtjb2xvcjp2YXIoLS1tdXRlZCl9LmFjdGlvbnN7ZGlzcGxheTpmbGV4O2dhcDo4cHg7ZmxleC13cmFwOndyYXB9LnN1bW1hcnl7bWFyZ2luLXRvcDoyMHB4O3BhZGRpbmc6MjJweDtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JvcmRlci1yYWRpdXM6MThweDtiYWNrZ3JvdW5kOiNmZmY7Ym94LXNoYWRvdzp2YXIoLS1zaGFkb3cpO2Rpc3BsYXk6ZmxleDthbGlnbi1pdGVtczpjZW50ZXI7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47Z2FwOjIwcHh9LnN1bW1hcnkucGFzc3tib3JkZXItY29sb3I6IzkxY2RiOTtiYWNrZ3JvdW5kOnZhcigtLWdyZWVuMil9LnNjb3JlIHN0cm9uZ3tkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZTozNnB4fS5zY29yZSBzcGFue2NvbG9yOnZhcigtLW11dGVkKX0uY2hlY2tze21hcmdpbi10b3A6MThweDtkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOnJlcGVhdCgzLDFmcik7Z2FwOjExcHh9LmNoZWNre3BhZGRpbmc6MTVweDtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JvcmRlci1yYWRpdXM6MTRweDtiYWNrZ3JvdW5kOiNmZmY7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtnYXA6MTBweH0uY2hlY2sucGFzc3tib3JkZXItY29sb3I6I2E4ZDdjNztiYWNrZ3JvdW5kOiNmMmZiZjd9LmNoZWNrLmZhaWx7Ym9yZGVyLWNvbG9yOiNlMGFhYTQ7YmFja2dyb3VuZDojZmZmNWYzfS5pY29ue3dpZHRoOjM0cHg7aGVpZ2h0OjM0cHg7ZGlzcGxheTpncmlkO3BsYWNlLWl0ZW1zOmNlbnRlcjtib3JkZXItcmFkaXVzOjUwJTtiYWNrZ3JvdW5kOnZhcigtLXNvZnQpO2ZvbnQtd2VpZ2h0OjkwMH0ucGFzcyAuaWNvbntiYWNrZ3JvdW5kOnZhcigtLWdyZWVuKTtjb2xvcjojZmZmfS5mYWlsIC5pY29ue2JhY2tncm91bmQ6dmFyKC0tcmVkKTtjb2xvcjojZmZmfS5jaGVjayBzdHJvbmd7ZGlzcGxheTpibG9jaztmb250LXNpemU6MTVweH0uY2hlY2sgc3BhbntkaXNwbGF5OmJsb2NrO2NvbG9yOnZhcigtLW11dGVkKTtmb250LXNpemU6MTJweH0uY291bnRze21hcmdpbi10b3A6MThweDtkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOnJlcGVhdCg0LDFmcik7Z2FwOjEwcHh9LmNvdW50e3BhZGRpbmc6MTVweDtib3JkZXItcmFkaXVzOjE0cHg7YmFja2dyb3VuZDojZmZmO2JvcmRlcjoxcHggc29saWQgdmFyKC0tbGluZSl9LmNvdW50IHNwYW57ZGlzcGxheTpibG9jaztjb2xvcjp2YXIoLS1tdXRlZCk7Zm9udC1zaXplOjEzcHh9LmNvdW50IHN0cm9uZ3tkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZToyNXB4fS5saW5rc3ttYXJnaW4tdG9wOjE4cHg7cGFkZGluZzoyMHB4O2JvcmRlci1yYWRpdXM6MThweDtiYWNrZ3JvdW5kOnZhcigtLW5hdnkpO2NvbG9yOiNmZmZ9LmxpbmtzIGgye21hcmdpbjowIDAgMTBweH0ubGluay1ncmlke2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6cmVwZWF0KDMsMWZyKTtnYXA6OHB4fS5wYWdlLWxpbmt7bWluLWhlaWdodDo0OHB4O3BhZGRpbmc6OHB4IDEycHg7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyO2JvcmRlci1yYWRpdXM6MTBweDtiYWNrZ3JvdW5kOnJnYmEoMjU1LDI1NSwyNTUsLjEpO2NvbG9yOiNmZmY7dGV4dC1kZWNvcmF0aW9uOm5vbmU7Zm9udC13ZWlnaHQ6ODUwO3RleHQtYWxpZ246Y2VudGVyfS5wcmVwYXJlLXJlc3VsdHttYXJnaW4tdG9wOjEycHg7cGFkZGluZzoxMnB4O2JvcmRlci1yYWRpdXM6MTFweDtiYWNrZ3JvdW5kOnZhcigtLWFtYmVyMik7Y29sb3I6Izc2NTIwZn0KICAgIEBtZWRpYShtYXgtd2lkdGg6OTAwcHgpey5jaGVja3N7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOjFmciAxZnJ9LmNvdW50c3tncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmcn0ubGluay1ncmlke2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyfX1AbWVkaWEobWF4LXdpZHRoOjYyMHB4KXtib2R5e2ZvbnQtc2l6ZToxN3B4fS50b3BiYXItaW5uZXIsLnBhZ2V7d2lkdGg6bWluKDEwMCUgLSAyMHB4LDExODBweCl9LmhlYWQsLnN1bW1hcnl7ZmxleC1kaXJlY3Rpb246Y29sdW1uO2FsaWduLWl0ZW1zOnN0cmV0Y2h9LmNoZWNrcywuY291bnRzLC5saW5rLWdyaWR7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOjFmcn19CiAgPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KICA8aGVhZGVyIGNsYXNzPSJ0b3BiYXIiPjxkaXYgY2xhc3M9InRvcGJhci1pbm5lciI+PGRpdiBjbGFzcz0iYnJhbmQiPkRQUk/kuK3lj6Tou4rjgrvjg7Pjgr/jg7w8c21hbGw+Q0FSLTE2IOWWtualreWJjeOCt+OCueODhuODoOeiuuiqjTwvc21hbGw+PC9kaXY+PGEgaWQ9Im93bmVyTGluayIgaHJlZj0ib3duZXIuaHRtbCI+44Kq44O844OK44O855S76Z2i44G4PC9hPjwvZGl2PjwvaGVhZGVyPgogIDxtYWluIGNsYXNzPSJnYXRlLXdyYXAiIGlkPSJsb2dpblBhbmVsIj48c2VjdGlvbiBjbGFzcz0iZ2F0ZSI+PGRpdiBjbGFzcz0iZ2F0ZS1oZWFkIj48aDE+5Za25qWt5YmN44K344K544OG44Og56K66KqNPC9oMT48cD5BUEnjg7tEQuODu1N0b3JhZ2Xjg7vlhazplovjgqvjgr/jg63jgrDjg7vlronlhajjgqzjg7zjg4njgpLkuIDmi6znorroqo3jgZfjgb7jgZnjgII8L3A+PC9kaXY+PGRpdiBjbGFzcz0iZ2F0ZS1ib2R5Ij48Zm9ybSBpZD0ibG9naW5Gb3JtIj48bGFiZWwgZm9yPSJhZG1pbkNvZGUiPjxzdHJvbmc+566h55CG44Kz44O844OJPC9zdHJvbmc+PC9sYWJlbD48ZGl2IGNsYXNzPSJjb2RlLXJvdyI+PGlucHV0IGlkPSJhZG1pbkNvZGUiIHR5cGU9InBhc3N3b3JkIiBpbnB1dG1vZGU9Im51bWVyaWMiIGF1dG9jb21wbGV0ZT0ib2ZmIiBtYXhsZW5ndGg9IjMyIj48YnV0dG9uIGNsYXNzPSJidXR0b24gcHJpbWFyeSIgdHlwZT0ic3VibWl0Ij7norroqo3jgpLplovlp4s8L2J1dHRvbj48L2Rpdj48cCBjbGFzcz0ibm90ZSI+566h55CG44Kz44O844OJ44Gv56uv5pyr44G45L+d5a2Y44GX44G+44Gb44KT44CCPC9wPjxkaXYgY2xhc3M9ImVycm9yIiBpZD0ibG9naW5FcnJvciIgaGlkZGVuPjwvZGl2PjwvZm9ybT48L2Rpdj48L3NlY3Rpb24+PC9tYWluPgogIDxtYWluIGNsYXNzPSJwYWdlIiBpZD0iYXBwIiBoaWRkZW4+CiAgICA8aGVhZGVyIGNsYXNzPSJoZWFkIj48ZGl2PjxoMT7jgrfjgrnjg4bjg6Dnorroqo08L2gxPjxwPkNBUi0xNiDllYboq4fjg7voqabkuZfjg7vos7zlhaXmpJzoqI7kuIDkvZPnrqHnkIY8L3A+PC9kaXY+PGRpdiBjbGFzcz0iYWN0aW9ucyI+PGJ1dHRvbiBjbGFzcz0iYnV0dG9uIiBpZD0icnVuQ2hlY2siIHR5cGU9ImJ1dHRvbiI+5YaN56K66KqNPC9idXR0b24+PGJ1dHRvbiBjbGFzcz0iYnV0dG9uIiBpZD0icHJlcGFyZURlbW8iIHR5cGU9ImJ1dHRvbiI+44OH44Oi5rqW5YKZPC9idXR0b24+PGJ1dHRvbiBjbGFzcz0iYnV0dG9uIGRhbmdlciIgaWQ9ImxvZ291dCIgdHlwZT0iYnV0dG9uIj7nrqHnkIbjgrPjg7zjg4njgpLmtojljrvjg7vntYLkuoY8L2J1dHRvbj48L2Rpdj48L2hlYWRlcj4KICAgIDxzZWN0aW9uIGNsYXNzPSJzdW1tYXJ5IiBpZD0ic3VtbWFyeSI+PGRpdj48aDIgaWQ9InJlc3VsdFRpdGxlIj7norroqo3kuK08L2gyPjxwIGlkPSJyZXN1bHRUZXh0Ij48L3A+PC9kaXY+PGRpdiBjbGFzcz0ic2NvcmUiIGlkPSJzY29yZSI+PHN0cm9uZz4wLzA8L3N0cm9uZz48c3Bhbj7norroqo3poIXnm648L3NwYW4+PC9kaXY+PC9zZWN0aW9uPgogICAgPHNlY3Rpb24gY2xhc3M9ImNoZWNrcyIgaWQ9ImNoZWNrR3JpZCI+PC9zZWN0aW9uPgogICAgPHNlY3Rpb24gY2xhc3M9ImNvdW50cyIgaWQ9ImNvdW50R3JpZCI+PC9zZWN0aW9uPgogICAgPHNlY3Rpb24gY2xhc3M9ImxpbmtzIj48aDI+55S76Z2i56K66KqNPC9oMj48ZGl2IGNsYXNzPSJsaW5rLWdyaWQiIGlkPSJwYWdlTGlua3MiPjwvZGl2PjxkaXYgY2xhc3M9InByZXBhcmUtcmVzdWx0IiBpZD0icHJlcGFyZVJlc3VsdCIgaGlkZGVuPjwvZGl2Pjwvc2VjdGlvbj4KICA8L21haW4+CiAgPGRpdiBjbGFzcz0icHJlcGFyZS1yZXN1bHQiIGlkPSJ0b2FzdCIgaGlkZGVuPjwvZGl2PgogIDxzY3JpcHQgc3JjPSJjb25maWcuanMiPjwvc2NyaXB0PgogIDxzY3JpcHQ+CiAgKCgpPT57InVzZSBzdHJpY3QiOwogICAgY29uc3QgY29uZmlnPXdpbmRvdy5EUFJPX0NBUl9DT05GSUd8fHt9LHBhcmFtcz1uZXcgVVJMU2VhcmNoUGFyYW1zKGxvY2F0aW9uLnNlYXJjaCksZGVtbz1wYXJhbXMuZ2V0KCJkZW1vIik9PT0iMSIsY29kZT1kb2N1bWVudC5nZXRFbGVtZW50QnlJZCgiYWRtaW5Db2RlIik7CiAgICBjb25zdCBsYWJlbHM9e2FwaV9oZWFsdGg6IkFQSeODmOODq+OCuSIsZGF0YWJhc2U6IlN1cGFiYXNl44OH44O844K/44OZ44O844K5Iixwcml2YXRlX3Bob3RvX2J1Y2tldDoi6Z2e5YWs6ZaL5p+75a6a5YaZ55yfU3RvcmFnZSIsbGlzdGluZ19waG90b19idWNrZXQ6IuWFrOmWi+WcqOW6q+WGmeecn1N0b3JhZ2UiLHBob25lX25vcm1hbGl6YXRpb246Iumbu+ipseeVquWPt+ato+imj+WMliIscmVnaXN0cmF0aW9uX25vcm1hbGl6YXRpb246IueZu+mMsueVquWPt+ato+imj+WMliIsdGhpcnR5X21pbnV0ZV9zbG90czoiMzDliIbljZjkvY3jga7kuojntITmnqAiLHB1YmxpY19pbnZlbnRvcnk6IuWFrOmWi+WcqOW6q0FQSSIscHVibGljX2ludmVudG9yeV9wYWdpbmF0aW9uOiLlhazplovlnKjluqvjg5rjg7zjgrjliIblibIiLHB1YmxpY19pbnZlbnRvcnlfZmFjZXRzOiLlhazplovlnKjluqvntZ7jgorovrzjgb/lgJnoo5wiLHB1YmxpY19pbnZlbnRvcnlfc2VydmVyX3NvcnQ6IuWFrOmWi+WcqOW6q+OCteODvOODkOODvOS4puOBs+abv+OBiCIscmV0dXJuaW5nX2N1c3RvbWVyX2RlbW86IuaXouWtmOmhp+WuouODh+ODoiIsb3duZXJfcGNfYXBpOiJQQ+euoeeQhkFQSSIsb3duZXJfaXBhZF9hcGk6ImlQYWTnrqHnkIZBUEkiLG93bmVyX2lwYWRfcHJpdmF0ZV9waG90b19ndWFyZDoi6Z2e5YWs6ZaL5YaZ55yf5oOF5aCx44Ks44O844OJIixvd25lcl9pbnZlbnRvcnlfY29udGVudDoi5Zyo5bqr5YaF5a6557eo6ZuGQVBJIixvd25lcl9saXN0aW5nX3Bob3RvX21hbmFnZW1lbnQ6IuWFrOmWi+aOsui8ieWGmeecn+euoeeQhiIsb3duZXJfc3RvcmVfc2V0dGluZ3M6IuW6l+iIl+ioreWumkFQSSIsb3duZXJfY3VzdG9tZXJfMzYwOiLpoaflrqLjg7vopIfmlbDou4rkuKEzNjDluqZBUEkiLG93bmVyX2N1c3RvbWVyX2R1cGxpY2F0ZV9ndWFyZDoi6YeN6KSH6aGn5a6i5YCZ6KOc44Ks44O844OJIixjYXIxNF9saWZlY3ljbGVfc2NoZW1hOiJDQVItMTTlronlhahEQiIsb3duZXJfYXBwcmFpc2FsX2xpZmVjeWNsZToi5p+75a6a44O76LK35Y+W44O75Zyo5bqr44Op44Kk44OV44K144Kk44Kv44OrIixhcHByYWlzYWxfcHVyY2hhc2VfaWRlbXBvdGVuY3k6Iuiyt+WPluWlkee0hOS6jOmHjeS9nOaIkOmYsuatoiIscHVyY2hhc2VfaW52ZW50b3J5X2lkZW1wb3RlbmN5OiLlnKjluqvkuozph43kvZzmiJDpmLLmraIiLG93bmVyX2ludmVudG9yeV9wdWJsaXNoX3JlYWRpbmVzczoi5YWs6ZaL5YmN56K66KqNIixvd25lcl9pbnZlbnRvcnlfcHVibGljX3ByZXZpZXc6IueuoeeQhuiAheeUqOWFrOmWi+WJjeODl+ODrOODk+ODpeODvCIsY2FyMTZfc2FsZXNfam91cm5leV9zY2hlbWE6IkNBUi0xNuWuieWFqERCIixvd25lcl9zYWxlc19qb3VybmV5OiLllYboq4fjg7voqabkuZfjg7vos7zlhaXmpJzoqI4zNjDluqZBUEkiLG93bmVyX3NhbGVzX2xlYWRfdXBkYXRlOiLllYboq4flhoXlrrnmm7TmlrBBUEkiLHNhbGVzX2xlYWRfbmV4dF9hY3Rpb25fdGFzazoi5qyh5Zue5a++5b+c44K/44K544Kv6YCj5pC6IixzYWxlc19jb250cmFjdF9pZGVtcG90ZW5jeToi6LKp5aOy5aWR57SE5LqM6YeN5L2c5oiQ6Ziy5q2iIixzYWxlc19sb3N0X3JlYXNvbl9ndWFyZDoi5aSx5rOo55CG55Sx5b+F6aCI44Ks44O844OJIixhZG1pbl9ndWFyZDoi566h55CG6ICF6KqN6Ki844Ks44O844OJIixwcm9kdWN0aW9uX2d1YXJkOiLmnKznlarlronlhajjgqzjg7zjg4kifTsKICAgIGNvbnN0IGNvdW50TGFiZWxzPXtzdGFmZjoi44K544K/44OD44OVIixjdXN0b21lcnM6Iumhp+WuoiIsY3VzdG9tZXJfdmVoaWNsZXM6Iumhp+Wuoui7iuS4oSIsYXBwcmFpc2Fsczoi5p+75a6aIixpbnZlbnRvcnk6IuWcqOW6qyIsc2FsZXNfbGVhZHM6IuWVhuirhyIscmVzZXJ2YXRpb25zOiLkuojntIQiLG9wZW5fdGFza3M6IuacquWujOS6huOCv+OCueOCryJ9OwogICAgY29uc3QgYnlJZD1pZD0+ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoaWQpLGNsZWFyPW5vZGU9Pnt3aGlsZShub2RlLmZpcnN0Q2hpbGQpbm9kZS5maXJzdENoaWxkLnJlbW92ZSgpfSxlbD0odGFnLGNscyx0ZXh0KT0+e2NvbnN0IG49ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCh0YWcpO2lmKGNscyluLmNsYXNzTmFtZT1jbHM7aWYodGV4dCE9PXVuZGVmaW5lZCluLnRleHRDb250ZW50PXRleHQ7cmV0dXJuIG59OwogICAgYXN5bmMgZnVuY3Rpb24gYXBpKHBhdGgsb3B0aW9ucz17fSl7Y29uc3QgcmVzcG9uc2U9YXdhaXQgZmV0Y2goYCR7Y29uZmlnLmFwaUJhc2V9JHtwYXRofWAsey4uLm9wdGlvbnMsaGVhZGVyczp7QWNjZXB0OiJhcHBsaWNhdGlvbi9qc29uIiwiQ29udGVudC1UeXBlIjoiYXBwbGljYXRpb24vanNvbiIsIlgtQWRtaW4tS2V5Ijpjb2RlLnZhbHVlLC4uLm9wdGlvbnMuaGVhZGVyc30sY2FjaGU6Im5vLXN0b3JlIn0pO2xldCBkYXRhPXt9O3RyeXtkYXRhPWF3YWl0IHJlc3BvbnNlLmpzb24oKX1jYXRjaHt9aWYoIXJlc3BvbnNlLm9rfHwhZGF0YS5vayl0aHJvdyBuZXcgRXJyb3IoZGF0YT8uZXJyb3I/Lm1lc3NhZ2V8fGRhdGE/Lm1lc3NhZ2V8fCLnorroqo3jgavlpLHmlZfjgZfjgb7jgZfjgZ/jgIIiKTtyZXR1cm4gZGF0YX0KICAgIGZ1bmN0aW9uIGJ1c3kodmFsdWUpe2J5SWQoInJ1bkNoZWNrIikuZGlzYWJsZWQ9dmFsdWU7YnlJZCgicHJlcGFyZURlbW8iKS5kaXNhYmxlZD12YWx1ZX0KICAgIGZ1bmN0aW9uIHJlbmRlcihkYXRhKXtjb25zdCBwYXNzZWQ9ZGF0YS5yZXN1bHQ/LnBhc3NlZHx8MCx0b3RhbD1kYXRhLnJlc3VsdD8udG90YWx8fDAsYWxsPWRhdGEucmVzdWx0Py5hbGxfcGFzc2VkPT09dHJ1ZTtieUlkKCJyZXN1bHRUaXRsZSIpLnRleHRDb250ZW50PWFsbD8i44GZ44G544Gm5q2j5bi444Gn44GZIjoi56K66KqN44GM5b+F6KaB44Gq6aCF55uu44GM44GC44KK44G+44GZIjtieUlkKCJyZXN1bHRUZXh0IikudGV4dENvbnRlbnQ9YOacgOe1gueiuuiqjSAke25ldyBEYXRlKGRhdGEuY2hlY2tlZF9hdCkudG9Mb2NhbGVTdHJpbmcoImphLUpQIil977yPJHtkYXRhLmNvbXBhbnkuY29tcGFueV9uYW1lfWA7YnlJZCgic3VtbWFyeSIpLmNsYXNzTGlzdC50b2dnbGUoInBhc3MiLGFsbCk7YnlJZCgic2NvcmUiKS5pbm5lckhUTUw9YDxzdHJvbmc+JHtwYXNzZWR9LyR7dG90YWx9PC9zdHJvbmc+PHNwYW4+56K66KqN6aCF55uuPC9zcGFuPmA7Y29uc3QgZ3JpZD1ieUlkKCJjaGVja0dyaWQiKTtjbGVhcihncmlkKTtPYmplY3QuZW50cmllcyhkYXRhLmNoZWNrc3x8e30pLmZvckVhY2goKFtrZXksb2tdKT0+e2NvbnN0IGNhcmQ9ZWwoImFydGljbGUiLGBjaGVjayAke29rPyJwYXNzIjoiZmFpbCJ9YCksaWNvbj1lbCgic3BhbiIsImljb24iLG9rPyLinJMiOiIhIiksY29weT1lbCgiZGl2Iik7Y29weS5hcHBlbmQoZWwoInN0cm9uZyIsIiIsbGFiZWxzW2tleV18fGtleSksZWwoInNwYW4iLCIiLG9rPyLmraPluLgiOiLopoHnorroqo0iKSk7Y2FyZC5hcHBlbmQoaWNvbixjb3B5KTtncmlkLmFwcGVuZChjYXJkKX0pO2NvbnN0IGNvdW50cz1ieUlkKCJjb3VudEdyaWQiKTtjbGVhcihjb3VudHMpO09iamVjdC5lbnRyaWVzKGNvdW50TGFiZWxzKS5mb3JFYWNoKChba2V5LGxhYmVsXSk9Pntjb25zdCBjYXJkPWVsKCJhcnRpY2xlIiwiY291bnQiKTtjYXJkLmFwcGVuZChlbCgic3BhbiIsIiIsbGFiZWwpLGVsKCJzdHJvbmciLCIiLGAke2RhdGEuY291bnRzPy5ba2V5XT8/MH3ku7ZgKSk7Y291bnRzLmFwcGVuZChjYXJkKX0pfQogICAgZnVuY3Rpb24gbGlua3MoKXtjb25zdCByb290PWJ5SWQoInBhZ2VMaW5rcyIpO2NsZWFyKHJvb3QpO1tbIue3j+WQiOWFpeWPoyIsImluZGV4Lmh0bWwiXSxbIuiyt+WPluafu+WumiIsInNlbGwuaHRtbCJdLFsi5Zyo5bqr44Kr44K/44Ot44KwIiwiaW52ZW50b3J5Lmh0bWwiXSxbIui7iuS4oeips+e0sCIsInZlaGljbGUuaHRtbCJdLFsi44Oe44Kk44Oa44O844K4IiwibWVtYmVyLmh0bWwiXSxbIuOCquODvOODiuODvFBDIiwib3duZXIuaHRtbCJdLFsiaVBhZOeuoeeQhiIsIm93bmVyLWlwYWQuaHRtbCJdXS5mb3JFYWNoKChbbGFiZWwscGF0aF0pPT57Y29uc3QgYT1lbCgiYSIsInBhZ2UtbGluayIsbGFiZWwpO2EuaHJlZj1gJHtwYXRofSR7ZGVtbz8iP2RlbW89MSI6IiJ9YDthLnRhcmdldD0iX2JsYW5rIjthLnJlbD0ibm9vcGVuZXIiO3Jvb3QuYXBwZW5kKGEpfSl9CiAgICBhc3luYyBmdW5jdGlvbiBydW4oKXtidXN5KHRydWUpO3RyeXtjb25zdCBkYXRhPWF3YWl0IGFwaSgiL2FwaS9hZG1pbi9zeXN0ZW0tY2hlY2siKTtyZW5kZXIoZGF0YSk7cmV0dXJuIGRhdGF9ZmluYWxseXtidXN5KGZhbHNlKX19CiAgICBhc3luYyBmdW5jdGlvbiBsb2dpbigpe2J5SWQoImxvZ2luRXJyb3IiKS5oaWRkZW49dHJ1ZTt0cnl7YXdhaXQgcnVuKCk7YnlJZCgibG9naW5QYW5lbCIpLmhpZGRlbj10cnVlO2J5SWQoImFwcCIpLmhpZGRlbj1mYWxzZTtsaW5rcygpfWNhdGNoKGVycm9yKXtieUlkKCJsb2dpbkVycm9yIikudGV4dENvbnRlbnQ9ZXJyb3IubWVzc2FnZTtieUlkKCJsb2dpbkVycm9yIikuaGlkZGVuPWZhbHNlO2NvZGUuZm9jdXMoKX19CiAgICBmdW5jdGlvbiBsb2dvdXQoKXtjb2RlLnZhbHVlPSIiO2J5SWQoImFwcCIpLmhpZGRlbj10cnVlO2J5SWQoImxvZ2luUGFuZWwiKS5oaWRkZW49ZmFsc2U7YnlJZCgicHJlcGFyZVJlc3VsdCIpLmhpZGRlbj10cnVlO2NvZGUuZm9jdXMoKX0KICAgIGJ5SWQoImxvZ2luRm9ybSIpLmFkZEV2ZW50TGlzdGVuZXIoInN1Ym1pdCIsZT0+e2UucHJldmVudERlZmF1bHQoKTtsb2dpbigpfSk7YnlJZCgicnVuQ2hlY2siKS5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsKCk9PnJ1bigpKTtieUlkKCJsb2dvdXQiKS5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsbG9nb3V0KTtieUlkKCJwcmVwYXJlRGVtbyIpLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIixhc3luYygpPT57aWYoIWNvbmZpcm0oIuaXouWtmOODh+ODouODh+ODvOOCv+OCkueiuuiqjeOBl+OAgeWWtualreODh+ODouOBrua6luWCmeeKtuaFi+OCkuWIpOWumuOBl+OBvuOBmeOBi++8nyIpKXJldHVybjtidXN5KHRydWUpO3RyeXtjb25zdCBkYXRhPWF3YWl0IGFwaSgiL2FwaS9hZG1pbi9kZW1vLXByZXBhcmUiLHttZXRob2Q6IlBPU1QiLGJvZHk6Int9In0pO2J5SWQoInByZXBhcmVSZXN1bHQiKS50ZXh0Q29udGVudD1gJHtkYXRhLm1lc3NhZ2V9IOODh+ODvOOCv+OBrumHjeikh+i/veWKoOOBr+OBguOCiuOBvuOBm+OCk+OAgmA7YnlJZCgicHJlcGFyZVJlc3VsdCIpLmhpZGRlbj1mYWxzZTthd2FpdCBydW4oKX1jYXRjaChlcnJvcil7YWxlcnQoZXJyb3IubWVzc2FnZSl9ZmluYWxseXtidXN5KGZhbHNlKX19KTtieUlkKCJvd25lckxpbmsiKS5ocmVmPWBvd25lci5odG1sJHtkZW1vPyI/ZGVtbz0xIjoiIn1gO2lmKGRlbW8pe2NvZGUudmFsdWU9IjEyMzQiO3NldFRpbWVvdXQobG9naW4sMTIwKX1lbHNlIGNvZGUuZm9jdXMoKTsKICB9KSgpOwogIDwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4K").decode("utf-8")
+          if VERSION not in config:
+              raise SystemExit("CAR-16 config.jsのバージョンを確認できません。")
+          for marker in [
+              "CAR-16 商談・試乗・購入検討一体管理",
+              "car16_sales_journey_schema",
+              "owner_sales_journey",
+              "sales_contract_idempotency",
+          ]:
+              if marker not in system:
+                  raise SystemExit(f"system-check.htmlに不足があります: {marker}")
+
+          OWNER.write_text(owner, encoding="utf-8")
+          CONFIG.write_text(config, encoding="utf-8")
+          SYSTEM.write_text(system, encoding="utf-8")
+          print("CAR-16 owner.html / config.js / system-check.html update: OK")
+          PY
+
+      - name: Validate CAR-16 frontend
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          targets = {
+              "owner": Path("owner.html"),
+              "system": Path("system-check.html"),
+          }
+          for key, path in targets.items():
+              text = path.read_text(encoding="utf-8")
+              scripts = [
+                  value for value in re.findall(
+                      r"<script(?:\s+[^>]*)?>(.*?)</script>",
+                      text,
+                      flags=re.S,
+                  ) if value.strip()
+              ]
+              if not scripts:
+                  raise SystemExit(f"{path.name}のJavaScriptが見つかりません。")
+              Path(f"/tmp/car16-{key}.js").write_text(
+                  scripts[-1],
+                  encoding="utf-8",
+              )
+
+          owner = Path("owner.html").read_text(encoding="utf-8")
+          required = [
+              "進行中商談",
+              "今後の試乗",
+              "見積・ローン中",
+              "商談360度を開く",
+              "来店・試乗予約",
+              "購入判断・販売契約",
+              "商談タイムライン",
+          ]
+          missing = [value for value in required if value not in owner]
+          if missing:
+              raise SystemExit(f"CAR-16必要表示が不足しています: {missing}")
+          print("CAR-16 HTML structure: OK")
+          PY
+
+          node --check /tmp/car16-owner.js
+          node --check /tmp/car16-system.js
+          node --check config.js
+
+      - name: Normalize whitespace and show changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          for filename in ("owner.html", "config.js", "system-check.html"):
+              path = Path(filename)
+              text = path.read_text(encoding="utf-8")
+              normalized = "\n".join(
+                  line.rstrip(" \t") for line in text.splitlines()
+              ) + "\n"
+              path.write_text(normalized, encoding="utf-8")
+              print(f"{filename}: 行末空白を除去しました。")
+          PY
+
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Commit CAR-16 and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name "DPRO CAR Automation"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add owner.html config.js system-check.html
+          git rm --ignore-unmatch .github/workflows/step-car-16-sales-purchase-journey.yml
+
+          if git diff --cached --quiet; then
+            echo "コミット対象の変更はありません。"
+            exit 0
+          fi
+
+          git commit -m "CAR-16: unify sales test drive and purchase journey"
+          git push origin main
