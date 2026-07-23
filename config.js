@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-12 オーナーPC NEXT共通設定
+ * STEP CAR-13 顧客・複数車両360度共通設定
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-12-OWNER-PC-NEXT-20260722",
+  version: "CAR-13-CUSTOMER-VEHICLE-360-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -17,4 +17,8 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   ownerSimpleMode: true,
   ownerDetailPanel: true,
   ownerLazyRender: true,
+  ownerCustomerVehicle360: true,
+  ownerCustomerEdit: true,
+  ownerCustomerVehicleEdit: true,
+  ownerDuplicateCandidateCheck: true,
 });

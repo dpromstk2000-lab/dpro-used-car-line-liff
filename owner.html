@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111d29">
   <meta name="description" content="DPRO中古車センターのオーナーPC管理画面。査定、在庫、商談、試乗、契約、納車、顧客検索を一元管理します。">
-  <title>オーナーPC管理 CAR-12｜DPRO中古車センター</title>
+  <title>オーナーPC管理 CAR-13｜DPRO中古車センター</title>
   <style>
     :root{--navy:#10243e;--navy2:#173858;--charcoal:#111d29;--amber:#e5a12b;--amber2:#fff1d2;--green:#117b61;--green2:#e2f3ed;--red:#b44235;--red2:#fff0ed;--canvas:#f4f2ed;--paper:#fff;--soft:#eef2f5;--line:#d5dee5;--ink:#102033;--muted:#617083;--shadow:0 15px 38px rgba(15,35,56,.11);--tap:52px;--side:244px}
     *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.68;-webkit-text-size-adjust:100%}button,input,select,textarea,a{font:inherit}button,a{touch-action:manipulation}:focus-visible{outline:4px solid rgba(229,161,43,.42);outline-offset:2px}a{color:inherit}
@@ -60,8 +60,48 @@
     @media(max-width:760px){.detail-drawer{top:auto;bottom:0;width:100%;height:min(88dvh,820px);border-radius:22px 22px 0 0;transform:translateY(102%)}.detail-drawer.open{transform:translateY(0)}.detail-data{grid-template-columns:1fr}}
     @media(max-width:560px){.quick-bar{grid-template-columns:1fr 1fr;gap:8px}.quick-action{min-height:56px;font-size:14px}.top-links{overflow-x:auto}.mode-button{white-space:nowrap}.mobile-nav{overflow-x:auto;display:flex!important;justify-content:flex-start!important}.mobile-nav .nav-button{flex:0 0 132px}}
 
+
+    /* DPRO CAR STEP CAR-13 CUSTOMER VEHICLE 360 */
+    .detail-drawer.customer-360{width:min(860px,100%)}
+    .customer-recent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0 24px}
+    .customer-card{padding:17px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 7px 20px rgba(16,36,62,.05)}
+    .customer-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .customer-card h3{margin:0;font-size:19px}.customer-card p{margin:2px 0 0;color:var(--muted);font-size:13px}
+    .customer-card-counts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
+    .customer-card-counts div{padding:8px;border-radius:9px;background:var(--soft);text-align:center}
+    .customer-card-counts span{display:block;color:var(--muted);font-size:11px}.customer-card-counts strong{display:block;font-size:17px}
+    .customer-card .button{width:100%;margin-top:12px}
+    .customer360-loading{padding:40px 10px;text-align:center;color:var(--muted);font-weight:800}
+    .customer360-hero{padding:18px;border-radius:17px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff}
+    .customer360-hero h3{margin:0;font-size:27px}.customer360-hero p{margin:3px 0 0;color:#d6e1e9}
+    .customer360-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+    .customer360-summary div{padding:10px;border-radius:11px;background:rgba(255,255,255,.1)}
+    .customer360-summary span{display:block;color:#d6e1e9;font-size:11px}.customer360-summary strong{display:block;font-size:22px}
+    .customer360-alert{margin-top:14px;padding:13px 15px;border:1px solid #e3b25b;border-radius:12px;background:#fff7e7;color:#72500e}
+    .customer360-section{margin-top:20px}.customer360-section>h3{margin:0 0 10px;font-size:21px}
+    .customer360-form{padding:16px;border:1px solid var(--line);border-radius:15px;background:#fff}
+    .customer360-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .customer360-field{display:grid;gap:5px}.customer360-field.full{grid-column:1/-1}
+    .customer360-field label{font-weight:850;font-size:14px}
+    .customer360-field input,.customer360-field select,.customer360-field textarea{width:100%;min-height:48px;padding:9px 11px;border:1px solid #b9c7d1;border-radius:10px;background:#fff;color:var(--ink)}
+    .customer360-field textarea{min-height:90px;resize:vertical}
+    .customer360-actions{display:flex;justify-content:flex-end;margin-top:12px}
+    .vehicle360-list{display:grid;gap:10px}
+    .vehicle360-card{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+    .vehicle360-card summary{min-height:58px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;font-weight:900}
+    .vehicle360-card summary::-webkit-details-marker{display:none}
+    .vehicle360-card summary span{display:block;color:var(--muted);font-size:12px}
+    .vehicle360-body{padding:0 15px 15px}
+    .relationship-chip{display:inline-flex;min-height:29px;align-items:center;padding:3px 9px;border-radius:999px;background:var(--amber2);color:#78520c;font-size:12px;font-weight:900}
+    .timeline360{display:grid;gap:8px}
+    .timeline360-item{display:grid;grid-template-columns:105px 1fr;gap:10px;padding:11px 13px;border-left:4px solid var(--amber);border-radius:0 10px 10px 0;background:var(--soft)}
+    .timeline360-item time{color:var(--muted);font-size:12px;font-weight:800}.timeline360-item strong{display:block}.timeline360-item span{display:block;color:var(--muted);font-size:12px}
+    .search-item-action{margin-top:9px;width:100%}
+    @media(max-width:760px){.customer-recent-grid{grid-template-columns:1fr}.customer360-summary{grid-template-columns:1fr 1fr}.customer360-fields{grid-template-columns:1fr}.customer360-field.full{grid-column:auto}.timeline360-item{grid-template-columns:1fr;gap:2px}}
+
   </style>
-  <!-- CAR-12-OWNER-PC-NEXT-20260722 -->
+  <!-- CAR-13-CUSTOMER-VEHICLE-360-20260723 -->
+  <!-- CAR-13-CUSTOMER-VEHICLE-360-20260723 -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
@@ -72,7 +112,7 @@
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-12-OWNER-PC-NEXT-20260722</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-13-CUSTOMER-VEHICLE-360-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -197,7 +237,7 @@
     };
     const isToday=value=>jstDateKey(value)===jstDateKey(new Date());
     function openDetail({title,number,resource,item,items=[],priceTitle,priceValue,note}){
-      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");
+      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");drawer.classList.remove("customer-360");
       document.getElementById("detailTitle").textContent=title||"詳細情報";
       document.getElementById("detailSubtitle").textContent=number||"";
       clear(body);
@@ -227,7 +267,7 @@
       const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay");
       drawer.classList.remove("open");overlay.classList.remove("open");
       document.body.style.overflow="";
-      setTimeout(()=>{drawer.hidden=true;overlay.hidden=true},210);
+      setTimeout(()=>{drawer.hidden=true;overlay.hidden=true;drawer.classList.remove("customer-360")},210);
     }
 
       function meta(card,items){
@@ -394,9 +434,108 @@
     }
 
       function renderWork(){const root=document.getElementById("view-work");clear(root);root.append(sectionHeader("未完了タスク","期限と担当者を確認",state.data.tasks.length));const tasks=el("div","record-grid");state.data.tasks.forEach(x=>tasks.append(recordCard({title:x.title,number:`${typeLabels.priority[x.priority]||x.priority}／${x.assigned_staff?.staff_name||"担当未設定"}`,resource:"task",item:x,items:[["期限",dateTime(x.due_at)],["査定番号",x.appraisal_case_number],["在庫",x.inventory?.inventory_code]],note:x.detail,attention:["open","in_progress"].includes(x.status)})));if(!tasks.children.length)tasks.append(empty("タスクはありません。"));root.append(tasks,subhead("必要書類",state.data.documents.length));const docs=el("div","record-grid");state.data.documents.forEach(x=>docs.append(recordCard({title:x.document_label,number:customerName(x.customer),resource:"document",item:x,items:[["期限",date(x.due_date)],["受領",dateTime(x.received_at)],["確認",dateTime(x.verified_at)],["区分",x.document_type]],note:x.note,attention:["missing","requested","rejected"].includes(x.status)})));if(!docs.children.length)docs.append(empty("書類情報はありません。"));root.append(docs,subhead("問い合わせ",state.data.inquiries.length));const inquiries=el("div","record-grid");state.data.inquiries.forEach(x=>inquiries.append(recordCard({title:x.subject,number:`${x.inquiry_number}／${customerName(x.customer)}`,resource:"inquiry",item:x,items:[["受付",dateTime(x.created_at)],["担当",x.assigned_staff?.staff_name||"未設定"],["車両",vehicleName(x.inventory)]],note:x.message,attention:["new","in_progress"].includes(x.status)})));if(!inquiries.children.length)inquiries.append(empty("問い合わせはありません。"));root.append(inquiries,subhead("納車後フォロー",state.data.followups.length));const followups=el("div","record-grid");state.data.followups.forEach(x=>followups.append(recordCard({title:typeLabels.followup_type[x.followup_type]||x.followup_type,number:customerName(x.customer),resource:"followup",item:x,items:[["予定日",date(x.scheduled_date)],["車両",vehicleName(x.inventory||x.vehicle)],["担当",x.assigned_staff?.staff_name||"未設定"]],note:x.message_text||x.note,attention:["pending","prepared"].includes(x.status)})));if(!followups.children.length)followups.append(empty("納車後フォローはありません。"));root.append(followups)}
-      function renderSearch(){const root=document.getElementById("view-search");clear(root);const box=el("section","search-box"),form=el("form"),row=el("div","search-row"),input=el("input","search-input"),button=el("button","button primary","検索する");input.type="search";input.placeholder="例：090-1111-2201、鈴木、CAR-C000001、福岡500あ1234";input.maxLength=80;button.type="submit";row.append(input,button);form.append(row,el("p","search-help","電話番号はハイフン・空白・全角・+81形式を同じ番号として検索します。"));const shortcuts=el("div","demo-shortcuts");["鈴木","090-1111-2201","福岡 500 あ 12-34","CAR-I000001"].forEach(q=>{const b=el("button","shortcut",q);b.type="button";b.addEventListener("click",()=>{input.value=q;form.requestSubmit()});shortcuts.append(b)});form.append(shortcuts);box.append(form);const results=el("div");results.append(empty("検索条件を入力してください。"));root.append(box,results);form.addEventListener("submit",async event=>{event.preventDefault();const q=input.value.trim();if(!q){showToast("検索文字を入力してください。",true);return}button.disabled=true;clear(results);results.append(el("p","search-summary","検索しています…"));try{const data=await api(`/api/admin/search?q=${encodeURIComponent(q)}&limit=20`);renderSearchResults(results,data)}catch(error){clear(results);results.append(empty(error.message));showToast(error.message,true)}finally{button.disabled=false}})}
-      function renderSearchResults(root,data){clear(root);root.append(el("p","search-summary",`「${data.query}」の検索結果：顧客${data.counts.customers}件・所有車${data.counts.customer_vehicles}件・在庫${data.counts.inventory}件・査定${data.counts.appraisals}件・商談${data.counts.sales_leads}件`));const groups=el("div","search-groups");const addGroup=(title,items,render)=>{if(!items.length)return;const group=el("section","search-group"),list=el("div","search-items");group.append(el("h3","",`${title}（${items.length}件）`));items.forEach(x=>list.append(render(x)));group.append(list);groups.append(group)};const item=(title,lines)=>{const n=el("article","search-item");n.append(el("strong","",title));lines.filter(Boolean).forEach(x=>n.append(el("span","",x)));return n};addGroup("顧客",data.results.customers,x=>item(`${x.customer_name}／${x.customer_code}`,[x.phone,x.internal_note]));addGroup("お客様の車",data.results.customer_vehicles,x=>item(vehicleName(x),[x.vehicle_code,x.registration_number,x.chassis_number?`車台番号 ${x.chassis_number}`:null,x.notes]));addGroup("販売在庫",data.results.inventory,x=>item(vehicleName(x),[x.inventory_code,label("inventory",x.status),money(x.total_price)]));addGroup("査定案件",data.results.appraisals,x=>item(x.case_number,[label("appraisal",x.status),x.presented_price!==null?`提示 ${money(x.presented_price)}`:null]));addGroup("購入商談",data.results.sales_leads,x=>item(x.lead_number,[label("sales_lead",x.status),x.estimate_total!==null?`見積 ${money(x.estimate_total)}`:null]));if(!groups.children.length)groups.append(empty("一致する情報はありませんでした。"));root.append(groups)}
-      function renderTeam(){const root=document.getElementById("view-team");clear(root);root.append(sectionHeader("店舗・担当者","営業時間・定休日・受付上限と担当者",state.data.stores.length));const grid=el("div","store-grid");state.data.stores.forEach(store=>{const card=el("article","store-card");card.append(el("h3","",store.store_name),el("p","",store.address||"住所未設定"),el("p","",`営業時間 ${String(store.opening_time||"").slice(0,5)}〜${String(store.closing_time||"").slice(0,5)}／${store.phone||"電話未設定"}`));const edit=el("button","button editor-open","店舗設定を編集");edit.type="button";edit.addEventListener("click",()=>openStoreEditor(store));card.append(edit);const list=el("div","staff-list"),members=state.data.staff.filter(x=>x.store_id===store.id);members.forEach(s=>{const row=el("div","staff-row"),left=el("div");left.append(el("strong","",s.staff_name),el("span","",s.staff_code));row.append(left,el("span","",{staff:"スタッフ",manager:"店長",admin:"管理者"}[s.role]||s.role));list.append(row)});if(!members.length)list.append(empty("担当者は未登録です。"));card.append(list);grid.append(card)});if(!grid.children.length)grid.append(empty("店舗情報はありません。"));root.append(grid);const safe=el("section","safe-panel");safe.append(el("h3","","管理画面の安全設計"),el("p","","お客様画面と管理情報を分離し、管理コードが一致した場合だけWorkerがデータを返します。"));const list=el("div","safe-list");["管理コードを端末内に保存しない","更新操作を監査ログへ記録","査定用の非公開写真と掲載写真を分離"].forEach((x,i)=>{const n=el("div");n.append(el("b","",`0${i+1} `),document.createTextNode(x));list.append(n)});safe.append(list);root.append(safe)}
+
+    function customerCounts(customerId){
+      const owned=(state.data.customer_vehicles||[]).filter(x=>x.customer_id===customerId).length;
+      const appraisals=(state.data.appraisals||[]).filter(x=>x.customer_id===customerId&&!["completed","cancelled","declined","expired"].includes(x.status)).length;
+      const sales=(state.data.sales_leads||[]).filter(x=>x.customer_id===customerId&&!["delivered","lost","cancelled"].includes(x.status)).length;
+      return{owned,appraisals,sales};
+    }
+    function customer360Button(customerId,labelText="360度詳細"){
+      const button=el("button","button small primary",labelText);button.type="button";
+      button.addEventListener("click",()=>openCustomer360(customerId));return button;
+    }
+    function recentCustomerCard(customer){
+      const counts=customerCounts(customer.id),card=el("article","customer-card"),head=el("div","customer-card-head"),copy=el("div");
+      copy.append(el("h3","",customer.customer_name),el("p","",`${customer.customer_code}／${customer.phone||"電話未設定"}`));
+      head.append(copy,el("span","badge active",customer.preferred_contact==="line"?"LINE優先":customer.preferred_contact==="email"?"メール優先":"電話優先"));
+      const grid=el("div","customer-card-counts");
+      [["車両",counts.owned],["査定中",counts.appraisals],["商談中",counts.sales]].forEach(([labelText,value])=>{const box=el("div");box.append(el("span","",labelText),el("strong","",String(value)));grid.append(box)});
+      card.append(head,grid,customer360Button(customer.id));return card;
+    }
+    function formField(labelText,name,value,type="text",full=false){
+      const wrap=el("div",`customer360-field${full?" full":""}`),labelNode=el("label","",labelText);let input;
+      if(type==="textarea"){input=document.createElement("textarea")}
+      else if(type==="select"){input=document.createElement("select");[["line","LINE"],["phone","電話"],["email","メール"]].forEach(([key,label])=>{const option=el("option","",label);option.value=key;option.selected=key===(value||"line");input.append(option)})}
+      else{input=document.createElement("input");input.type=type}
+      input.name=name;if(type!=="select")input.value=value??"";wrap.append(labelNode,input);return wrap;
+    }
+    async function openCustomer360(customerId){
+      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");
+      drawer.classList.add("customer-360");document.getElementById("detailTitle").textContent="顧客・複数車両360度";
+      document.getElementById("detailSubtitle").textContent="顧客、所有車、査定、購入、契約、納車後まで一体表示";
+      clear(body);body.append(el("div","customer360-loading","顧客情報を取得しています…"));overlay.hidden=false;drawer.hidden=false;
+      requestAnimationFrame(()=>{overlay.classList.add("open");drawer.classList.add("open")});document.body.style.overflow="hidden";
+      try{const data=await api(`/api/admin/customers/${encodeURIComponent(customerId)}/360`);renderCustomer360(body,data)}
+      catch(error){clear(body);body.append(empty(error.message));showToast(error.message,true)}
+    }
+    function renderCustomer360(root,data){
+      clear(root);const customer=data.customer,summary=data.summary||{},hero=el("section","customer360-hero");
+      hero.append(el("h3","",customer.customer_name),el("p","",`${customer.customer_code}／${customer.phone||"電話未設定"}／${customer.email||"メール未設定"}`));
+      const summaryGrid=el("div","customer360-summary");
+      [["現在車両",summary.owned_vehicles||0],["査定中",summary.active_appraisals||0],["購入車",summary.purchased_vehicles||0],["要対応",Number(summary.pending_documents||0)+Number(summary.open_tasks||0)]].forEach(([labelText,value])=>{const box=el("div");box.append(el("span","",labelText),el("strong","",String(value)));summaryGrid.append(box)});
+      hero.append(summaryGrid);root.append(hero);
+      if((data.duplicate_candidates||[]).length)root.append(el("div","customer360-alert",`重複候補が${data.duplicate_candidates.length}件あります。電話番号・LINE・メールの一致を確認してください。`));
+
+      const profile=el("section","customer360-section");profile.append(el("h3","","顧客基本情報"));
+      const form=el("form","customer360-form"),fields=el("div","customer360-fields");
+      fields.append(formField("お名前","customer_name",customer.customer_name),formField("フリガナ","customer_name_kana",customer.customer_name_kana),formField("電話番号","phone",customer.phone,"tel"),formField("メール","email",customer.email,"email"),formField("希望連絡方法","preferred_contact",customer.preferred_contact,"select"),formField("店舗内メモ","internal_note",customer.internal_note,"textarea",true));
+      const actions=el("div","customer360-actions"),save=el("button","button amber","顧客情報を保存");save.type="submit";actions.append(save);form.append(fields,actions);
+      form.addEventListener("submit",async event=>{event.preventDefault();save.disabled=true;const fd=new FormData(form);try{
+        await api(`/api/admin/customers/${encodeURIComponent(customer.id)}`,{method:"PATCH",body:JSON.stringify({customer_name:fd.get("customer_name"),customer_name_kana:fd.get("customer_name_kana"),phone:fd.get("phone"),email:fd.get("email"),preferred_contact:fd.get("preferred_contact"),internal_note:fd.get("internal_note")})});
+        showToast("顧客情報を保存しました。");await reloadOverview();const refreshed=await api(`/api/admin/customers/${encodeURIComponent(customer.id)}/360`);renderCustomer360(root,refreshed)
+      }catch(error){showToast(error.message,true)}finally{save.disabled=false}});
+      profile.append(form);root.append(profile);
+
+      const vehicles=el("section","customer360-section"),vehicleItems=data.vehicle_groups?.customer_vehicles||[];vehicles.append(el("h3","",`お客様の車（${vehicleItems.length}台）`));
+      const vehicleList=el("div","vehicle360-list");
+      vehicleItems.forEach(vehicle=>{
+        const details=el("details","vehicle360-card"),summaryNode=document.createElement("summary"),title=el("div"),chip=el("span","relationship-chip",vehicle.relationship_label||"お客様の車");
+        title.append(document.createTextNode(vehicleName(vehicle)),el("span","",`${vehicle.vehicle_code}／${vehicle.registration_number||"登録番号未設定"}`));summaryNode.append(title,chip);
+        const body=el("div","vehicle360-body"),vehicleForm=el("form","customer360-form"),vehicleFields=el("div","customer360-fields");
+        vehicleFields.append(formField("メーカー","manufacturer",vehicle.manufacturer),formField("車名","car_name",vehicle.car_name),formField("グレード","grade",vehicle.grade),formField("年式","model_year",vehicle.model_year,"number"),formField("カラー","color",vehicle.color),formField("走行距離 km","mileage_km",vehicle.mileage_km,"number"),formField("登録番号","registration_number",vehicle.registration_number),formField("車台番号","chassis_number",vehicle.chassis_number),formField("車検期限","inspection_expiry",vehicle.inspection_expiry,"date"),formField("車両メモ","notes",vehicle.notes,"textarea",true));
+        const vehicleActions=el("div","customer360-actions"),vehicleSave=el("button","button primary","車両情報を保存");vehicleSave.type="submit";vehicleActions.append(vehicleSave);vehicleForm.append(vehicleFields,vehicleActions);
+        vehicleForm.addEventListener("submit",async event=>{event.preventDefault();vehicleSave.disabled=true;const fd=new FormData(vehicleForm);try{
+          await api(`/api/admin/customer-vehicles/${encodeURIComponent(vehicle.id)}`,{method:"PATCH",body:JSON.stringify({manufacturer:fd.get("manufacturer"),car_name:fd.get("car_name"),grade:fd.get("grade"),model_year:fd.get("model_year"),color:fd.get("color"),mileage_km:fd.get("mileage_km"),registration_number:fd.get("registration_number"),chassis_number:fd.get("chassis_number"),inspection_expiry:fd.get("inspection_expiry"),notes:fd.get("notes")})});
+          showToast("車両情報を保存しました。");await reloadOverview();const refreshed=await api(`/api/admin/customers/${encodeURIComponent(customer.id)}/360`);renderCustomer360(root,refreshed)
+        }catch(error){showToast(error.message,true)}finally{vehicleSave.disabled=false}});
+        body.append(vehicleForm);details.append(summaryNode,body);vehicleList.append(details)
+      });
+      if(!vehicleItems.length)vehicleList.append(empty("登録車両はありません。"));vehicles.append(vehicleList);root.append(vehicles);
+
+      const purchased=data.vehicle_groups?.purchased_vehicles||[];
+      if(purchased.length){const section=el("section","customer360-section");section.append(el("h3","",`購入車・納車車（${purchased.length}台）`));const list=el("div","vehicle360-list");purchased.forEach(vehicle=>{const card=el("article","customer-card");card.append(el("h3","",vehicleName(vehicle)),el("p","",`${vehicle.inventory_code}／${vehicle.relationship_label}／${money(vehicle.total_price)}`));list.append(card)});section.append(list);root.append(section)}
+
+      const timeline=el("section","customer360-section"),timelineList=el("div","timeline360");timeline.append(el("h3","",`履歴タイムライン（${(data.timeline||[]).length}件）`));
+      (data.timeline||[]).slice(0,40).forEach(event=>{const item=el("article","timeline360-item"),time=el("time","",dateTime(event.at)),copy=el("div");copy.append(el("strong","",event.label),el("span","",[event.number,event.status,event.detail].filter(Boolean).join("／")));item.append(time,copy);timelineList.append(item)});
+      if(!(data.timeline||[]).length)timelineList.append(empty("履歴はありません。"));timeline.append(timelineList);root.append(timeline)
+    }
+
+      function renderSearch(){
+      const root=document.getElementById("view-search");clear(root);
+      root.append(sectionHeader("顧客・複数車両360度管理","顧客を選ぶと所有車・査定・購入・契約・納車後履歴をまとめて表示",state.data.customers.length));
+      const recentTitle=el("div","subhead");recentTitle.append(el("h3","","最近のお客様"),el("span","",`${Math.min(state.data.customers.length,8)}件表示`));root.append(recentTitle);
+      const recent=el("div","customer-recent-grid");state.data.customers.slice(0,8).forEach(customer=>recent.append(recentCustomerCard(customer)));if(!recent.children.length)recent.append(empty("顧客情報はありません。"));root.append(recent);
+      const box=el("section","search-box"),form=el("form"),row=el("div","search-row"),input=el("input","search-input"),button=el("button","button primary","検索する");
+      input.type="search";input.placeholder="例：090-1111-2201、鈴木、CAR-C000001、福岡500あ1234";input.maxLength=80;button.type="submit";row.append(input,button);
+      form.append(row,el("p","search-help","電話番号はハイフン・空白・全角・+81形式を同じ番号として検索します。"));
+      const shortcuts=el("div","demo-shortcuts");["鈴木","090-1111-2201","福岡 500 あ 12-34","CAR-I000001"].forEach(q=>{const b=el("button","shortcut",q);b.type="button";b.addEventListener("click",()=>{input.value=q;form.requestSubmit()});shortcuts.append(b)});form.append(shortcuts);box.append(form);
+      const results=el("div");results.append(empty("検索条件を入力してください。"));root.append(box,results);
+      form.addEventListener("submit",async event=>{event.preventDefault();const q=input.value.trim();if(!q){showToast("検索文字を入力してください。",true);return}button.disabled=true;clear(results);results.append(el("p","search-summary","検索しています…"));try{const data=await api(`/api/admin/search?q=${encodeURIComponent(q)}&limit=20`);renderSearchResults(results,data)}catch(error){clear(results);results.append(empty(error.message));showToast(error.message,true)}finally{button.disabled=false}})
+    }
+    function renderSearchResults(root,data){
+      clear(root);root.append(el("p","search-summary",`「${data.query}」の検索結果：顧客${data.counts.customers}件・所有車${data.counts.customer_vehicles}件・在庫${data.counts.inventory}件・査定${data.counts.appraisals}件・商談${data.counts.sales_leads}件`));
+      const groups=el("div","search-groups");
+      const addGroup=(title,items,render)=>{if(!items.length)return;const group=el("section","search-group"),list=el("div","search-items");group.append(el("h3","",`${title}（${items.length}件）`));items.forEach(x=>list.append(render(x)));group.append(list);groups.append(group)};
+      const item=(title,lines,action=null)=>{const node=el("article","search-item");node.append(el("strong","",title));lines.filter(Boolean).forEach(x=>node.append(el("span","",x)));if(action){action.classList.add("search-item-action");node.append(action)}return node};
+      addGroup("顧客",data.results.customers,x=>item(`${x.customer_name}／${x.customer_code}`,[x.phone,x.internal_note],customer360Button(x.id)));
+      addGroup("お客様の車",data.results.customer_vehicles,x=>item(vehicleName(x),[x.vehicle_code,x.registration_number,x.chassis_number?`車台番号 ${x.chassis_number}`:null,x.notes],x.customer_id?customer360Button(x.customer_id,"この顧客の360度詳細"):null));
+      addGroup("販売在庫",data.results.inventory,x=>item(vehicleName(x),[x.inventory_code,label("inventory",x.status),money(x.total_price)]));
+      addGroup("査定案件",data.results.appraisals,x=>item(x.case_number,[label("appraisal",x.status),x.presented_price!==null?`提示 ${money(x.presented_price)}`:null],x.customer_id?customer360Button(x.customer_id,"顧客の360度詳細"):null));
+      addGroup("購入商談",data.results.sales_leads,x=>item(x.lead_number,[label("sales_lead",x.status),x.estimate_total!==null?`見積 ${money(x.estimate_total)}`:null],x.customer_id?customer360Button(x.customer_id,"顧客の360度詳細"):null));
+      if(!groups.children.length)groups.append(empty("一致する情報はありませんでした。"));root.append(groups)
+    }
+    function renderTeam(){const root=document.getElementById("view-team");clear(root);root.append(sectionHeader("店舗・担当者","営業時間・定休日・受付上限と担当者",state.data.stores.length));const grid=el("div","store-grid");state.data.stores.forEach(store=>{const card=el("article","store-card");card.append(el("h3","",store.store_name),el("p","",store.address||"住所未設定"),el("p","",`営業時間 ${String(store.opening_time||"").slice(0,5)}〜${String(store.closing_time||"").slice(0,5)}／${store.phone||"電話未設定"}`));const edit=el("button","button editor-open","店舗設定を編集");edit.type="button";edit.addEventListener("click",()=>openStoreEditor(store));card.append(edit);const list=el("div","staff-list"),members=state.data.staff.filter(x=>x.store_id===store.id);members.forEach(s=>{const row=el("div","staff-row"),left=el("div");left.append(el("strong","",s.staff_name),el("span","",s.staff_code));row.append(left,el("span","",{staff:"スタッフ",manager:"店長",admin:"管理者"}[s.role]||s.role));list.append(row)});if(!members.length)list.append(empty("担当者は未登録です。"));card.append(list);grid.append(card)});if(!grid.children.length)grid.append(empty("店舗情報はありません。"));root.append(grid);const safe=el("section","safe-panel");safe.append(el("h3","","管理画面の安全設計"),el("p","","お客様画面と管理情報を分離し、管理コードが一致した場合だけWorkerがデータを返します。"));const list=el("div","safe-list");["管理コードを端末内に保存しない","更新操作を監査ログへ記録","査定用の非公開写真と掲載写真を分離"].forEach((x,i)=>{const n=el("div");n.append(el("b","",`0${i+1} `),document.createTextNode(x));list.append(n)});safe.append(list);root.append(safe)}
       const storeModal=document.getElementById("storeModal"),storeForm=document.getElementById("storeForm"),weekdayRoot=document.getElementById("closedWeekdays");["日","月","火","水","木","金","土"].forEach((day,index)=>{const label=document.createElement("label"),input=document.createElement("input");input.type="checkbox";input.name="closed_weekdays";input.value=String(index);label.append(input,document.createTextNode(day));weekdayRoot.append(label)});
       function openStoreEditor(store){fieldValue(storeForm,"store_id",store.id);["store_name","postal_code","address","phone","email","appraisal_daily_limit","test_drive_daily_limit"].forEach(name=>fieldValue(storeForm,name,store[name]));fieldValue(storeForm,"opening_time",String(store.opening_time||"").slice(0,5));fieldValue(storeForm,"closing_time",String(store.closing_time||"").slice(0,5));const closed=new Set((store.closed_weekdays||[]).map(Number));storeForm.querySelectorAll('[name="closed_weekdays"]').forEach(input=>input.checked=closed.has(Number(input.value)));storeModal.showModal()}
       function renderAll(){
