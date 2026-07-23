@@ -1,0 +1,185 @@
+name: DPRO CAR STEP CAR-16 R1 Journey Clarity
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/step-car-16-r1-journey-clarity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dpro-car-step-car-16-r1
+  cancel-in-progress: false
+
+jobs:
+  update-sales-journey-clarity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply CAR-16 R1 journey clarity
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          OWNER = Path("owner.html")
+          CONFIG = Path("config.js")
+          OLD_VERSION = "CAR-16-SALES-TESTDRIVE-PURCHASE-JOURNEY-20260723"
+          VERSION = "CAR-16-R1-SALES-JOURNEY-CLARITY-20260723"
+
+          for path in (OWNER, CONFIG):
+              if not path.exists():
+                  raise SystemExit(f"{path.name} が見つかりません。")
+
+          owner = OWNER.read_text(encoding="utf-8")
+          config = CONFIG.read_text(encoding="utf-8")
+
+          if OLD_VERSION not in owner:
+              raise SystemExit("CAR-16 owner.htmlを確認できません。")
+          if OLD_VERSION not in config:
+              raise SystemExit("CAR-16 config.jsを確認できません。")
+
+          old_block = """      const stages=el("div","sales-stages"),visitDone=Boolean(ready.completed_test_drive)||["visited","negotiating","estimate_presented","loan_review","agreed","documents_waiting","delivery_preparing","delivery_scheduled","delivered"].includes(lead.status);
+                const stage=(number,title,done,current)=>{const card=el("article",`sales-stage${done?" done":""}${current?" current":""}`);card.append(el("span","",number),el("strong","",title),el("small","",done?"完了・確認済み":current?"次に対応":"準備待ち"));return card};
+                stages.append(
+                  stage("01","相談受付",true,false),
+                  stage("02","来店・試乗",visitDone,!visitDone),
+                  stage("03","見積・相談",Boolean(ready.estimate_ready),visitDone&&!ready.estimate_ready),
+                  stage("04","購入判断",Boolean(ready.purchase_decided),ready.estimate_ready&&!ready.purchase_decided),
+                  stage("05","販売契約",Boolean(ready.sale_contract_created),ready.purchase_decided&&!ready.sale_contract_created)
+                );"""
+
+          new_block = """      const stages=el("div","sales-stages"),reservations=Array.isArray(data.reservations)?data.reservations:[],
+                  visitRequired=Boolean(lead.test_drive_requested)||reservations.some(item=>["test_drive","consultation"].includes(item.reservation_type)),
+                  visitDone=Boolean(ready.completed_test_drive)||reservations.some(item=>["arrived","completed"].includes(item.status))||["visited","negotiating","estimate_presented","loan_review","agreed","documents_waiting","delivery_preparing","delivery_scheduled","delivered"].includes(lead.status),
+                  estimateDone=Boolean(ready.estimate_ready),purchaseDone=Boolean(ready.purchase_decided),contractDone=Boolean(ready.sale_contract_created),
+                  currentStage=contractDone?"":visitRequired&&!visitDone?"visit":!estimateDone?"estimate":!purchaseDone?"purchase":"contract";
+                const stage=(number,title,done,current,skipped=false)=>{const card=el("article",`sales-stage${done?" done":""}${current?" current":""}`);card.append(el("span","",number),el("strong","",title),el("small","",done?"完了・確認済み":skipped?"対象外":current?"次に対応":"待機中"));return card};
+                stages.append(
+                  stage("01","相談受付",true,false),
+                  stage("02","来店・試乗",visitDone,currentStage==="visit",!visitRequired&&!visitDone),
+                  stage("03","見積・相談",estimateDone,currentStage==="estimate"),
+                  stage("04","購入判断",purchaseDone,currentStage==="purchase"),
+                  stage("05","販売契約",contractDone,currentStage==="contract")
+                );"""
+
+          if owner.count(old_block) != 1:
+              raise SystemExit(
+                  f"進捗表示の置換対象が{owner.count(old_block)}件でした。安全停止します。"
+              )
+
+          owner = owner.replace(old_block, new_block, 1)
+          owner = owner.replace(OLD_VERSION, VERSION)
+          owner = owner.replace(
+              "<title>オーナーPC管理 CAR-15｜DPRO中古車センター</title>",
+              "<title>オーナーPC管理 CAR-16-R1｜DPRO中古車センター</title>",
+              1,
+          )
+
+          config = config.replace(
+              " * STEP CAR-16 商談・試乗・購入検討一体管理",
+              " * STEP CAR-16-R1 商談進捗表示・既存タスク補完",
+              1,
+          )
+          config = re.sub(
+              r'version:\s*"[^"]+"',
+              f'version: "{VERSION}"',
+              config,
+              count=1,
+          )
+
+          required = [
+              VERSION,
+              'currentStage=contractDone?',
+              'skipped?"対象外"',
+              'currentStage==="visit"',
+              'currentStage==="purchase"',
+              "商談360度を開く",
+          ]
+          missing = [value for value in required if value not in owner]
+          if missing:
+              raise SystemExit(f"owner.html検査失敗: {missing}")
+
+          OWNER.write_text(owner, encoding="utf-8")
+          CONFIG.write_text(config, encoding="utf-8")
+
+          print("CAR-16-R1 商談進捗表示修正: OK")
+          PY
+
+      - name: Validate CAR-16 R1 frontend
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          owner = Path("owner.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script>(.*?)</script>", owner, flags=re.S)
+          if not scripts:
+              raise SystemExit("owner.htmlのJavaScriptが見つかりません。")
+          Path("/tmp/car16-r1-owner.js").write_text(
+              scripts[-1],
+              encoding="utf-8",
+          )
+
+          ids = re.findall(r'\bid="([^"]+)"', owner)
+          duplicates = sorted({value for value in ids if ids.count(value) > 1})
+          if duplicates:
+              raise SystemExit(f"重複IDがあります: {duplicates}")
+
+          if owner.count('currentStage==="') < 4:
+              raise SystemExit("単一の次対応判定を確認できません。")
+
+          print("CAR-16-R1 HTML構成検査: OK")
+          PY
+
+          node --check /tmp/car16-r1-owner.js
+          node --check config.js
+
+      - name: Normalize whitespace and show changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          for filename in ("owner.html", "config.js"):
+              path = Path(filename)
+              text = path.read_text(encoding="utf-8")
+              normalized = "\n".join(
+                  line.rstrip(" \t") for line in text.splitlines()
+              ) + "\n"
+              path.write_text(normalized, encoding="utf-8")
+          PY
+
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Commit CAR-16 R1 and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name "DPRO CAR Automation"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add owner.html config.js
+          git rm --ignore-unmatch .github/workflows/step-car-16-r1-journey-clarity.yml
+
+          if git diff --cached --quiet; then
+            echo "コミット対象の変更はありません。"
+            exit 0
+          fi
+
+          git commit -m "CAR-16-R1: clarify next sales stage and legacy tasks"
+          git push origin main
