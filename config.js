@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-13-R1 顧客サマリー表示修正
+ * STEP CAR-14 査定・買取契約・販売在庫ライフサイクル
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-13-R1-CUSTOMER-SUMMARY-FIX-20260723",
+  version: "CAR-14-APPRAISAL-PURCHASE-INVENTORY-LIFECYCLE-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -21,4 +21,9 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   ownerCustomerEdit: true,
   ownerCustomerVehicleEdit: true,
   ownerDuplicateCandidateCheck: true,
+  ownerAppraisalLifecycle: true,
+  ownerPurchaseContractAutocreate: true,
+  ownerInventoryConversion: true,
+  ownerInventoryTaskAutocreate: true,
+  privateAppraisalPhotoAutoPublish: false,
 });

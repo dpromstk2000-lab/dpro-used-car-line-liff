@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111d29">
   <meta name="description" content="DPRO中古車センターのオーナーPC管理画面。査定、在庫、商談、試乗、契約、納車、顧客検索を一元管理します。">
-  <title>オーナーPC管理 CAR-13｜DPRO中古車センター</title>
+  <title>オーナーPC管理 CAR-14｜DPRO中古車センター</title>
   <style>
     :root{--navy:#10243e;--navy2:#173858;--charcoal:#111d29;--amber:#e5a12b;--amber2:#fff1d2;--green:#117b61;--green2:#e2f3ed;--red:#b44235;--red2:#fff0ed;--canvas:#f4f2ed;--paper:#fff;--soft:#eef2f5;--line:#d5dee5;--ink:#102033;--muted:#617083;--shadow:0 15px 38px rgba(15,35,56,.11);--tap:52px;--side:244px}
     *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.68;-webkit-text-size-adjust:100%}button,input,select,textarea,a{font:inherit}button,a{touch-action:manipulation}:focus-visible{outline:4px solid rgba(229,161,43,.42);outline-offset:2px}a{color:inherit}
@@ -99,9 +99,28 @@
     .search-item-action{margin-top:9px;width:100%}
     @media(max-width:760px){.customer-recent-grid{grid-template-columns:1fr}.customer360-summary{grid-template-columns:1fr 1fr}.customer360-fields{grid-template-columns:1fr}.customer360-field.full{grid-column:auto}.timeline360-item{grid-template-columns:1fr;gap:2px}}
 
+
+    /* DPRO CAR STEP CAR-14 APPRAISAL PURCHASE INVENTORY LIFECYCLE */
+    .detail-drawer.vehicle-lifecycle{width:min(760px,100%)}
+    .lifecycle-hero{padding:18px;border-radius:17px;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff}
+    .lifecycle-hero h3{margin:0;font-size:26px}.lifecycle-hero p{margin:3px 0 0;color:#d5e1eb}
+    .lifecycle-stages{margin-top:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .lifecycle-stage{padding:12px;border:1px solid var(--line);border-radius:13px;background:#fff}
+    .lifecycle-stage.done{border-color:#90cdbb;background:#ebf8f3}.lifecycle-stage.current{border-color:#e4b95e;background:#fff8e7}
+    .lifecycle-stage span{display:block;color:var(--muted);font-size:12px;font-weight:900}.lifecycle-stage strong{display:block;font-size:16px}.lifecycle-stage small{display:block;color:var(--muted)}
+    .lifecycle-section{margin-top:15px;padding:16px;border:1px solid var(--line);border-radius:15px;background:#fff}.lifecycle-section h3{margin:0 0 10px;font-size:20px}
+    .lifecycle-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.lifecycle-grid div{padding:10px 12px;border-radius:10px;background:var(--soft)}
+    .lifecycle-grid span{display:block;color:var(--muted);font-size:12px;font-weight:800}.lifecycle-grid strong{display:block;overflow-wrap:anywhere}
+    .lifecycle-warning{margin-top:11px;padding:12px 14px;border-left:5px solid var(--amber);border-radius:0 11px 11px 0;background:#fff7e5;color:#68490e}
+    .lifecycle-safety{margin-top:11px;padding:12px 14px;border-radius:11px;background:#eaf5f1;color:#14634e;font-weight:800}
+    .lifecycle-actions{margin-top:14px;display:grid;gap:9px}.lifecycle-actions .button{width:100%}
+    .lifecycle-task-list{display:grid;gap:7px}.lifecycle-task{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-radius:10px;background:var(--soft)}
+    .lifecycle-open{width:100%;margin-top:9px;border-color:#d7a43d;background:#fff8e6}
+    @media(max-width:760px){.lifecycle-stages{grid-template-columns:1fr}.lifecycle-grid{grid-template-columns:1fr}.detail-drawer.vehicle-lifecycle{height:min(92dvh,920px)}}
+
   </style>
-  <!-- CAR-13-R1-CUSTOMER-SUMMARY-FIX-20260723 -->
-  <!-- CAR-13-R1-CUSTOMER-SUMMARY-FIX-20260723 -->
+  <!-- CAR-14-APPRAISAL-PURCHASE-INVENTORY-LIFECYCLE-20260723 -->
+  <!-- CAR-14-APPRAISAL-PURCHASE-INVENTORY-LIFECYCLE-20260723 -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
@@ -112,7 +131,7 @@
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-13-R1-CUSTOMER-SUMMARY-FIX-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-14-APPRAISAL-PURCHASE-INVENTORY-LIFECYCLE-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -237,7 +256,7 @@
     };
     const isToday=value=>jstDateKey(value)===jstDateKey(new Date());
     function openDetail({title,number,resource,item,items=[],priceTitle,priceValue,note}){
-      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");drawer.classList.remove("customer-360");
+      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");drawer.classList.remove("customer-360","vehicle-lifecycle");
       document.getElementById("detailTitle").textContent=title||"詳細情報";
       document.getElementById("detailSubtitle").textContent=number||"";
       clear(body);
@@ -267,7 +286,7 @@
       const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay");
       drawer.classList.remove("open");overlay.classList.remove("open");
       document.body.style.overflow="";
-      setTimeout(()=>{drawer.hidden=true;overlay.hidden=true;drawer.classList.remove("customer-360")},210);
+      setTimeout(()=>{drawer.hidden=true;overlay.hidden=true;drawer.classList.remove("customer-360","vehicle-lifecycle")},210);
     }
 
       function meta(card,items){
@@ -350,7 +369,72 @@
       root.append(layout);
     }
 
-      function renderAppraisals(){const root=document.getElementById("view-appraisals");clear(root);root.append(sectionHeader("査定・買取案件","内部査定額・提示額・次回対応を管理",state.data.appraisals.length));const grid=el("div","record-grid");state.data.appraisals.forEach(x=>grid.append(recordCard({title:vehicleName(x.vehicle),number:`${x.case_number}／${customerName(x.customer)}`,resource:"appraisal",item:x,items:[["申込区分",typeLabels.case_type[x.case_type]||x.case_type],["査定方法",typeLabels.appraisal_method[x.appraisal_method]||x.appraisal_method],["担当",x.assigned_staff?.staff_name||"未設定"],["受付",date(x.requested_at)],["次回対応",x.next_action_at?dateTime(x.next_action_at):"未設定"],["お客様希望",money(x.customer_expected_price)]],priceTitle:"内部査定額／提示額",priceValue:x.internal_appraisal_price??x.presented_price,note:x.internal_note,attention:["new","checking","price_ready","documents_waiting"].includes(x.status)})));if(!grid.children.length)grid.append(empty("査定案件はありません。"));root.append(grid,subhead("買取契約",state.data.purchase_contracts.length));const contracts=el("div","record-grid");state.data.purchase_contracts.forEach(x=>contracts.append(recordCard({title:vehicleName(x.vehicle),number:`${x.contract_number}／${customerName(x.customer)}`,resource:"purchase_contract",item:x,items:[["査定受付",x.appraisal_case_number],["契約日",date(x.contract_date)],["引取予定",dateTime(x.pickup_at)],["書類",x.documents_complete?"確認済み":"確認中"],["支払方法",x.payment_method||"未設定"]],priceTitle:"買取金額",priceValue:x.purchase_price,note:x.note})));if(!contracts.children.length)contracts.append(empty("買取契約はありません。"));root.append(contracts)}
+
+    function lifecycleActionButton(appraisalId,labelText="査定→買取→在庫"){
+      const button=el("button","button lifecycle-open",labelText);button.type="button";
+      button.addEventListener("click",()=>openAppraisalLifecycle(appraisalId));return button;
+    }
+    function lifecycleValue(value,fallback="未設定"){return value===null||value===undefined||value===""?fallback:String(value)}
+    function lifecycleMissing(items){return Array.isArray(items)&&items.length?items.join("、"):"なし"}
+    async function openAppraisalLifecycle(appraisalId){
+      const drawer=document.getElementById("detailDrawer"),overlay=document.getElementById("detailOverlay"),body=document.getElementById("detailBody");
+      drawer.classList.remove("customer-360");drawer.classList.add("vehicle-lifecycle");
+      document.getElementById("detailTitle").textContent="査定→買取契約→販売在庫";
+      document.getElementById("detailSubtitle").textContent="車両情報を再入力せず、同じ履歴のまま次工程へ進めます。";
+      clear(body);body.append(el("div","customer360-loading","ライフサイクル情報を取得しています…"));
+      overlay.hidden=false;drawer.hidden=false;requestAnimationFrame(()=>{overlay.classList.add("open");drawer.classList.add("open")});document.body.style.overflow="hidden";
+      try{const data=await api(`/api/admin/appraisals/${encodeURIComponent(appraisalId)}/lifecycle`);renderAppraisalLifecycle(body,data)}
+      catch(error){clear(body);body.append(empty(error.message));showToast(error.message,true)}
+    }
+    function renderAppraisalLifecycle(root,data){
+      clear(root);const appraisal=data.appraisal,vehicle=data.vehicle||{},contract=data.purchase_contract,inventory=data.inventory,ready=data.readiness||{};
+      const hero=el("section","lifecycle-hero");hero.append(el("h3","",vehicleName(vehicle)),el("p","",`${appraisal.case_number}／${data.customer?.customer_name||"顧客未設定"}`));
+      const stages=el("div","lifecycle-stages");
+      const stage=(labelText,statusText,done,current)=>{const card=el("article",`lifecycle-stage${done?" done":""}${current?" current":""}`);card.append(el("span","",labelText),el("strong","",statusText),el("small","",done?"完了・作成済み":current?"次に実施":"準備待ち"));return card};
+      stages.append(
+        stage("1. 査定",label("appraisal",appraisal.status),true,!contract),
+        stage("2. 買取契約",contract?label("purchase_contract",contract.status):"未作成",Boolean(contract),Boolean(contract&&!inventory)),
+        stage("3. 販売在庫",inventory?label("inventory",inventory.status):"未作成",Boolean(inventory),Boolean(inventory)),
+      );
+      hero.append(stages);root.append(hero);
+
+      const vehicleSection=el("section","lifecycle-section");vehicleSection.append(el("h3","","引き継ぐ車両情報"));const vehicleGrid=el("div","lifecycle-grid");
+      [["メーカー",vehicle.manufacturer],["車名",vehicle.car_name],["グレード",vehicle.grade],["年式",vehicle.model_year?`${vehicle.model_year}年`:null],["走行距離",vehicle.mileage_km!==null&&vehicle.mileage_km!==undefined?`${fmt.format(vehicle.mileage_km)}km`:null],["登録番号",vehicle.registration_number],["車検期限",vehicle.inspection_expiry],["買取金額",ready.purchase_price!==null&&ready.purchase_price!==undefined?money(ready.purchase_price):null]].forEach(([key,value])=>{const box=el("div");box.append(el("span","",key),el("strong","",lifecycleValue(value)));vehicleGrid.append(box)});
+      vehicleSection.append(vehicleGrid,el("div","lifecycle-safety",`査定写真 ${data.private_photo_summary?.count||0}枚は非公開のまま保持します。販売写真へ自動公開しません。`));root.append(vehicleSection);
+
+      const actionSection=el("section","lifecycle-section");actionSection.append(el("h3","","次に必要な操作"));const actions=el("div","lifecycle-actions");
+      if(!contract){
+        if(ready.can_create_purchase_contract){const create=el("button","button amber","査定情報から買取契約を作成");create.type="button";create.addEventListener("click",async()=>{if(!confirm(`${appraisal.case_number}から買取契約を作成しますか？
+買取金額：${money(ready.purchase_price)}`))return;create.disabled=true;try{const result=await api(`/api/admin/appraisals/${encodeURIComponent(appraisal.id)}/create-purchase-contract`,{method:"POST",body:"{}"});showToast(result.message||"買取契約を作成しました。");await reloadOverview();const refreshed=await api(`/api/admin/appraisals/${encodeURIComponent(appraisal.id)}/lifecycle`);renderAppraisalLifecycle(root,refreshed)}catch(error){showToast(error.message,true)}finally{create.disabled=false}});actions.append(create)}
+        else actionSection.append(el("div","lifecycle-warning",`買取契約作成前の確認：${lifecycleMissing(ready.purchase_missing)}`));
+      }else if(!inventory){
+        const info=el("div","lifecycle-grid"),contractInfo=el("div");contractInfo.append(el("span","","買取契約番号"),el("strong","",contract.contract_number));const priceInfo=el("div");priceInfo.append(el("span","","買取金額"),el("strong","",money(contract.purchase_price)));info.append(contractInfo,priceInfo);actionSection.append(info);
+        if(ready.can_create_inventory){const convert=el("button","button amber","買取車両を販売在庫へ移行");convert.type="button";convert.addEventListener("click",async()=>{if(!confirm(`${contract.contract_number}の車両を販売在庫へ移行しますか？
+非公開の入庫状態で作成し、商品化タスクを自動生成します。`))return;convert.disabled=true;try{const result=await api(`/api/admin/purchase-contracts/${encodeURIComponent(contract.id)}/create-inventory`,{method:"POST",body:"{}"});showToast(result.message||"販売在庫を作成しました。");await reloadOverview();const refreshed=await api(`/api/admin/appraisals/${encodeURIComponent(appraisal.id)}/lifecycle`);renderAppraisalLifecycle(root,refreshed)}catch(error){showToast(error.message,true)}finally{convert.disabled=false}});actions.append(convert)}
+        else actionSection.append(el("div","lifecycle-warning",`在庫化前の確認：${lifecycleMissing(ready.inventory_missing)}`));
+      }else{
+        const info=el("div","lifecycle-grid"),code=el("div"),stateBox=el("div");code.append(el("span","","在庫番号"),el("strong","",inventory.inventory_code));stateBox.append(el("span","","公開状態"),el("strong","",inventory.is_public?"公開中":"非公開"));info.append(code,stateBox);actionSection.append(info);
+        if(ready.publication_missing?.length)actionSection.append(el("div","lifecycle-warning",`公開前の不足項目：${lifecycleMissing(ready.publication_missing)}`));
+        const openInventory=el("button","button primary","販売在庫画面を開く");openInventory.type="button";openInventory.addEventListener("click",()=>{closeDetail();openSection("inventory")});actions.append(openInventory);
+      }
+      if(actions.children.length)actionSection.append(actions);root.append(actionSection);
+
+      if((data.generated_tasks||[]).length){const taskSection=el("section","lifecycle-section");taskSection.append(el("h3","",`自動作成された商品化タスク（${data.generated_tasks.length}件）`));const list=el("div","lifecycle-task-list");data.generated_tasks.forEach(task=>{const row=el("div","lifecycle-task");row.append(el("strong","",task.title),el("span",`badge ${badgeClass("task",task.status)}`,label("task",task.status)));list.append(row)});taskSection.append(list);root.append(taskSection)}
+    }
+
+      function renderAppraisals(){
+        const root=document.getElementById("view-appraisals");clear(root);
+        root.append(sectionHeader("査定・買取案件","査定から買取契約、販売在庫まで同じ車両情報で進めます。",state.data.appraisals.length));
+        const grid=el("div","record-grid");
+        state.data.appraisals.forEach(x=>{
+          const card=recordCard({title:vehicleName(x.vehicle),number:`${x.case_number}／${customerName(x.customer)}`,resource:"appraisal",item:x,items:[["申込区分",typeLabels.case_type[x.case_type]||x.case_type],["査定方法",typeLabels.appraisal_method[x.appraisal_method]||x.appraisal_method],["担当",x.assigned_staff?.staff_name||"未設定"],["受付",date(x.requested_at)],["次回対応",x.next_action_at?dateTime(x.next_action_at):"未設定"],["お客様希望",money(x.customer_expected_price)]],priceTitle:"内部査定額／提示額",priceValue:x.internal_appraisal_price??x.presented_price,note:x.internal_note,attention:["new","checking","price_ready","documents_waiting"].includes(x.status)});
+          card.append(lifecycleActionButton(x.id));grid.append(card)
+        });
+        if(!grid.children.length)grid.append(empty("査定案件はありません。"));root.append(grid,subhead("買取契約",state.data.purchase_contracts.length));
+        const contracts=el("div","record-grid");
+        state.data.purchase_contracts.forEach(x=>{const card=recordCard({title:vehicleName(x.vehicle),number:`${x.contract_number}／${customerName(x.customer)}`,resource:"purchase_contract",item:x,items:[["査定受付",x.appraisal_case_number],["契約日",date(x.contract_date)],["引取予定",dateTime(x.pickup_at)],["書類",x.documents_complete?"確認済み":"確認中"],["支払方法",x.payment_method||"未設定"]],priceTitle:"買取金額",priceValue:x.purchase_price,note:x.note});if(x.appraisal_case_id)card.append(lifecycleActionButton(x.appraisal_case_id,"買取契約→販売在庫"));contracts.append(card)});
+        if(!contracts.children.length)contracts.append(empty("買取契約はありません。"));root.append(contracts)
+      }
       function renderInventory(){const root=document.getElementById("view-inventory");clear(root);root.append(sectionHeader("販売在庫","価格・公開内容・掲載写真まで管理",state.data.inventory.length));const grid=el("div","record-grid");state.data.inventory.forEach(x=>{const cost=(x.purchase_cost||0)+(x.reconditioning_cost||0)+(x.other_cost||0),gross=x.total_price===null||x.total_price===undefined?null:x.total_price-cost,card=recordCard({title:vehicleName(x),number:x.inventory_code,resource:"inventory",item:x,items:[["年式",x.model_year?`${x.model_year}年`:"未設定"],["走行距離",x.mileage_km!==null?`${fmt.format(x.mileage_km)}km`:"未設定"],["登録番号",x.registration_number||"未設定"],["公開",x.is_public?"公開中":"非公開"],["仕入・商品化原価",money(cost),"advanced"],["概算粗利",money(gross),"advanced"]],priceTitle:"支払総額",priceValue:x.total_price,note:x.is_public?`公開URL：vehicle.html?slug=${x.public_slug||"未設定"}`:"公開前の在庫です。",attention:["incoming","inspection","reconditioning","ready_to_publish"].includes(x.status)}),edit=el("button","button editor-open","車両情報・掲載写真を編集");edit.type="button";edit.addEventListener("click",()=>openInventoryEditor(x.id));card.append(edit);grid.append(card)});if(!grid.children.length)grid.append(empty("販売在庫はありません。"));root.append(grid)}
       const inventoryModal=document.getElementById("inventoryModal"),inventoryForm=document.getElementById("inventoryForm"),photoForm=document.getElementById("photoForm");let editingInventoryId="";
       function fieldValue(form,name,value){const field=form.elements.namedItem(name);if(!field)return;if(field.type==="checkbox")field.checked=Boolean(value);else field.value=value??""}
