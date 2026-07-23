@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-15 公開在庫カタログ・車両詳細強化
+ * STEP CAR-16 商談・試乗・購入検討一体管理
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-15-PUBLIC-INVENTORY-CATALOG-DETAIL-20260723",
+  version: "CAR-16-SALES-TESTDRIVE-PURCHASE-JOURNEY-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -33,4 +33,9 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   publicVehicleShare: true,
   ownerInventoryPublishReadiness: true,
   ownerInventoryPublicPreview: true,
+  ownerSalesJourney360: true,
+  ownerSalesLeadEdit: true,
+  ownerSalesContractAutocreate: true,
+  ownerSalesNextActionTask: true,
+  ownerSalesLostReason: true,
 });
