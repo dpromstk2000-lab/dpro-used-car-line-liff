@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-16 商談・試乗・購入検討一体管理
+ * STEP CAR-16-R1 商談進捗表示・既存タスク補完
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-16-SALES-TESTDRIVE-PURCHASE-JOURNEY-20260723",
+  version: "CAR-16-R1-SALES-JOURNEY-CLARITY-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",

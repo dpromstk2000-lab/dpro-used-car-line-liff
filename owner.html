@@ -156,8 +156,8 @@
     @media(max-width:650px){.detail-drawer.sales-journey{height:min(94dvh,980px)}.sales-stages,.sales-summary-grid,.sales-form-grid{grid-template-columns:1fr}.sales-field.full,.sales-options,.sales-form-actions{grid-column:auto}.sales-reservation{grid-template-columns:1fr}.sales-pipeline-summary{grid-template-columns:1fr 1fr}.sales-form-actions .button{width:100%;min-width:0}}
 
   </style>
-  <!-- CAR-16-SALES-TESTDRIVE-PURCHASE-JOURNEY-20260723 -->
-  <!-- CAR-16-SALES-TESTDRIVE-PURCHASE-JOURNEY-20260723 -->
+  <!-- CAR-16-R1-SALES-JOURNEY-CLARITY-20260723 -->
+  <!-- CAR-16-R1-SALES-JOURNEY-CLARITY-20260723 -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
@@ -168,7 +168,7 @@
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-16-SALES-TESTDRIVE-PURCHASE-JOURNEY-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-16-R1-SALES-JOURNEY-CLARITY-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -527,14 +527,18 @@
     function renderSalesJourney(root,data){
       clear(root);const lead=data.lead,customer=data.customer||{},inventory=data.inventory||{},ready=data.readiness||{},summary=data.summary||{};
       const hero=el("section","sales-hero");hero.append(el("h3","",`${customer.customer_name||"顧客未設定"}／${vehicleName(inventory)}`),el("p","",`${lead.lead_number}／${typeLabels.source[lead.source]||lead.source||"受付経路未設定"}`));
-      const stages=el("div","sales-stages"),visitDone=Boolean(ready.completed_test_drive)||["visited","negotiating","estimate_presented","loan_review","agreed","documents_waiting","delivery_preparing","delivery_scheduled","delivered"].includes(lead.status);
-      const stage=(number,title,done,current)=>{const card=el("article",`sales-stage${done?" done":""}${current?" current":""}`);card.append(el("span","",number),el("strong","",title),el("small","",done?"完了・確認済み":current?"次に対応":"準備待ち"));return card};
+      const stages=el("div","sales-stages"),reservations=Array.isArray(data.reservations)?data.reservations:[],
+        visitRequired=Boolean(lead.test_drive_requested)||reservations.some(item=>["test_drive","consultation"].includes(item.reservation_type)),
+        visitDone=Boolean(ready.completed_test_drive)||reservations.some(item=>["arrived","completed"].includes(item.status))||["visited","negotiating","estimate_presented","loan_review","agreed","documents_waiting","delivery_preparing","delivery_scheduled","delivered"].includes(lead.status),
+        estimateDone=Boolean(ready.estimate_ready),purchaseDone=Boolean(ready.purchase_decided),contractDone=Boolean(ready.sale_contract_created),
+        currentStage=contractDone?"":visitRequired&&!visitDone?"visit":!estimateDone?"estimate":!purchaseDone?"purchase":"contract";
+      const stage=(number,title,done,current,skipped=false)=>{const card=el("article",`sales-stage${done?" done":""}${current?" current":""}`);card.append(el("span","",number),el("strong","",title),el("small","",done?"完了・確認済み":skipped?"対象外":current?"次に対応":"待機中"));return card};
       stages.append(
         stage("01","相談受付",true,false),
-        stage("02","来店・試乗",visitDone,!visitDone),
-        stage("03","見積・相談",Boolean(ready.estimate_ready),visitDone&&!ready.estimate_ready),
-        stage("04","購入判断",Boolean(ready.purchase_decided),ready.estimate_ready&&!ready.purchase_decided),
-        stage("05","販売契約",Boolean(ready.sale_contract_created),ready.purchase_decided&&!ready.sale_contract_created)
+        stage("02","来店・試乗",visitDone,currentStage==="visit",!visitRequired&&!visitDone),
+        stage("03","見積・相談",estimateDone,currentStage==="estimate"),
+        stage("04","購入判断",purchaseDone,currentStage==="purchase"),
+        stage("05","販売契約",contractDone,currentStage==="contract")
       );hero.append(stages);if(ready.next_action_overdue)hero.append(el("div","sales-overdue",`次回対応期限を過ぎています：${dateTime(lead.next_action_at)}`));root.append(hero);
 
       const summarySection=el("section","sales-section");summarySection.append(el("h3","","お客様・購入検討車両"));const grid=el("div","sales-summary-grid");
