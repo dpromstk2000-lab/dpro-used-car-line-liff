@@ -27,10 +27,11 @@
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.spinner{animation:none}}
   </style>
   <!-- DPRO CAR STEP CAR-18 AFTERCARE MAINTENANCE RETENTION -->
+  <!-- DPRO CAR STEP CAR-20 COMMUNICATION HISTORY -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><a class="back" id="homeLink" href="index.html">← 総合入口へ</a><div class="brand">LINEマイページ<small>DPRO中古車センター</small></div></div></header>
-  <section class="hero"><div class="hero-inner"><p class="kicker">MY CAR SUPPORT</p><h1>購入から点検・車検まで、<br>愛車をひとつの画面で。</h1><p>査定、商談、納車予定に加え、点検・車検・保証・整備履歴をLINE本人確認後に表示します。</p><span class="safe-chip">🔒 ご本人に関係する情報だけを表示</span></div></section>
+  <section class="hero"><div class="hero-inner"><p class="kicker">MY CAR SUPPORT</p><h1>購入から点検・車検まで、<br>愛車をひとつの画面で。</h1><p>査定、商談、納車予定、点検・車検・整備履歴、店舗からのご案内をLINE本人確認後に表示します。</p><span class="safe-chip">🔒 ご本人に関係する情報だけを表示</span></div></section>
 
   <aside class="demo-bar" id="demoBar" hidden aria-label="デモ顧客切替"><div class="demo-copy"><strong>営業デモ切替</strong><span>お客様の進行状況に合わせた画面を確認できます。</span></div><nav class="demo-links"><a class="demo-link" data-demo-user="demo_car_line_001" href="member.html?demo=1&line_user_id=demo_car_line_001">購入・試乗中</a><a class="demo-link" data-demo-user="demo_car_line_002" href="member.html?demo=1&line_user_id=demo_car_line_002">写真査定中</a><a class="demo-link" data-demo-user="demo_car_line_004" href="member.html?demo=1&line_user_id=demo_car_line_004">契約・納車待ち</a></nav></aside>
 
@@ -45,7 +46,7 @@
 
       <section class="next-panel" id="nextPanel"><div class="next-icon" aria-hidden="true">✓</div><div class="next-copy"><p>NEXT ACTION</p><h2 id="nextTitle">現在の状況を確認しています</h2><div id="nextDetail"></div></div><div class="next-number" id="nextNumber"></div></section>
 
-      <nav class="jump-nav" aria-label="マイページ内メニュー"><a href="#reservations">予約</a><a href="#appraisals">査定・買取</a><a href="#sales">購入・納車</a><a href="#documents">必要書類</a><a href="#vehicles">登録車両</a><a href="#aftercare">愛車サポート</a><a href="#followups">フォロー予定</a></nav>
+      <nav class="jump-nav" aria-label="マイページ内メニュー"><a href="#reservations">予約</a><a href="#appraisals">査定・買取</a><a href="#sales">購入・納車</a><a href="#documents">必要書類</a><a href="#vehicles">登録車両</a><a href="#aftercare">愛車サポート</a><a href="#followups">フォロー予定</a><a href="#communications">ご案内履歴</a></nav>
 
       <section class="section" id="reservations"><div class="section-head"><div><p class="section-kicker">RESERVATIONS</p><h2>ご予約・ご来店予定</h2></div><p>査定・試乗・納車予定</p></div><div class="grid" id="reservationGrid"></div></section>
       <section class="section" id="appraisals"><div class="section-head"><div><p class="section-kicker">APPRAISAL & PURCHASE</p><h2>査定・買取状況</h2></div><p>内部査定額は表示しません</p></div><div class="grid" id="appraisalGrid"></div><div class="grid" id="purchaseGrid" style="margin-top:14px"></div></section>
@@ -54,6 +55,7 @@
       <section class="section" id="vehicles"><div class="section-head"><div><p class="section-kicker">YOUR VEHICLES</p><h2>登録車両</h2></div><p>登録番号は下4桁のみ表示</p></div><div class="vehicle-list" id="vehicleList"></div></section>
       <section class="section" id="aftercare"><div class="section-head"><div><p class="section-kicker">MY CAR AFTERCARE</p><h2>点検・車検・整備履歴</h2></div><p>愛車の次回予定と実施履歴</p></div><div class="grid" id="aftercareGrid"></div><div class="follow-list" id="serviceList" style="margin-top:14px"></div></section>
       <section class="section" id="followups"><div class="section-head"><div><p class="section-kicker">AFTER SUPPORT</p><h2>納車後フォロー</h2></div><p>点検・車検・オイル交換</p></div><div class="follow-list" id="followList"></div></section>
+      <section class="section" id="communications"><div class="section-head"><div><p class="section-kicker">MESSAGE HISTORY</p><h2>店舗からのご案内</h2></div><p>送信済みのご案内だけを表示</p></div><div class="follow-list" id="communicationList"></div></section>
 
       <section class="privacy"><div><p class="section-kicker">PRIVACY GUARD</p><h2>本人確認と情報分離</h2><p>LINEの本人確認後、ご本人に関係する情報だけをWorker経由で取得します。</p></div><div class="privacy-list"><div><b>01</b>内部査定額・仕入原価・内部メモを除外</div><div><b>02</b>非公開写真の保存先を画面へ返しません</div><div><b>03</b>氏名・電話番号を端末内へ保存しません</div></div></section>
       <div class="bottom-actions"><a class="button amber" id="inventoryLink" href="inventory.html">販売在庫を見る</a><a class="button primary" id="sellLink" href="sell.html">無料査定を申し込む</a><a class="button" href="tel:0920001234">店舗へ電話</a></div>
@@ -91,7 +93,7 @@
       function renderMember(data){
         const c=data.customer;document.getElementById("memberName").textContent=`${c.customer_name} 様`;document.getElementById("memberCode").textContent=c.customer_code;document.getElementById("memberContact").textContent=[c.phone_masked,c.email_masked].filter(Boolean).join(" ／ ")||"LINE連携済み";const memberNote=document.getElementById("memberNote");memberNote.textContent=c.public_note||"査定・商談・納車予定の最新状況をご確認いただけます。";
         document.getElementById("summaryAppraisals").textContent=data.summary.active_appraisals;document.getElementById("summaryLeads").textContent=data.summary.active_sales_leads;document.getElementById("summaryReservations").textContent=data.summary.upcoming_reservations;document.getElementById("summaryDocuments").textContent=data.summary.pending_documents;
-        renderNext(data);renderReservations(data.reservations);renderAppraisals(data.appraisals);renderPurchaseContracts(data.purchase_contracts);renderSales(data.sales_leads);renderSaleContracts(data.sale_contracts);renderDocuments(data.documents);renderVehicles(data.vehicles);renderAftercare(data.aftercare_profiles||[],data.service_records||[]);renderFollowups(data.followups);
+        renderNext(data);renderReservations(data.reservations);renderAppraisals(data.appraisals);renderPurchaseContracts(data.purchase_contracts);renderSales(data.sales_leads);renderSaleContracts(data.sale_contracts);renderDocuments(data.documents);renderVehicles(data.vehicles);renderAftercare(data.aftercare_profiles||[],data.service_records||[]);renderFollowups(data.followups);renderCommunications(data.communications||[]);
         loading.hidden=true;messagePanel.hidden=true;dashboard.hidden=false;
       }
 
@@ -109,6 +111,19 @@
       function renderDocuments(items){const list=document.getElementById("documentList");clear(list);if(!items.length){empty(list,"現在、ご準備いただく書類はありません。");return;}items.forEach(item=>{const row=el("article","row-card"),left=el("div"),right=el("div","row-status");left.append(el("h3","",item.document_label),el("p","",[item.sale_contract_number,item.purchase_contract_number,item.appraisal_case_number].filter(Boolean).join(" ／ ")||"お客様書類"));right.append(el("strong","",item.status_label),el("small","",item.due_date?`期限目安 ${date(item.due_date)}`:""));row.append(left,right);list.append(row)});}
       function renderVehicles(items){const list=document.getElementById("vehicleList");clear(list);if(!items.length){empty(list,"登録車両はありません。");return;}items.forEach(item=>{const row=el("article","row-card"),left=el("div"),right=el("div","row-status");left.append(el("h3","",vehicleName(item)),el("p","",[item.model_year?`${item.model_year}年式`:null,item.mileage_km!==null?`${new Intl.NumberFormat("ja-JP").format(item.mileage_km)}km`:null,item.color].filter(Boolean).join("・")));right.append(el("strong","",item.registration_number_masked||item.vehicle_code),el("small","",item.inspection_expiry?`車検 ${date(item.inspection_expiry)}`:""));row.append(left,right);list.append(row)});}
       function renderFollowups(items){const list=document.getElementById("followList");clear(list);if(!items.length){empty(list,"現在、予定されているフォローはありません。");return;}items.forEach(item=>{const row=el("article","row-card"),left=el("div"),right=el("div","row-status");left.append(el("h3","",item.followup_type_label),el("p","",item.message_text||vehicleName(item.inventory)));right.append(el("strong","",date(item.scheduled_date)),el("small","",item.status==="completed"?"完了":"予定"));row.append(left,right);list.append(row)});}
+
+
+      function renderCommunications(items){
+        const list=document.getElementById("communicationList");clear(list);
+        if(!items.length){empty(list,"現在、表示できるご案内履歴はありません。");return;}
+        items.forEach(item=>{
+          const row=el("article","row-card"),left=el("div"),right=el("div","row-status");
+          const category={appraisal_received:"査定受付",appraisal_price:"査定金額",document_request:"必要書類",reservation_reminder:"予約案内",estimate_notice:"見積案内",payment_reminder:"入金案内",registration_progress:"登録進捗",delivery_confirmation:"納車確認",after_delivery_check:"納車後確認",inspection_reminder:"点検案内",vehicle_inspection_reminder:"車検案内",oil_change_reminder:"オイル交換",replacement_offer:"乗り換え提案",general:"ご案内"}[item.category]||"ご案内";
+          left.append(el("h3","",category),el("p","",item.body_text||""));
+          right.append(el("strong","",item.sent_at?dateTime(item.sent_at):dateTime(item.created_at)),el("small","",item.channel==="line"?"LINEでご案内":"店舗からご案内"));
+          row.append(left,right);list.append(row);
+        });
+      }
 
       const memberAftercareInterest={none:"現在は予定なし",low:"情報収集中",medium:"今後検討",high:"相談希望"};
       const memberServiceType={after_delivery_check:"納車後確認",initial_inspection:"1か月点検",periodic_inspection:"定期点検",vehicle_inspection:"車検",oil_change:"オイル交換",warranty:"保証対応",repair:"修理",recall:"リコール",other:"その他"};

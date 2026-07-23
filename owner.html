@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111d29">
   <meta name="description" content="DPRO中古車センターのオーナーPC管理画面。査定、在庫、商談、試乗、契約、納車、顧客検索を一元管理します。">
-  <title>オーナーPC管理 CAR-19-R1｜DPRO中古車センター</title>
+  <title>オーナーPC管理 CAR-20｜DPRO中古車センター</title>
   <style>
     :root{--navy:#10243e;--navy2:#173858;--charcoal:#111d29;--amber:#e5a12b;--amber2:#fff1d2;--green:#117b61;--green2:#e2f3ed;--red:#b44235;--red2:#fff0ed;--canvas:#f4f2ed;--paper:#fff;--soft:#eef2f5;--line:#d5dee5;--ink:#102033;--muted:#617083;--shadow:0 15px 38px rgba(15,35,56,.11);--tap:52px;--side:244px}
     *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.68;-webkit-text-size-adjust:100%}button,input,select,textarea,a{font:inherit}button,a{touch-action:manipulation}:focus-visible{outline:4px solid rgba(229,161,43,.42);outline-offset:2px}a{color:inherit}
@@ -204,21 +204,45 @@
     @media(max-width:1000px){.management-kpis{grid-template-columns:repeat(2,1fr)}.management-grid{grid-template-columns:1fr}.management-panel.full{grid-column:auto}.management-target-form{grid-template-columns:1fr 1fr}}
     @media(max-width:650px){.management-kpis,.management-conversions,.management-alerts,.management-target-form{grid-template-columns:1fr}.management-progress-row{grid-template-columns:1fr}.management-actions .button{width:100%}}
 
+
+    /* DPRO CAR STEP CAR-20 COMMUNICATION TEMPLATES / HISTORY */
+    .communication-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+    .communication-kpi{padding:15px;border:1px solid var(--line);border-radius:15px;background:#fff}
+    .communication-kpi.warn{border-color:#e0b35d;background:#fff9ec}.communication-kpi.danger{border-color:#dfa39b;background:#fff5f3}.communication-kpi.good{border-color:#8fceb9;background:#effaf6}
+    .communication-kpi span{display:block;color:var(--muted);font-size:13px;font-weight:850}.communication-kpi strong{display:block;font-size:28px}.communication-kpi small{display:block;color:var(--muted);font-size:12px}
+    .communication-grid{margin-top:15px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.9fr);gap:15px}
+    .communication-panel{padding:18px;border:1px solid var(--line);border-radius:17px;background:#fff}
+    .communication-panel.full{grid-column:1/-1}.communication-panel h3{margin:0;font-size:21px}.communication-panel>p{margin:3px 0 12px;color:var(--muted);font-size:13px}
+    .communication-list,.communication-suggestions,.communication-templates{display:grid;gap:10px}
+    .communication-card{padding:14px;border:1px solid var(--line);border-radius:13px;background:#fff}
+    .communication-card.warn{border-color:#e1b45c;background:#fffaf0}.communication-card.danger{border-color:#dfa39b;background:#fff5f3}
+    .communication-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.communication-card-head h4{margin:0;font-size:18px}.communication-card-head p{margin:2px 0 0;color:var(--muted);font-size:12px}
+    .communication-body{margin:10px 0 0;padding:12px;border-radius:10px;background:var(--soft);white-space:pre-wrap;overflow-wrap:anywhere}
+    .communication-meta{margin-top:9px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.communication-meta div{padding:8px 9px;border-radius:9px;background:var(--soft)}.communication-meta span{display:block;color:var(--muted);font-size:11px;font-weight:800}.communication-meta strong{display:block;overflow-wrap:anywhere}
+    .communication-actions{margin-top:10px;display:flex;flex-wrap:wrap;gap:7px}.communication-actions .button{min-height:44px;padding:7px 12px;font-size:14px}
+    .communication-edit{margin-top:11px;display:grid;gap:8px}.communication-edit textarea,.communication-edit input,.communication-edit select{width:100%;min-height:44px;padding:8px 10px;border:1px solid #b9c6d0;border-radius:10px;background:#fff}.communication-edit textarea{min-height:105px;resize:vertical}
+    .communication-template{padding:13px;border:1px solid var(--line);border-radius:12px;background:#fff}.communication-template summary{cursor:pointer;font-weight:900}.communication-template textarea{width:100%;min-height:130px;margin-top:10px;padding:10px;border:1px solid #b9c6d0;border-radius:10px;resize:vertical}
+    .communication-template-actions{margin-top:8px;display:flex;justify-content:flex-end}.communication-template-actions .button{min-height:44px}
+    .communication-safe{margin-top:14px;padding:14px;border-radius:12px;background:var(--navy);color:#fff}.communication-safe strong{display:block}.communication-safe span{display:block;color:#d2dfe8;font-size:13px}
+    .communication-filter{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}.communication-filter button{min-height:40px;padding:6px 11px;border:1px solid #bdc9d2;border-radius:999px;background:#fff;font-weight:850;cursor:pointer}.communication-filter button.active{border-color:var(--amber);background:var(--amber2)}
+    @media(max-width:1050px){.communication-kpis{grid-template-columns:repeat(2,1fr)}.communication-grid{grid-template-columns:1fr}.communication-panel.full{grid-column:auto}}
+    @media(max-width:650px){.communication-kpis,.communication-meta{grid-template-columns:1fr}.communication-actions .button{width:100%}}
+
   </style>
-  <!-- CAR-19-R1-MANAGEMENT-ANALYTICS-INVENTORY-PRICE-GUARD-20260723 -->
-  <!-- CAR-19-R1-MANAGEMENT-ANALYTICS-INVENTORY-PRICE-GUARD-20260723 -->
+  <!-- CAR-20-COMMUNICATION-TEMPLATES-HISTORY-20260723 -->
+  <!-- CAR-20-COMMUNICATION-TEMPLATES-HISTORY-20260723 -->
   <!-- DPRO CAR STEP CAR-18 AFTERCARE MAINTENANCE RETENTION -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
 
   <main class="gate-wrap" id="gateView">
-    <section class="gate" aria-labelledby="gateTitle"><div class="gate-head"><p class="gate-kicker">OWNER CONTROL CENTER</p><h1 id="gateTitle">買取から経営分析まで、一元管理。</h1><p>査定・在庫・商談・契約・納車・アフターケア・経営分析を同じ画面で確認します。</p></div><div class="gate-body"><form id="loginForm"><label class="field-label" for="adminCode">管理コード</label><div class="code-row"><input class="code-input" id="adminCode" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="管理コードを入力"><button class="button" id="clearCode" type="button">削除</button></div><p class="gate-note">管理コードはこの画面の通信中だけ使用し、端末内へ保存しません。営業デモURLではデモ用コードを自動設定します。</p><div class="gate-actions"><button class="button primary" id="loginButton" type="submit">管理画面を開く</button><a class="button" href="index.html">総合入口へ戻る</a></div><div class="form-message" id="loginError" hidden></div><div class="loading-line" id="loginLoading" hidden>Supabaseから最新情報を取得しています…</div></form></div></section>
+    <section class="gate" aria-labelledby="gateTitle"><div class="gate-head"><p class="gate-kicker">OWNER CONTROL CENTER</p><h1 id="gateTitle">買取からLINE連絡管理まで、一元管理。</h1><p>査定・在庫・商談・契約・納車・アフターケア・経営分析・連絡履歴を同じ画面で確認します。</p></div><div class="gate-body"><form id="loginForm"><label class="field-label" for="adminCode">管理コード</label><div class="code-row"><input class="code-input" id="adminCode" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="管理コードを入力"><button class="button" id="clearCode" type="button">削除</button></div><p class="gate-note">管理コードはこの画面の通信中だけ使用し、端末内へ保存しません。営業デモURLではデモ用コードを自動設定します。</p><div class="gate-actions"><button class="button primary" id="loginButton" type="submit">管理画面を開く</button><a class="button" href="index.html">総合入口へ戻る</a></div><div class="form-message" id="loginError" hidden></div><div class="loading-line" id="loginLoading" hidden>Supabaseから最新情報を取得しています…</div></form></div></section>
   </main>
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-19-R1-MANAGEMENT-ANALYTICS-INVENTORY-PRICE-GUARD-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-20-COMMUNICATION-TEMPLATES-HISTORY-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -230,6 +254,7 @@
         <section class="section-view" id="view-delivery" hidden></section>
         <section class="section-view" id="view-aftercare" hidden></section>
         <section class="section-view" id="view-management" hidden></section>
+        <section class="section-view" id="view-communications" hidden></section>
         <section class="section-view" id="view-search" hidden></section>
         <section class="section-view" id="view-team" hidden></section>
       </main>
@@ -284,6 +309,7 @@
       {id:"delivery",icon:"納",label:"納車・フォロー",kicker:"DELIVERY & FOLLOW",title:"納車・アフターフォロー",description:"納車準備、納車予定、納車後の連絡を確認します。",count:d=>(d.followups||[]).filter(x=>["pending","prepared"].includes(x.status)).length},
       {id:"aftercare",icon:"巡",label:"納車後管理",kicker:"AFTERCARE & RETENTION",title:"点検・車検・乗り換え",description:"納車後フォロー、点検、車検、保証、整備履歴、乗り換え見込みを管理します。",count:d=>(d.followups||[]).filter(x=>["pending","prepared"].includes(x.status)).length},
       {id:"management",icon:"経",label:"経営分析",kicker:"MANAGEMENT ANALYTICS",title:"経営・在庫・粗利",description:"査定、買取、販売、在庫回転、粗利、成約率を経営数値で確認します。",count:()=>0},
+      {id:"communications",icon:"連",label:"連絡管理",kicker:"CUSTOMER COMMUNICATION",title:"LINE連絡・送信履歴",description:"テンプレート、送信予定、文章コピー、送信済み履歴を一元管理します。",count:()=>0},
       {id:"team",icon:"設",label:"設定",kicker:"STORE SETTINGS",title:"店舗・担当者設定",description:"営業時間・定休日・受付上限と担当者を確認します。",count:d=>(d.staff||[]).length},
     ];
       const statusLabels={
@@ -312,7 +338,7 @@
       function renderSection(id,force=false){
       if(!state.data)return;
       if(!force&&state.rendered.has(id))return;
-      const renderers={dashboard:renderDashboard,today:renderToday,appraisals:renderAppraisals,search:renderSearch,inventory:renderInventory,sales:renderSales,contracts:renderContracts,delivery:renderDelivery,aftercare:renderAftercare,management:renderManagement,team:renderTeam};
+      const renderers={dashboard:renderDashboard,today:renderToday,appraisals:renderAppraisals,search:renderSearch,inventory:renderInventory,sales:renderSales,contracts:renderContracts,delivery:renderDelivery,aftercare:renderAftercare,management:renderManagement,communications:renderCommunications,team:renderTeam};
       const render=renderers[id];
       if(render){render();state.rendered.add(id)}
     }
@@ -851,6 +877,161 @@
     }
     function car19TargetForm(data,root){const t=data.targets||{},form=el("form","management-target-form"),field=(labelText,name,value,type="number",full=false,min=0)=>{const wrap=el("div",`management-target-field${full?" full":""}`),labelNode=el("label","",labelText);let input;if(type==="textarea")input=document.createElement("textarea");else{input=document.createElement("input");input.type=type;input.min=String(min)}input.name=name;input.value=value??"";wrap.append(labelNode,input);return{wrap,input}};const fields=[["査定受付目標","appraisal_target",t.appraisal_target],["買取契約目標","purchase_contract_target",t.purchase_contract_target],["販売契約目標","sales_contract_target",t.sales_contract_target],["納車目標","delivery_target",t.delivery_target],["契約売上目標（円）","sales_revenue_target",t.sales_revenue_target],["粗利目標（円）","gross_profit_target",t.gross_profit_target],["粗利率目標（%）","gross_margin_target",t.gross_margin_target],["在庫回転日数目標","inventory_turnover_days_target",t.inventory_turnover_days_target,"number",false,1],["長期在庫警告日数","aged_inventory_warning_days",t.aged_inventory_warning_days,"number",false,1],["商談対応目標時間","lead_response_hours_target",t.lead_response_hours_target,"number",false,1]];fields.forEach(args=>form.append(field(...args).wrap));const note=field("経営メモ","note",t.note,"textarea",true);form.append(note.wrap);const actions=el("div","management-actions"),save=el("button","button amber","経営目標を保存");save.type="submit";actions.append(save);form.append(actions);form.addEventListener("submit",async event=>{event.preventDefault();save.disabled=true;try{const payload=Object.fromEntries(new FormData(form).entries());payload.target_month=t.target_month;await api("/api/admin/management-targets",{method:"PATCH",body:JSON.stringify(payload)});showToast("経営目標を保存しました。");await loadManagement(root,data.period?.key||"month")}catch(error){showToast(error.message,true)}finally{save.disabled=false}});return form}
     function car19DownloadCsv(data){const rows=[["集計期間",data.period?.label||""],["査定受付",data.kpis?.appraisals_received||0],["買取契約",data.kpis?.purchase_contracts||0],["販売契約",data.kpis?.sales_contracts||0],["契約売上",data.kpis?.contract_revenue||0],["見込粗利",data.kpis?.estimated_gross_profit||0],["見込粗利率",data.kpis?.estimated_gross_margin||0],["管理在庫",data.kpis?.active_inventory||0],["在庫原価",data.kpis?.inventory_cost||0],["平均在庫日数",data.kpis?.average_stock_days||0]];const csv="\ufeff"+rows.map(row=>row.map(value=>`"${String(value).replaceAll('"','""')}"`).join(",")).join("\r\n"),blob=new Blob([csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`DPRO_CAR_経営分析_${data.period?.start_date||""}_${data.period?.end_date||""}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+
+
+    const CAR20_STATUS_LABEL={draft:"下書き",scheduled:"送信予定",prepared:"準備済み",copied:"コピー済み",sent:"送信済み",failed:"送信失敗",cancelled:"中止"};
+    const CAR20_CATEGORY_LABEL={appraisal_received:"査定受付",appraisal_price:"査定金額",document_request:"必要書類",reservation_reminder:"予約案内",estimate_notice:"見積案内",payment_reminder:"入金案内",registration_progress:"登録進捗",delivery_confirmation:"納車確認",after_delivery_check:"納車後確認",inspection_reminder:"点検案内",vehicle_inspection_reminder:"車検案内",oil_change_reminder:"オイル交換",replacement_offer:"乗り換え提案",general:"一般連絡"};
+    let car20Data=null,car20Filter="all";
+
+    function car20Kpi(labelText,value,kind="",sub=""){
+      const card=el("article",`communication-kpi ${kind}`.trim());
+      card.append(el("span","",labelText),el("strong","",String(value??0)),el("small","",sub));
+      return card;
+    }
+
+    async function car20Load(){
+      car20Data=await api("/api/admin/communications");
+      return car20Data;
+    }
+
+    function renderCommunications(){
+      const root=document.getElementById("view-communications");
+      clear(root);
+      root.append(sectionHeader("連絡テンプレート・送信履歴","文章作成、コピー、送信予定、送信済み履歴を一元管理",0));
+      root.append(el("div","empty","連絡情報を取得しています。"));
+      car20Load().then(()=>car20RenderPage(root)).catch(error=>{
+        clear(root);root.append(el("div","empty",error.message));showToast(error.message,true);
+      });
+    }
+
+    function car20RenderPage(root){
+      clear(root);
+      root.append(sectionHeader("連絡テンプレート・送信履歴","初期状態は文章コピー・手動送信確認方式です",car20Data.communications?.length||0));
+      const summary=car20Data.summary||{},kpis=el("div","communication-kpis");
+      kpis.append(
+        car20Kpi("未送信",summary.unsent,summary.unsent?"warn":"","下書き・予定・コピー済み"),
+        car20Kpi("本日予定",summary.today_scheduled,summary.today_scheduled?"warn":"","送信予定"),
+        car20Kpi("期限超過",summary.overdue,summary.overdue?"danger":"","未送信"),
+        car20Kpi("送信済み",summary.sent,"good","手動確認済み"),
+        car20Kpi("おすすめ",summary.suggestions,summary.suggestions?"warn":"","文章作成候補")
+      );
+      root.append(kpis);
+
+      const grid=el("div","communication-grid"),suggestionPanel=el("section","communication-panel"),historyPanel=el("section","communication-panel");
+      suggestionPanel.append(el("h3","","次に作成する案内"),el("p","","書類・予約・入金・納車・点検予定から候補を表示"));
+      const suggestions=el("div","communication-suggestions");
+      (car20Data.suggestions||[]).forEach(item=>suggestions.append(car20SuggestionCard(item)));
+      if(!suggestions.children.length)suggestions.append(empty("現在、未作成の案内候補はありません。"));
+      suggestionPanel.append(suggestions);
+
+      historyPanel.append(el("h3","","連絡履歴"),el("p","","文章作成から送信済み確認までの履歴"));
+      const filter=el("div","communication-filter");
+      [["all","すべて"],["draft","下書き"],["scheduled","送信予定"],["copied","コピー済み"],["sent","送信済み"]].forEach(([value,labelText])=>{
+        const button=el("button",car20Filter===value?"active":"",labelText);button.type="button";
+        button.addEventListener("click",()=>{car20Filter=value;car20RenderPage(root)});
+        filter.append(button);
+      });
+      historyPanel.append(filter);
+      const history=el("div","communication-list");
+      (car20Data.communications||[]).filter(item=>car20Filter==="all"||item.status===car20Filter).forEach(item=>history.append(car20HistoryCard(item)));
+      if(!history.children.length)history.append(empty("該当する連絡履歴はありません。"));
+      historyPanel.append(history);
+      grid.append(suggestionPanel,historyPanel);
+      root.append(grid);
+
+      const templatePanel=el("section","communication-panel full");
+      templatePanel.append(el("h3","","連絡テンプレート"),el("p","","差し込み項目は文章作成時に顧客・車両情報へ置き換えます"));
+      const templates=el("div","communication-templates");
+      (car20Data.templates||[]).filter(item=>item.is_active).forEach(item=>templates.append(car20TemplateEditor(item)));
+      templatePanel.append(templates);
+      const safe=el("div","communication-safe");
+      safe.append(el("strong","","自動送信はOFFです"),el("span","","LINE公式アカウント等へ文章を貼り付けて送信した後、「送信済みとして記録」を押します。"));
+      templatePanel.append(safe);
+      grid.append(templatePanel);
+    }
+
+    function car20SuggestionCard(item){
+      const card=el("article","communication-card warn"),head=el("div","communication-card-head"),copy=el("div");
+      copy.append(el("h4","",item.title||CAR20_CATEGORY_LABEL[item.category]||"ご案内候補"),el("p","",item.due_at?`予定・期限 ${dateTime(item.due_at)}`:"未作成"));
+      head.append(copy,el("span","badge warn",CAR20_CATEGORY_LABEL[item.category]||item.category));
+      const button=el("button","button amber","文章を作成");button.type="button";
+      button.addEventListener("click",async()=>{
+        button.disabled=true;
+        try{
+          const result=await api("/api/admin/communications/drafts",{method:"POST",body:JSON.stringify({source_key:item.source_key,template_code:item.template_code,...(item.context||{})})});
+          showToast(result.message||"連絡文章を作成しました。");
+          await car20Load();car20RenderPage(document.getElementById("view-communications"));
+        }catch(error){showToast(error.message,true)}finally{button.disabled=false}
+      });
+      card.append(head,button);return card;
+    }
+
+    function car20HistoryCard(item){
+      const overdue=item.scheduled_at&&Date.parse(item.scheduled_at)<Date.now()&&!["sent","cancelled"].includes(item.status);
+      const card=el("article",`communication-card${overdue?" danger":""}`),head=el("div","communication-card-head"),copy=el("div");
+      copy.append(el("h4","",`${item.recipient_name||item.customer?.customer_name||"お客様"}／${CAR20_CATEGORY_LABEL[item.category]||item.category}`),el("p","",[item.communication_number,item.vehicle?.vehicle_name].filter(Boolean).join(" ／ ")));
+      head.append(copy,el("span",`badge ${item.status==="sent"?"active":overdue?"danger":"warn"}`,CAR20_STATUS_LABEL[item.status]||item.status));
+      card.append(head);
+      const metaGrid=el("div","communication-meta");
+      [["予定",item.scheduled_at?dateTime(item.scheduled_at):"未設定"],["担当",item.assigned_staff?.staff_name||"未設定"],["連絡先",item.recipient_phone_masked||"LINE"]].forEach(([k,v])=>{const box=el("div");box.append(el("span","",k),el("strong","",v));metaGrid.append(box)});
+      card.append(metaGrid,el("div","communication-body",item.body_text));
+      const actions=el("div","communication-actions");
+      const copyButton=el("button","button primary","文章をコピー");copyButton.type="button";
+      copyButton.addEventListener("click",async()=>{
+        try{
+          await navigator.clipboard.writeText(item.body_text);
+          await api(`/api/admin/communications/${item.id}/copied`,{method:"POST",body:"{}"});
+          showToast("文章をコピーし、履歴へ記録しました。");
+          await car20Load();car20RenderPage(document.getElementById("view-communications"));
+        }catch(error){showToast(error.message,true)}
+      });
+      actions.append(copyButton);
+      if(item.status!=="sent"&&item.status!=="cancelled"){
+        const sent=el("button","button amber","送信済みとして記録");sent.type="button";
+        sent.addEventListener("click",async()=>{
+          if(!confirm("LINE公式アカウント等で実際に送信済みですか？"))return;
+          sent.disabled=true;
+          try{
+            const result=await api(`/api/admin/communications/${item.id}/sent`,{method:"POST",body:JSON.stringify({confirmed:true})});
+            showToast(result.message||"送信済みとして記録しました。");
+            await car20Load();car20RenderPage(document.getElementById("view-communications"));
+          }catch(error){showToast(error.message,true)}finally{sent.disabled=false}
+        });
+        actions.append(sent);
+      }
+      card.append(actions);
+      if(item.status!=="sent"){
+        const details=document.createElement("details"),summary=document.createElement("summary");summary.textContent="文章・予定を編集";
+        const edit=el("div","communication-edit"),textarea=document.createElement("textarea"),schedule=document.createElement("input"),status=document.createElement("select");
+        textarea.value=item.body_text||"";schedule.type="datetime-local";schedule.value=item.scheduled_at?new Date(item.scheduled_at).toISOString().slice(0,16):"";
+        [["draft","下書き"],["scheduled","送信予定"],["prepared","準備済み"],["copied","コピー済み"],["cancelled","中止"]].forEach(([v,t])=>{const o=el("option","",t);o.value=v;o.selected=item.status===v;status.append(o)});
+        const save=el("button","button primary","変更を保存");save.type="button";
+        save.addEventListener("click",async()=>{
+          save.disabled=true;
+          try{
+            await api(`/api/admin/communications/${item.id}`,{method:"PATCH",body:JSON.stringify({body_text:textarea.value,scheduled_at:schedule.value||null,status:status.value})});
+            showToast("連絡内容を保存しました。");await car20Load();car20RenderPage(document.getElementById("view-communications"));
+          }catch(error){showToast(error.message,true)}finally{save.disabled=false}
+        });
+        edit.append(textarea,schedule,status,save);details.append(summary,edit);card.append(details);
+      }
+      return card;
+    }
+
+    function car20TemplateEditor(item){
+      const details=document.createElement("details");details.className="communication-template";
+      const summary=document.createElement("summary");summary.textContent=`${item.template_name}（${CAR20_CATEGORY_LABEL[item.category]||item.category}）`;
+      const textarea=document.createElement("textarea");textarea.value=item.body_text||"";
+      const actions=el("div","communication-template-actions"),save=el("button","button primary","テンプレートを保存");save.type="button";
+      save.addEventListener("click",async()=>{
+        save.disabled=true;
+        try{
+          await api(`/api/admin/communication-templates/${item.id}`,{method:"PATCH",body:JSON.stringify({body_text:textarea.value})});
+          showToast("テンプレートを保存しました。");await car20Load();car20RenderPage(document.getElementById("view-communications"));
+        }catch(error){showToast(error.message,true)}finally{save.disabled=false}
+      });
+      actions.append(save);details.append(summary,textarea,actions);return details;
+    }
 
     function renderTeam(){const root=document.getElementById("view-team");clear(root);root.append(sectionHeader("店舗・担当者","営業時間・定休日・受付上限と担当者",state.data.stores.length));const grid=el("div","store-grid");state.data.stores.forEach(store=>{const card=el("article","store-card");card.append(el("h3","",store.store_name),el("p","",store.address||"住所未設定"),el("p","",`営業時間 ${String(store.opening_time||"").slice(0,5)}〜${String(store.closing_time||"").slice(0,5)}／${store.phone||"電話未設定"}`));const edit=el("button","button editor-open","店舗設定を編集");edit.type="button";edit.addEventListener("click",()=>openStoreEditor(store));card.append(edit);const list=el("div","staff-list"),members=state.data.staff.filter(x=>x.store_id===store.id);members.forEach(s=>{const row=el("div","staff-row"),left=el("div");left.append(el("strong","",s.staff_name),el("span","",s.staff_code));row.append(left,el("span","",{staff:"スタッフ",manager:"店長",admin:"管理者"}[s.role]||s.role));list.append(row)});if(!members.length)list.append(empty("担当者は未登録です。"));card.append(list);grid.append(card)});if(!grid.children.length)grid.append(empty("店舗情報はありません。"));root.append(grid);const safe=el("section","safe-panel");safe.append(el("h3","","管理画面の安全設計"),el("p","","お客様画面と管理情報を分離し、管理コードが一致した場合だけWorkerがデータを返します。"));const list=el("div","safe-list");["管理コードを端末内に保存しない","更新操作を監査ログへ記録","査定用の非公開写真と掲載写真を分離"].forEach((x,i)=>{const n=el("div");n.append(el("b","",`0${i+1} `),document.createTextNode(x));list.append(n)});safe.append(list);root.append(safe)}
       const storeModal=document.getElementById("storeModal"),storeForm=document.getElementById("storeForm"),weekdayRoot=document.getElementById("closedWeekdays");["日","月","火","水","木","金","土"].forEach((day,index)=>{const label=document.createElement("label"),input=document.createElement("input");input.type="checkbox";input.name="closed_weekdays";input.value=String(index);label.append(input,document.createTextNode(day));weekdayRoot.append(label)});

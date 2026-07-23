@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-19-R1 販売価格未設定車の粗利算出除外
+ * STEP CAR-20 LINE連絡テンプレート・送信予定・対応履歴管理
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-19-R1-MANAGEMENT-ANALYTICS-INVENTORY-PRICE-GUARD-20260723",
+  version: "CAR-20-COMMUNICATION-TEMPLATES-HISTORY-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -57,4 +57,10 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   ownerGrossProfit: true,
   ownerConversionMetrics: true,
   ownerStaffPerformance: true,
+  ownerCommunicationOverview: true,
+  ownerCommunicationTemplates: true,
+  ownerCommunicationSchedule: true,
+  ownerCommunicationHistory: true,
+  memberCommunicationHistory: true,
+  communicationAutoSend: false,
 });
