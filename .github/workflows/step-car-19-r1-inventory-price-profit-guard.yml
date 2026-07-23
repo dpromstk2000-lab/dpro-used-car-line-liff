@@ -1,0 +1,285 @@
+name: DPRO CAR STEP CAR-19 R1 Inventory Price Profit Guard
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/step-car-19-r1-inventory-price-profit-guard.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dpro-car-step-car-19-r1
+  cancel-in-progress: false
+
+jobs:
+  update-inventory-price-profit-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify CAR-19 R1 Worker
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.error
+          import urllib.request
+
+          url = "https://dpro-used-car-line-api.dpromstk2000.workers.dev/api/health"
+          request = urllib.request.Request(
+              url,
+              headers={
+                  "Accept": "application/json",
+                  "User-Agent": (
+                      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 Chrome/150.0 Safari/537.36"
+                  ),
+                  "Origin": "https://dpromstk2000-lab.github.io",
+                  "Referer": (
+                      "https://dpromstk2000-lab.github.io/"
+                      "dpro-used-car-line-liff/"
+                  ),
+              },
+          )
+
+          try:
+              with urllib.request.urlopen(request, timeout=25) as response:
+                  data = json.load(response)
+          except urllib.error.HTTPError as error:
+              if error.code == 403:
+                  print(
+                      "::warning::GitHub ActionsからWorkerへの確認だけが"
+                      "HTTP 403で拒否されました。事前のブラウザ確認を前提に続行します。"
+                  )
+                  raise SystemExit(0)
+              raise
+
+          expected = "CAR-19-R1-WORKER-MANAGEMENT-ANALYTICS-INVENTORY-PRICE-GUARD-COMPLETE-20260723"
+          if data.get("version") != expected:
+              raise SystemExit(
+                  f"WorkerがCAR-19-R1ではありません: {data.get('version')}"
+              )
+
+          checks = data.get("checks") or {}
+          required = [
+              "car19_management_dashboard_schema",
+              "owner_management_dashboard_api_ready",
+              "management_inventory_aging_ready",
+              "management_inventory_price_guard_ready",
+              "management_gross_profit_internal_guard_ready",
+          ]
+          failed = [key for key in required if checks.get(key) is not True]
+          if failed:
+              raise SystemExit(f"CAR-19-R1 Worker確認失敗: {failed}")
+
+          print("CAR-19-R1 Worker: OK")
+          PY
+
+      - name: Apply CAR-19 R1 frontend guard
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          OWNER = Path("owner.html")
+          CONFIG = Path("config.js")
+          SYSTEM = Path("system-check.html")
+
+          OLD_VERSION = "CAR-19-MANAGEMENT-ANALYTICS-20260723"
+          VERSION = "CAR-19-R1-MANAGEMENT-ANALYTICS-INVENTORY-PRICE-GUARD-20260723"
+
+          for path in (OWNER, CONFIG, SYSTEM):
+              if not path.exists():
+                  raise SystemExit(f"{path.name} が見つかりません。")
+
+          owner = OWNER.read_text(encoding="utf-8")
+          config = CONFIG.read_text(encoding="utf-8")
+          system = SYSTEM.read_text(encoding="utf-8")
+
+          if OLD_VERSION not in owner:
+              raise SystemExit("CAR-19 owner.htmlを確認できません。")
+          if OLD_VERSION not in config:
+              raise SystemExit("CAR-19 config.jsを確認できません。")
+
+          old_total = '{text:car19Money(item.total_price),className:"money-cell"}'
+          new_total = '{text:Number(item.total_price||0)>0?car19Money(item.total_price):"未設定",className:"money-cell"}'
+          old_profit = '{text:item.estimated_gross_profit===null?"算出不可":car19Money(item.estimated_gross_profit),className:item.estimated_gross_profit!==null&&item.estimated_gross_profit<0?"danger-text money-cell":"money-cell"}'
+          new_profit = '{text:Number(item.total_price||0)<=0?"未算出":item.estimated_gross_profit===null?"算出不可":car19Money(item.estimated_gross_profit),className:Number(item.total_price||0)>0&&item.estimated_gross_profit!==null&&item.estimated_gross_profit<0?"danger-text money-cell":"money-cell"}'
+
+          if owner.count(old_total) != 1:
+              raise SystemExit(
+                  f"支払総額表示の置換対象が{owner.count(old_total)}件でした。"
+              )
+          if owner.count(old_profit) != 1:
+              raise SystemExit(
+                  f"見込粗利表示の置換対象が{owner.count(old_profit)}件でした。"
+              )
+
+          owner = owner.replace(old_total, new_total, 1)
+          owner = owner.replace(old_profit, new_profit, 1)
+          owner = owner.replace(OLD_VERSION, VERSION)
+          owner = owner.replace(
+              "<title>オーナーPC管理 CAR-19｜DPRO中古車センター</title>",
+              "<title>オーナーPC管理 CAR-19-R1｜DPRO中古車センター</title>",
+              1,
+          )
+
+          config = config.replace(
+              " * STEP CAR-19 経営ダッシュボード・在庫回転・粗利・成約率管理",
+              " * STEP CAR-19-R1 販売価格未設定車の粗利算出除外",
+              1,
+          )
+          config = re.sub(
+              r'version:\s*"[^"]+"',
+              f'version: "{VERSION}"',
+              config,
+              count=1,
+          )
+
+          system = system.replace(
+              "<title>システム確認 CAR-19｜DPRO中古車センター</title>",
+              "<title>システム確認 CAR-19-R1｜DPRO中古車センター</title>",
+              1,
+          )
+          system = system.replace(
+              "CAR-19 営業前システム確認",
+              "CAR-19-R1 営業前システム確認",
+              1,
+          )
+          system = system.replace(
+              "CAR-19 経営ダッシュボード・在庫回転・粗利・成約率管理",
+              "CAR-19-R1 販売価格未設定車の粗利算出除外",
+              1,
+          )
+
+          old_label = 'management_inventory_aging:"在庫回転・長期在庫",management_conversion_metrics:'
+          new_label = 'management_inventory_aging:"在庫回転・長期在庫",management_inventory_price_guard:"販売価格未設定車の粗利除外",management_conversion_metrics:'
+          if system.count(old_label) != 1:
+              raise SystemExit(
+                  f"system-check表示追加対象が{system.count(old_label)}件でした。"
+              )
+          system = system.replace(old_label, new_label, 1)
+
+          required_owner = [
+              VERSION,
+              'Number(item.total_price||0)>0?car19Money(item.total_price):"未設定"',
+              'Number(item.total_price||0)<=0?"未算出"',
+              "経営・在庫・粗利",
+          ]
+          missing_owner = [value for value in required_owner if value not in owner]
+          if missing_owner:
+              raise SystemExit(f"owner.html検査失敗: {missing_owner}")
+
+          if VERSION not in config:
+              raise SystemExit("config.jsのCAR-19-R1更新を確認できません。")
+          if "management_inventory_price_guard" not in system:
+              raise SystemExit("system-checkの価格ガード表示を確認できません。")
+
+          OWNER.write_text(owner, encoding="utf-8")
+          CONFIG.write_text(config, encoding="utf-8")
+          SYSTEM.write_text(system, encoding="utf-8")
+
+          print("CAR-19-R1 フロント表示ガード: OK")
+          PY
+
+      - name: Validate CAR-19 R1 frontend
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          owner = Path("owner.html").read_text(encoding="utf-8")
+          config = Path("config.js").read_text(encoding="utf-8")
+          system = Path("system-check.html").read_text(encoding="utf-8")
+
+          owner_scripts = re.findall(r"<script>(.*?)</script>", owner, flags=re.S)
+          system_scripts = [
+              value
+              for value in re.findall(
+                  r"<script(?:\s+[^>]*)?>(.*?)</script>",
+                  system,
+                  flags=re.S,
+              )
+              if value.strip()
+          ]
+          if not owner_scripts or not system_scripts:
+              raise SystemExit("JavaScript抽出に失敗しました。")
+
+          Path("/tmp/car19-r1-owner.js").write_text(
+              owner_scripts[-1],
+              encoding="utf-8",
+          )
+          Path("/tmp/car19-r1-system.js").write_text(
+              system_scripts[-1],
+              encoding="utf-8",
+          )
+
+          ids = re.findall(r'\bid="([^"]+)"', owner)
+          duplicates = sorted({value for value in ids if ids.count(value) > 1})
+          if duplicates:
+              raise SystemExit(f"owner.htmlに重複IDがあります: {duplicates}")
+
+          required = [
+              "CAR-19-R1-MANAGEMENT-ANALYTICS-INVENTORY-PRICE-GUARD-20260723",
+              '"未設定"',
+              '"未算出"',
+              "management_inventory_price_guard",
+          ]
+          for value in required:
+              if value not in owner and value not in config and value not in system:
+                  raise SystemExit(f"必須項目がありません: {value}")
+
+          print("CAR-19-R1 フロント構成検査: OK")
+          PY
+
+          node --check /tmp/car19-r1-owner.js
+          node --check /tmp/car19-r1-system.js
+          node --check config.js
+
+      - name: Normalize whitespace and show changes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          for filename in ("owner.html", "config.js", "system-check.html"):
+              path = Path(filename)
+              text = path.read_text(encoding="utf-8")
+              normalized = "\n".join(
+                  line.rstrip(" \t") for line in text.splitlines()
+              ) + "\n"
+              path.write_text(normalized, encoding="utf-8")
+          PY
+
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Commit CAR-19 R1 and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name "DPRO CAR Automation"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add owner.html config.js system-check.html
+          git rm --ignore-unmatch .github/workflows/step-car-19-r1-inventory-price-profit-guard.yml
+
+          if git diff --cached --quiet; then
+            echo "コミット対象の変更はありません。"
+            exit 0
+          fi
+
+          git commit -m "CAR-19-R1: exclude unpriced inventory from profit"
+          git push origin main
