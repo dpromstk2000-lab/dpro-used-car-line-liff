@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-19 経営ダッシュボード・在庫回転・粗利・成約率管理
+ * STEP CAR-19-R1 販売価格未設定車の粗利算出除外
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-19-MANAGEMENT-ANALYTICS-20260723",
+  version: "CAR-19-R1-MANAGEMENT-ANALYTICS-INVENTORY-PRICE-GUARD-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
