@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111d29">
   <meta name="description" content="DPRO中古車センターのオーナーPC管理画面。査定、在庫、商談、試乗、契約、納車、顧客検索を一元管理します。">
-  <title>オーナーPC管理 CAR-17｜DPRO中古車センター</title>
+  <title>オーナーPC管理 CAR-17-R1｜DPRO中古車センター</title>
   <style>
     :root{--navy:#10243e;--navy2:#173858;--charcoal:#111d29;--amber:#e5a12b;--amber2:#fff1d2;--green:#117b61;--green2:#e2f3ed;--red:#b44235;--red2:#fff0ed;--canvas:#f4f2ed;--paper:#fff;--soft:#eef2f5;--line:#d5dee5;--ink:#102033;--muted:#617083;--shadow:0 15px 38px rgba(15,35,56,.11);--tap:52px;--side:244px}
     *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.68;-webkit-text-size-adjust:100%}button,input,select,textarea,a{font:inherit}button,a{touch-action:manipulation}:focus-visible{outline:4px solid rgba(229,161,43,.42);outline-offset:2px}a{color:inherit}
@@ -168,8 +168,8 @@
     @media(max-width:900px){.delivery-stages{grid-template-columns:repeat(2,1fr)}.delivery-summary-grid{grid-template-columns:1fr 1fr}.delivery-pipeline-summary{grid-template-columns:1fr 1fr}}@media(max-width:650px){.detail-drawer.delivery-journey{height:min(94dvh,980px)}.delivery-stages,.delivery-summary-grid,.delivery-form-grid{grid-template-columns:1fr}.delivery-field.full,.delivery-form-actions{grid-column:auto}.delivery-row{grid-template-columns:1fr}.delivery-form-actions .button{width:100%;min-width:0}}
 
   </style>
-  <!-- CAR-17-SALE-CONTRACT-DELIVERY-LIFECYCLE-20260723 -->
-  <!-- CAR-17-SALE-CONTRACT-DELIVERY-LIFECYCLE-20260723 -->
+  <!-- CAR-17-R1-CONTRACT-DELIVERY-HEADER-ALIGNMENT-20260723 -->
+  <!-- CAR-17-R1-CONTRACT-DELIVERY-HEADER-ALIGNMENT-20260723 -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
@@ -180,7 +180,7 @@
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-17-SALE-CONTRACT-DELIVERY-LIFECYCLE-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-17-R1-CONTRACT-DELIVERY-HEADER-ALIGNMENT-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -240,7 +240,7 @@
       {id:"search",icon:"客",label:"顧客・車両",kicker:"CUSTOMER & VEHICLE",title:"顧客・車両検索",description:"電話番号・氏名・顧客番号・登録番号・車台番号で横断検索します。",count:()=>0},
       {id:"inventory",icon:"車",label:"販売在庫",kicker:"INVENTORY CONTROL",title:"販売在庫管理",description:"仕入・商品化・公開・商談中・販売済みを確認します。",count:d=>(d.inventory||[]).length},
       {id:"sales",icon:"商",label:"商談",kicker:"SALES CONTROL",title:"商談・試乗・購入検討",description:"問合せから試乗、見積、ローン、下取り、購入判断まで一体管理します。",count:d=>(d.sales_leads||[]).filter(x=>!["delivered","lost","cancelled"].includes(x.status)).length},
-      {id:"contracts",icon:"書",label:"契約・書類",kicker:"CONTRACT & DOCUMENT",title:"契約・必要書類",description:"買取契約・販売契約・必要書類をまとめて確認します。",count:d=>(d.documents||[]).filter(x=>["missing","requested","rejected"].includes(x.status)).length},
+      {id:"contracts",icon:"書",label:"契約・書類",kicker:"CONTRACT & DELIVERY",title:"契約・入金・必要書類",description:"買取契約・販売契約・入金・登録・納車準備をまとめて確認します。",count:d=>(d.documents||[]).filter(x=>["missing","requested","rejected"].includes(x.status)).length},
       {id:"delivery",icon:"納",label:"納車・フォロー",kicker:"DELIVERY & FOLLOW",title:"納車・アフターフォロー",description:"納車準備、納車予定、納車後の連絡を確認します。",count:d=>(d.followups||[]).filter(x=>["pending","prepared"].includes(x.status)).length},
       {id:"team",icon:"設",label:"設定",kicker:"STORE SETTINGS",title:"店舗・担当者設定",description:"営業時間・定休日・受付上限と担当者を確認します。",count:d=>(d.staff||[]).length},
     ];

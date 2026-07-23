@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-17 販売契約から納車までの進行管理
+ * STEP CAR-17-R1 契約・入金・納車画面の表示名統一
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-17-SALE-CONTRACT-DELIVERY-LIFECYCLE-20260723",
+  version: "CAR-17-R1-CONTRACT-DELIVERY-HEADER-ALIGNMENT-20260723",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
