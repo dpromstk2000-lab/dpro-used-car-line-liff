@@ -1,0 +1,322 @@
+name: DPRO CAR STEP CAR-21 Payment Cashflow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/step-car-21-payment-cashflow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dpro-car-step-car-21
+  cancel-in-progress: false
+
+jobs:
+  update-payment-cashflow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify CAR-21 Worker and SQL
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.error
+          import urllib.request
+
+          url="https://dpro-used-car-line-api.dpromstk2000.workers.dev/api/health"
+          request=urllib.request.Request(
+              url,
+              headers={
+                  "Accept":"application/json",
+                  "User-Agent":"Mozilla/5.0",
+                  "Origin":"https://dpromstk2000-lab.github.io",
+              },
+          )
+          try:
+              with urllib.request.urlopen(request,timeout=25) as response:
+                  data=json.load(response)
+          except urllib.error.HTTPError as error:
+              if error.code==403:
+                  print(
+                      "::warning::GitHub ActionsからWorkerへの確認だけが"
+                      "HTTP 403で拒否されました。ブラウザ確認を前提に続行します。"
+                  )
+                  raise SystemExit(0)
+              raise
+
+          expected="CAR-21-WORKER-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-COMPLETE-20260724"
+          if data.get("version")!=expected:
+              raise SystemExit(
+                  f"WorkerがCAR-21ではありません: {data.get('version')}"
+              )
+          checks=data.get("checks") or {}
+          required=[
+              "car21_payment_cashflow_schema",
+              "owner_payment_overview_api_ready",
+              "owner_payment_create_api_ready",
+              "payment_completion_idempotency_ready",
+              "payment_cancellation_guard_ready",
+              "payment_member_visibility_guard_ready",
+              "admin_guard",
+          ]
+          failed=[key for key in required if checks.get(key) is not True]
+          if failed:
+              raise SystemExit(f"CAR-21 Worker/SQL確認失敗: {failed}")
+          print("CAR-21 Worker/SQL: OK")
+          PY
+
+      - name: Apply CAR-21 frontend update
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import base64
+          import re
+
+          OWNER=Path("owner.html")
+          CONFIG=Path("config.js")
+          SYSTEM=Path("system-check.html")
+          OLD_VERSION="CAR-20-COMMUNICATION-TEMPLATES-HISTORY-20260723"
+          VERSION="CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724"
+
+          for path in (OWNER,CONFIG,SYSTEM):
+              if not path.exists():
+                  raise SystemExit(f"{path.name} が見つかりません。")
+
+          owner=OWNER.read_text(encoding="utf-8")
+          config=CONFIG.read_text(encoding="utf-8")
+          system=SYSTEM.read_text(encoding="utf-8")
+
+          if OLD_VERSION not in owner or OLD_VERSION not in config:
+              raise SystemExit("CAR-20フロントエンドを確認できません。")
+
+          css=base64.b64decode("CiAgICAvKiBEUFJPIENBUiBTVEVQIENBUi0yMSBQQVlNRU5UIENBU0hGTE9XICovCiAgICAucGF5bWVudC1rcGlze2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6cmVwZWF0KDUsbWlubWF4KDAsMWZyKSk7Z2FwOjEwcHh9CiAgICAucGF5bWVudC1rcGl7cGFkZGluZzoxNXB4O2JvcmRlcjoxcHggc29saWQgdmFyKC0tbGluZSk7Ym9yZGVyLXJhZGl1czoxNXB4O2JhY2tncm91bmQ6I2ZmZn0KICAgIC5wYXltZW50LWtwaS53YXJue2JvcmRlci1jb2xvcjojZTFiNDVjO2JhY2tncm91bmQ6I2ZmZmFmMH0KICAgIC5wYXltZW50LWtwaS5kYW5nZXJ7Ym9yZGVyLWNvbG9yOiNkZmEzOWI7YmFja2dyb3VuZDojZmZmNWYzfQogICAgLnBheW1lbnQta3BpLmdvb2R7Ym9yZGVyLWNvbG9yOiM4ZmNlYjk7YmFja2dyb3VuZDojZWZmYWY2fQogICAgLnBheW1lbnQta3BpIHNwYW57ZGlzcGxheTpibG9jaztjb2xvcjp2YXIoLS1tdXRlZCk7Zm9udC1zaXplOjEzcHg7Zm9udC13ZWlnaHQ6ODUwfQogICAgLnBheW1lbnQta3BpIHN0cm9uZ3tkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZToyN3B4O292ZXJmbG93LXdyYXA6YW55d2hlcmV9CiAgICAucGF5bWVudC1ncmlke21hcmdpbi10b3A6MTVweDtkaXNwbGF5OmdyaWQ7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOm1pbm1heCgzMzBweCwuNzVmcikgbWlubWF4KDAsMS4yNWZyKTtnYXA6MTVweH0KICAgIC5wYXltZW50LXBhbmVse3BhZGRpbmc6MThweDtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JvcmRlci1yYWRpdXM6MTdweDtiYWNrZ3JvdW5kOiNmZmZ9CiAgICAucGF5bWVudC1wYW5lbCBoM3ttYXJnaW46MDtmb250LXNpemU6MjFweH0ucGF5bWVudC1wYW5lbD5we21hcmdpbjozcHggMCAxNHB4O2NvbG9yOnZhcigtLW11dGVkKTtmb250LXNpemU6MTNweH0KICAgIC5wYXltZW50LWZvcm17ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnIgMWZyO2dhcDo5cHh9CiAgICAucGF5bWVudC1maWVsZHtkaXNwbGF5OmdyaWQ7Z2FwOjRweH0ucGF5bWVudC1maWVsZC5mdWxse2dyaWQtY29sdW1uOjEvLTF9CiAgICAucGF5bWVudC1maWVsZCBsYWJlbHtmb250LXNpemU6MTNweDtmb250LXdlaWdodDo4NTB9CiAgICAucGF5bWVudC1maWVsZCBpbnB1dCwucGF5bWVudC1maWVsZCBzZWxlY3QsLnBheW1lbnQtZmllbGQgdGV4dGFyZWF7d2lkdGg6MTAwJTttaW4taGVpZ2h0OjQ2cHg7cGFkZGluZzo4cHggMTBweDtib3JkZXI6MXB4IHNvbGlkICNiOWM2ZDA7Ym9yZGVyLXJhZGl1czoxMHB4O2JhY2tncm91bmQ6I2ZmZn0KICAgIC5wYXltZW50LWZpZWxkIHRleHRhcmVhe21pbi1oZWlnaHQ6ODJweDtyZXNpemU6dmVydGljYWx9CiAgICAucGF5bWVudC1saXN0e2Rpc3BsYXk6Z3JpZDtnYXA6MTBweH0KICAgIC5wYXltZW50LWNhcmR7cGFkZGluZzoxNHB4O2JvcmRlcjoxcHggc29saWQgdmFyKC0tbGluZSk7Ym9yZGVyLXJhZGl1czoxM3B4O2JhY2tncm91bmQ6I2ZmZn0KICAgIC5wYXltZW50LWNhcmQub3ZlcmR1ZXtib3JkZXItY29sb3I6I2RmYTM5YjtiYWNrZ3JvdW5kOiNmZmY1ZjN9CiAgICAucGF5bWVudC1jYXJkLWhlYWR7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmZsZXgtc3RhcnQ7anVzdGlmeS1jb250ZW50OnNwYWNlLWJldHdlZW47Z2FwOjEwcHh9CiAgICAucGF5bWVudC1jYXJkIGg0e21hcmdpbjowO2ZvbnQtc2l6ZToxOHB4fS5wYXltZW50LWNhcmQgcHttYXJnaW46MnB4IDAgMDtjb2xvcjp2YXIoLS1tdXRlZCk7Zm9udC1zaXplOjEycHh9CiAgICAucGF5bWVudC1hbW91bnR7bWFyZ2luLXRvcDoxMHB4O3BhZGRpbmc6MTBweCAxMnB4O2JvcmRlci1yYWRpdXM6MTBweDtiYWNrZ3JvdW5kOnZhcigtLXNvZnQpfQogICAgLnBheW1lbnQtYW1vdW50Lmlue2JhY2tncm91bmQ6I2VhZjdmMn0ucGF5bWVudC1hbW91bnQub3V0e2JhY2tncm91bmQ6I2ZmZjNlOH0KICAgIC5wYXltZW50LWFtb3VudCBzcGFue2Rpc3BsYXk6YmxvY2s7Y29sb3I6dmFyKC0tbXV0ZWQpO2ZvbnQtc2l6ZToxMnB4fS5wYXltZW50LWFtb3VudCBzdHJvbmd7ZGlzcGxheTpibG9jaztmb250LXNpemU6MjNweH0KICAgIC5wYXltZW50LW1ldGF7bWFyZ2luLXRvcDo5cHg7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoMywxZnIpO2dhcDo3cHh9CiAgICAucGF5bWVudC1tZXRhIGRpdntwYWRkaW5nOjhweDtib3JkZXItcmFkaXVzOjlweDtiYWNrZ3JvdW5kOnZhcigtLXNvZnQpfQogICAgLnBheW1lbnQtbWV0YSBzcGFue2Rpc3BsYXk6YmxvY2s7Y29sb3I6dmFyKC0tbXV0ZWQpO2ZvbnQtc2l6ZToxMXB4fS5wYXltZW50LW1ldGEgc3Ryb25ne2Rpc3BsYXk6YmxvY2s7b3ZlcmZsb3ctd3JhcDphbnl3aGVyZX0KICAgIC5wYXltZW50LWFjdGlvbnN7bWFyZ2luLXRvcDoxMHB4O2Rpc3BsYXk6ZmxleDtmbGV4LXdyYXA6d3JhcDtnYXA6N3B4fQogICAgLnBheW1lbnQtYWN0aW9ucyAuYnV0dG9ue21pbi1oZWlnaHQ6NDNweDtwYWRkaW5nOjdweCAxMnB4O2ZvbnQtc2l6ZToxM3B4fQogICAgLnBheW1lbnQtZmlsdGVye2Rpc3BsYXk6ZmxleDtmbGV4LXdyYXA6d3JhcDtnYXA6N3B4O21hcmdpbi1ib3R0b206MTJweH0KICAgIC5wYXltZW50LWZpbHRlciBidXR0b257bWluLWhlaWdodDo0MHB4O3BhZGRpbmc6NnB4IDExcHg7Ym9yZGVyOjFweCBzb2xpZCAjYmRjOWQyO2JvcmRlci1yYWRpdXM6OTk5cHg7YmFja2dyb3VuZDojZmZmO2ZvbnQtd2VpZ2h0Ojg1MDtjdXJzb3I6cG9pbnRlcn0KICAgIC5wYXltZW50LWZpbHRlciBidXR0b24uYWN0aXZle2JvcmRlci1jb2xvcjp2YXIoLS1hbWJlcik7YmFja2dyb3VuZDp2YXIoLS1hbWJlcjIpfQogICAgLnBheW1lbnQtc2FmZXttYXJnaW4tdG9wOjE1cHg7cGFkZGluZzoxNHB4O2JvcmRlci1yYWRpdXM6MTJweDtiYWNrZ3JvdW5kOnZhcigtLW5hdnkpO2NvbG9yOiNmZmZ9CiAgICAucGF5bWVudC1zYWZlIHN0cm9uZ3tkaXNwbGF5OmJsb2NrfS5wYXltZW50LXNhZmUgc3BhbntkaXNwbGF5OmJsb2NrO2NvbG9yOiNkMmRmZTg7Zm9udC1zaXplOjEzcHh9CiAgICBAbWVkaWEobWF4LXdpZHRoOjExMDBweCl7LnBheW1lbnQta3Bpc3tncmlkLXRlbXBsYXRlLWNvbHVtbnM6cmVwZWF0KDIsMWZyKX0ucGF5bWVudC1ncmlke2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnJ9fQogICAgQG1lZGlhKG1heC13aWR0aDo2NTBweCl7LnBheW1lbnQta3BpcywucGF5bWVudC1mb3JtLC5wYXltZW50LW1ldGF7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOjFmcn0ucGF5bWVudC1maWVsZC5mdWxse2dyaWQtY29sdW1uOmF1dG99fQo=").decode("utf-8")
+          owner_js=base64.b64decode("CiAgICBjb25zdCBDQVIyMV9TVEFUVVNfTEFCRUw9e3BsYW5uZWQ6IuS6iOWumiIsZHVlOiLmnJ/pmZDlr77lv5wiLGNvbXBsZXRlZDoi5a6M5LqGIixjYW5jZWxsZWQ6IuS4reatoiJ9OwogICAgY29uc3QgQ0FSMjFfRElSRUNUSU9OX0xBQkVMPXtpbjoi5YWl6YeRIixvdXQ6IuWHuumHkSJ9OwogICAgY29uc3QgQ0FSMjFfVFlQRV9MQUJFTD17Y3VzdG9tZXJfcGF5bWVudDoi44GK5a6i5qeY5YWl6YeRIixwdXJjaGFzZV9wYXltZW50OiLosrflj5bmlK/miZUiLGV4cGVuc2U6Iue1jOiyuyIscmVmdW5kOiLov5Tph5EiLGFkanVzdG1lbnQ6Iuiqv+aVtCJ9OwogICAgY29uc3QgQ0FSMjFfQ0FURUdPUllfTEFCRUw9e2RlcG9zaXQ6IueUs+i+vOmHkeODu+mgremHkSIsYmFsYW5jZToi5q6L6YeRIixsb2FuX3Byb2NlZWRzOiLjg63jg7zjg7PlhaXph5EiLHB1cmNoYXNlX3ByaWNlOiLosrflj5bku6Pph5EiLHJlY29uZGl0aW9uaW5nOiLllYblk4HljJbosrsiLHJlZ2lzdHJhdGlvbjoi55m76Yyy6LK7Iix3YXJyYW50eToi5L+d6Ki8IixpbnN1cmFuY2U6IuS/nemZuiIsdGF4X2ZlZToi56iO44O76Ku46LK755SoIixyZWZ1bmQ6Iui/lOmHkSIsb3RoZXI6IuOBneOBruS7liJ9OwogICAgbGV0IGNhcjIxRGF0YT1udWxsLGNhcjIxRmlsdGVyPSJhY3RpdmUiOwoKICAgIGFzeW5jIGZ1bmN0aW9uIGNhcjIxTG9hZCgpewogICAgICBjYXIyMURhdGE9YXdhaXQgYXBpKCIvYXBpL2FkbWluL3BheW1lbnRzIik7CiAgICAgIHJldHVybiBjYXIyMURhdGE7CiAgICB9CgogICAgZnVuY3Rpb24gY2FyMjFLcGkobGFiZWxUZXh0LHZhbHVlLGtpbmQ9IiIpewogICAgICBjb25zdCBjYXJkPWVsKCJhcnRpY2xlIixgcGF5bWVudC1rcGkgJHtraW5kfWAudHJpbSgpKTsKICAgICAgY2FyZC5hcHBlbmQoZWwoInNwYW4iLCIiLGxhYmVsVGV4dCksZWwoInN0cm9uZyIsIiIsbW9uZXkodmFsdWUpKSk7CiAgICAgIHJldHVybiBjYXJkOwogICAgfQoKICAgIGZ1bmN0aW9uIHJlbmRlclBheW1lbnRzKCl7CiAgICAgIGNvbnN0IHJvb3Q9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoInZpZXctcGF5bWVudHMiKTsKICAgICAgY2xlYXIocm9vdCk7CiAgICAgIHJvb3QuYXBwZW5kKHNlY3Rpb25IZWFkZXIoIuWFpeWHuumHkeODu+acquWPjumHkeODu+aUr+aJlSIsIuWFpemHkeS6iOWumuOAgeiyt+WPluaUr+aJleOAgee1jOiyu+OAgeWujOS6huWxpeattOOCkueuoeeQhiIsMCkpOwogICAgICByb290LmFwcGVuZChlbCgiZGl2IiwiZW1wdHkiLCLlhaXlh7rph5Hmg4XloLHjgpLlj5blvpfjgZfjgabjgYTjgb7jgZnjgIIiKSk7CiAgICAgIGNhcjIxTG9hZCgpLnRoZW4oKCk9PmNhcjIxUmVuZGVyUGFnZShyb290KSkuY2F0Y2goZXJyb3I9PnsKICAgICAgICBjbGVhcihyb290KTtyb290LmFwcGVuZChlbCgiZGl2IiwiZW1wdHkiLGVycm9yLm1lc3NhZ2UpKTtzaG93VG9hc3QoZXJyb3IubWVzc2FnZSx0cnVlKTsKICAgICAgfSk7CiAgICB9CgogICAgZnVuY3Rpb24gY2FyMjFSZW5kZXJQYWdlKHJvb3QpewogICAgICBjbGVhcihyb290KTsKICAgICAgY29uc3QgZGF0YT1jYXIyMURhdGF8fHt9LHN1bW1hcnk9ZGF0YS5zdW1tYXJ5fHx7fSx0cmFuc2FjdGlvbnM9ZGF0YS50cmFuc2FjdGlvbnN8fFtdOwogICAgICByb290LmFwcGVuZChzZWN0aW9uSGVhZGVyKCLlhaXlh7rph5Hjg7vmnKrlj47ph5Hjg7vmlK/miZUiLCLpioDooYzoh6rli5XpgKPmkLrjgafjga/jgarjgY/jgIHlupfoiJfjgYznorroqo3jgZfjgZ/kuovlrp/jgpLlj7DluLPjgbjoqJjpjLLjgZfjgb7jgZkiLHRyYW5zYWN0aW9ucy5sZW5ndGgpKTsKICAgICAgY29uc3Qga3Bpcz1lbCgiZGl2IiwicGF5bWVudC1rcGlzIik7CiAgICAgIGtwaXMuYXBwZW5kKAogICAgICAgIGNhcjIxS3BpKCLmnKrlj47ph5EiLHN1bW1hcnkucmVjZWl2YWJsZXMsc3VtbWFyeS5yZWNlaXZhYmxlcz8id2FybiI6IiIpLAogICAgICAgIGNhcjIxS3BpKCLmlK/miZXkuojlrpoiLHN1bW1hcnkucGF5YWJsZXMsc3VtbWFyeS5wYXlhYmxlcz8id2FybiI6IiIpLAogICAgICAgIGNhcjIxS3BpKCLmnJ/plpPlhaXph5EiLHN1bW1hcnkuY29tcGxldGVkX2luY29tZSwiZ29vZCIpLAogICAgICAgIGNhcjIxS3BpKCLmnJ/plpPlh7rph5EiLHN1bW1hcnkuY29tcGxldGVkX291dGZsb3cpLAogICAgICAgIGNhcjIxS3BpKCLlt67lvJXos4fph5EiLHN1bW1hcnkubmV0X2Nhc2hmbG93LHN1bW1hcnkubmV0X2Nhc2hmbG93PDA/ImRhbmdlciI6Imdvb2QiKQogICAgICApOwogICAgICByb290LmFwcGVuZChrcGlzKTsKCiAgICAgIGNvbnN0IGdyaWQ9ZWwoImRpdiIsInBheW1lbnQtZ3JpZCIpLGZvcm1QYW5lbD1lbCgic2VjdGlvbiIsInBheW1lbnQtcGFuZWwiKSxsaXN0UGFuZWw9ZWwoInNlY3Rpb24iLCJwYXltZW50LXBhbmVsIik7CiAgICAgIGZvcm1QYW5lbC5hcHBlbmQoZWwoImgzIiwiIiwi5YWl5Ye66YeR5LqI5a6a44KS55m76YyyIiksZWwoInAiLCIiLCLlrozkuobjga/nmbvpjLLlvozjgavjgIzlrozkuobjgajjgZfjgaboqJjpjLLjgI3jgYvjgonnorrlrprjgZfjgb7jgZnjgIIiKSk7CiAgICAgIGZvcm1QYW5lbC5hcHBlbmQoY2FyMjFDcmVhdGVGb3JtKCkpOwogICAgICBjb25zdCBzYWZlPWVsKCJkaXYiLCJwYXltZW50LXNhZmUiKTsKICAgICAgc2FmZS5hcHBlbmQoZWwoInN0cm9uZyIsIiIsIumKgOihjOODu+S8muioiOOCveODleODiOOBqOOBr+iHquWLlemAo+aQuuOBl+OBvuOBm+OCkyIpLGVsKCJzcGFuIiwiIiwi5a6f6Zqb44Gu5YWl5Ye66YeR56K66KqN5b6M44Gr5a6M5LqG44Go44GX44Gm6KiY6Yyy44GX44CB5a6M5LqG5bGl5q2044Gv5YmK6Zmk44Gb44Ga55uj5p+744Ot44Kw44G45q6L44GX44G+44GZ44CCIikpOwogICAgICBmb3JtUGFuZWwuYXBwZW5kKHNhZmUpOwoKICAgICAgbGlzdFBhbmVsLmFwcGVuZChlbCgiaDMiLCIiLCLlhaXlh7rph5Hlj7DluLMiKSxlbCgicCIsIiIsIuacquWPjumHkeODu+aUr+aJleS6iOWumuODu+WujOS6huODu+S4reatouOCkuS4gOWFg+euoeeQhiIpKTsKICAgICAgY29uc3QgZmlsdGVyPWVsKCJkaXYiLCJwYXltZW50LWZpbHRlciIpOwogICAgICBbWyJhY3RpdmUiLCLmnKrlrozkuoYiXSxbImFsbCIsIuOBmeOBueOBpiJdLFsiaW4iLCLlhaXph5EiXSxbIm91dCIsIuWHuumHkSJdLFsiY29tcGxldGVkIiwi5a6M5LqGIl0sWyJjYW5jZWxsZWQiLCLkuK3mraIiXV0uZm9yRWFjaCgoW3ZhbHVlLGxhYmVsVGV4dF0pPT57CiAgICAgICAgY29uc3QgYnV0dG9uPWVsKCJidXR0b24iLGNhcjIxRmlsdGVyPT09dmFsdWU/ImFjdGl2ZSI6IiIsbGFiZWxUZXh0KTtidXR0b24udHlwZT0iYnV0dG9uIjsKICAgICAgICBidXR0b24uYWRkRXZlbnRMaXN0ZW5lcigiY2xpY2siLCgpPT57Y2FyMjFGaWx0ZXI9dmFsdWU7Y2FyMjFSZW5kZXJQYWdlKHJvb3QpfSk7CiAgICAgICAgZmlsdGVyLmFwcGVuZChidXR0b24pOwogICAgICB9KTsKICAgICAgbGlzdFBhbmVsLmFwcGVuZChmaWx0ZXIpOwogICAgICBjb25zdCBsaXN0PWVsKCJkaXYiLCJwYXltZW50LWxpc3QiKTsKICAgICAgdHJhbnNhY3Rpb25zLmZpbHRlcihpdGVtPT57CiAgICAgICAgaWYoY2FyMjFGaWx0ZXI9PT0iYWxsIilyZXR1cm4gdHJ1ZTsKICAgICAgICBpZihjYXIyMUZpbHRlcj09PSJhY3RpdmUiKXJldHVyblsicGxhbm5lZCIsImR1ZSJdLmluY2x1ZGVzKGl0ZW0uc3RhdHVzKTsKICAgICAgICBpZihbImluIiwib3V0Il0uaW5jbHVkZXMoY2FyMjFGaWx0ZXIpKXJldHVybiBpdGVtLmRpcmVjdGlvbj09PWNhcjIxRmlsdGVyOwogICAgICAgIHJldHVybiBpdGVtLnN0YXR1cz09PWNhcjIxRmlsdGVyOwogICAgICB9KS5mb3JFYWNoKGl0ZW09Pmxpc3QuYXBwZW5kKGNhcjIxQ2FyZChpdGVtKSkpOwogICAgICBpZighbGlzdC5jaGlsZHJlbi5sZW5ndGgpbGlzdC5hcHBlbmQoZW1wdHkoIuipsuW9k+OBmeOCi+WFpeWHuumHkeWxpeattOOBr+OBguOCiuOBvuOBm+OCk+OAgiIpKTsKICAgICAgbGlzdFBhbmVsLmFwcGVuZChsaXN0KTsKICAgICAgZ3JpZC5hcHBlbmQoZm9ybVBhbmVsLGxpc3RQYW5lbCk7cm9vdC5hcHBlbmQoZ3JpZCk7CiAgICB9CgogICAgZnVuY3Rpb24gY2FyMjFDcmVhdGVGb3JtKCl7CiAgICAgIGNvbnN0IGZvcm09ZWwoImZvcm0iLCJwYXltZW50LWZvcm0iKTsKICAgICAgY29uc3QgbWFrZT0obGFiZWxUZXh0LG5vZGUsZnVsbD1mYWxzZSk9Pntjb25zdCB3cmFwPWVsKCJkaXYiLGBwYXltZW50LWZpZWxkJHtmdWxsPyIgZnVsbCI6IiJ9YCk7d3JhcC5hcHBlbmQoZWwoImxhYmVsIiwiIixsYWJlbFRleHQpLG5vZGUpO3JldHVybiB3cmFwfTsKICAgICAgY29uc3QgZGlyZWN0aW9uPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoInNlbGVjdCIpOwogICAgICBbWyJpbiIsIuWFpemHkSJdLFsib3V0Iiwi5Ye66YeRIl1dLmZvckVhY2goKFt2LHRdKT0+e2NvbnN0IG89ZWwoIm9wdGlvbiIsIiIsdCk7by52YWx1ZT12O2RpcmVjdGlvbi5hcHBlbmQobyl9KTsKICAgICAgY29uc3QgdHlwZT1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCJzZWxlY3QiKTsKICAgICAgT2JqZWN0LmVudHJpZXMoQ0FSMjFfVFlQRV9MQUJFTCkuZm9yRWFjaCgoW3YsdF0pPT57Y29uc3Qgbz1lbCgib3B0aW9uIiwiIix0KTtvLnZhbHVlPXY7dHlwZS5hcHBlbmQobyl9KTsKICAgICAgY29uc3QgY2F0ZWdvcnk9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgic2VsZWN0Iik7CiAgICAgIE9iamVjdC5lbnRyaWVzKENBUjIxX0NBVEVHT1JZX0xBQkVMKS5mb3JFYWNoKChbdix0XSk9Pntjb25zdCBvPWVsKCJvcHRpb24iLCIiLHQpO28udmFsdWU9djtjYXRlZ29yeS5hcHBlbmQobyl9KTsKICAgICAgY29uc3QgY3VzdG9tZXI9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgic2VsZWN0IiksY3VzdG9tZXJFbXB0eT1lbCgib3B0aW9uIiwiIiwi6aGn5a6i5pyq5oyH5a6aIik7Y3VzdG9tZXJFbXB0eS52YWx1ZT0iIjtjdXN0b21lci5hcHBlbmQoY3VzdG9tZXJFbXB0eSk7CiAgICAgIChjYXIyMURhdGE/Lm9wdGlvbnM/LmN1c3RvbWVyc3x8W10pLmZvckVhY2goaXRlbT0+e2NvbnN0IG89ZWwoIm9wdGlvbiIsIiIsYCR7aXRlbS5jdXN0b21lcl9jb2RlfSAke2l0ZW0uY3VzdG9tZXJfbmFtZX1gKTtvLnZhbHVlPWl0ZW0uaWQ7Y3VzdG9tZXIuYXBwZW5kKG8pfSk7CiAgICAgIGNvbnN0IHNhbGU9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgic2VsZWN0Iiksc2FsZUVtcHR5PWVsKCJvcHRpb24iLCIiLCLosqnlo7LlpZHntITjgarjgZciKTtzYWxlRW1wdHkudmFsdWU9IiI7c2FsZS5hcHBlbmQoc2FsZUVtcHR5KTsKICAgICAgKGNhcjIxRGF0YT8ub3B0aW9ucz8uc2FsZV9jb250cmFjdHN8fFtdKS5mb3JFYWNoKGl0ZW09Pntjb25zdCBvPWVsKCJvcHRpb24iLCIiLGAke2l0ZW0uY29udHJhY3RfbnVtYmVyfSAke21vbmV5KGl0ZW0udG90YWxfcHJpY2UpfWApO28udmFsdWU9aXRlbS5pZDtzYWxlLmFwcGVuZChvKX0pOwogICAgICBjb25zdCBwdXJjaGFzZT1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCJzZWxlY3QiKSxwdXJjaGFzZUVtcHR5PWVsKCJvcHRpb24iLCIiLCLosrflj5blpZHntITjgarjgZciKTtwdXJjaGFzZUVtcHR5LnZhbHVlPSIiO3B1cmNoYXNlLmFwcGVuZChwdXJjaGFzZUVtcHR5KTsKICAgICAgKGNhcjIxRGF0YT8ub3B0aW9ucz8ucHVyY2hhc2VfY29udHJhY3RzfHxbXSkuZm9yRWFjaChpdGVtPT57Y29uc3Qgbz1lbCgib3B0aW9uIiwiIixgJHtpdGVtLmNvbnRyYWN0X251bWJlcn0gJHttb25leShpdGVtLnB1cmNoYXNlX3ByaWNlKX1gKTtvLnZhbHVlPWl0ZW0uaWQ7cHVyY2hhc2UuYXBwZW5kKG8pfSk7CiAgICAgIGNvbnN0IGFtb3VudD1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCJpbnB1dCIpO2Ftb3VudC50eXBlPSJudW1iZXIiO2Ftb3VudC5taW49IjEiO2Ftb3VudC5yZXF1aXJlZD10cnVlOwogICAgICBjb25zdCBkdWU9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgiaW5wdXQiKTtkdWUudHlwZT0iZGF0ZSI7CiAgICAgIGNvbnN0IG1ldGhvZD1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCJzZWxlY3QiKTtjb25zdCBtZXRob2RPcHRpb25zPVtbIiIsIuacquioreWumiJdLFsiY2FzaCIsIuePvumHkSJdLFsiYmFua190cmFuc2ZlciIsIumKgOihjOaMr+i+vCJdLFsiY2FyZCIsIuOCq+ODvOODiSJdLFsibG9hbiIsIuODreODvOODsyJdLFsib3RoZXIiLCLjgZ3jga7ku5YiXV07bWV0aG9kT3B0aW9ucy5mb3JFYWNoKChbdix0XSk9Pntjb25zdCBvPWVsKCJvcHRpb24iLCIiLHQpO28udmFsdWU9djttZXRob2QuYXBwZW5kKG8pfSk7CiAgICAgIGNvbnN0IG5vdGU9ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgidGV4dGFyZWEiKTtub3RlLm1heExlbmd0aD04MDA7bm90ZS5wbGFjZWhvbGRlcj0i44GK5a6i5qeY5ZCR44GR6KGo56S644O756S+5YaF56K66KqN55So44Gu6KOc6LazIjsKICAgICAgY29uc3QgbWVtYmVyPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoImlucHV0Iik7bWVtYmVyLnR5cGU9ImNoZWNrYm94IjsKICAgICAgY29uc3QgbWVtYmVyV3JhcD1lbCgibGFiZWwiLCJjaGVjay1maWVsZCIpO21lbWJlcldyYXAuYXBwZW5kKG1lbWJlcixkb2N1bWVudC5jcmVhdGVUZXh0Tm9kZSgiIOOBiuWuouanmOODnuOCpOODmuODvOOCuOOBuOihqOekuuWPr+iDvSIpKTsKICAgICAgY29uc3Qgc3VibWl0PWVsKCJidXR0b24iLCJidXR0b24gYW1iZXIiLCLlhaXlh7rph5HkuojlrprjgpLnmbvpjLIiKTtzdWJtaXQudHlwZT0ic3VibWl0IjsKICAgICAgZm9ybS5hcHBlbmQobWFrZSgi5YWl5Ye66YeRIixkaXJlY3Rpb24pLG1ha2UoIuWPluW8leeoruWIpSIsdHlwZSksbWFrZSgi6LK755uuIixjYXRlZ29yeSksbWFrZSgi6YeR6aGN77yI5YaG77yJIixhbW91bnQpLG1ha2UoIuacn+mZkCIsZHVlKSxtYWtlKCLmlK/miZXmlrnms5UiLG1ldGhvZCksbWFrZSgi6aGn5a6iIixjdXN0b21lciksbWFrZSgi6LKp5aOy5aWR57SEIixzYWxlKSxtYWtlKCLosrflj5blpZHntIQiLHB1cmNoYXNlKSxtYWtlKCLoo5zotrMiLG5vdGUsdHJ1ZSksbWVtYmVyV3JhcCxzdWJtaXQpOwogICAgICBkaXJlY3Rpb24uYWRkRXZlbnRMaXN0ZW5lcigiY2hhbmdlIiwoKT0+e2lmKGRpcmVjdGlvbi52YWx1ZT09PSJvdXQiKW1lbWJlci5jaGVja2VkPWZhbHNlfSk7CiAgICAgIGZvcm0uYWRkRXZlbnRMaXN0ZW5lcigic3VibWl0Iixhc3luYyBldmVudD0+ewogICAgICAgIGV2ZW50LnByZXZlbnREZWZhdWx0KCk7c3VibWl0LmRpc2FibGVkPXRydWU7CiAgICAgICAgdHJ5ewogICAgICAgICAgY29uc3QgcmVzdWx0PWF3YWl0IGFwaSgiL2FwaS9hZG1pbi9wYXltZW50cyIse21ldGhvZDoiUE9TVCIsYm9keTpKU09OLnN0cmluZ2lmeSh7CiAgICAgICAgICAgIGRpcmVjdGlvbjpkaXJlY3Rpb24udmFsdWUsCiAgICAgICAgICAgIHRyYW5zYWN0aW9uX3R5cGU6dHlwZS52YWx1ZSwKICAgICAgICAgICAgY2F0ZWdvcnk6Y2F0ZWdvcnkudmFsdWUsCiAgICAgICAgICAgIGFtb3VudDpOdW1iZXIoYW1vdW50LnZhbHVlKSwKICAgICAgICAgICAgZHVlX2RhdGU6ZHVlLnZhbHVlfHxudWxsLAogICAgICAgICAgICBwYXltZW50X21ldGhvZDptZXRob2QudmFsdWV8fG51bGwsCiAgICAgICAgICAgIGN1c3RvbWVyX2lkOmN1c3RvbWVyLnZhbHVlfHxudWxsLAogICAgICAgICAgICBzYWxlX2NvbnRyYWN0X2lkOnNhbGUudmFsdWV8fG51bGwsCiAgICAgICAgICAgIHB1cmNoYXNlX2NvbnRyYWN0X2lkOnB1cmNoYXNlLnZhbHVlfHxudWxsLAogICAgICAgICAgICBwdWJsaWNfbm90ZTpub3RlLnZhbHVlfHxudWxsLAogICAgICAgICAgICBtZW1iZXJfdmlzaWJsZTptZW1iZXIuY2hlY2tlZAogICAgICAgICAgfSl9KTsKICAgICAgICAgIHNob3dUb2FzdChyZXN1bHQubWVzc2FnZXx8IuWFpeWHuumHkeS6iOWumuOCkueZu+mMsuOBl+OBvuOBl+OBn+OAgiIpOwogICAgICAgICAgYXdhaXQgY2FyMjFMb2FkKCk7Y2FyMjFSZW5kZXJQYWdlKGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJ2aWV3LXBheW1lbnRzIikpOwogICAgICAgIH1jYXRjaChlcnJvcil7c2hvd1RvYXN0KGVycm9yLm1lc3NhZ2UsdHJ1ZSl9ZmluYWxseXtzdWJtaXQuZGlzYWJsZWQ9ZmFsc2V9CiAgICAgIH0pOwogICAgICByZXR1cm4gZm9ybTsKICAgIH0KCiAgICBmdW5jdGlvbiBjYXIyMUNhcmQoaXRlbSl7CiAgICAgIGNvbnN0IG92ZXJkdWU9WyJwbGFubmVkIiwiZHVlIl0uaW5jbHVkZXMoaXRlbS5zdGF0dXMpJiZpdGVtLmR1ZV9kYXRlJiZpdGVtLmR1ZV9kYXRlPG5ldyBEYXRlKCkudG9JU09TdHJpbmcoKS5zbGljZSgwLDEwKTsKICAgICAgY29uc3QgY2FyZD1lbCgiYXJ0aWNsZSIsYHBheW1lbnQtY2FyZCR7b3ZlcmR1ZT8iIG92ZXJkdWUiOiIifWApLGhlYWQ9ZWwoImRpdiIsInBheW1lbnQtY2FyZC1oZWFkIiksbGVmdD1lbCgiZGl2Iik7CiAgICAgIGxlZnQuYXBwZW5kKGVsKCJoNCIsIiIsYCR7Q0FSMjFfRElSRUNUSU9OX0xBQkVMW2l0ZW0uZGlyZWN0aW9uXXx8aXRlbS5kaXJlY3Rpb25977yPJHtDQVIyMV9DQVRFR09SWV9MQUJFTFtpdGVtLmNhdGVnb3J5XXx8aXRlbS5jYXRlZ29yeX1gKSxlbCgicCIsIiIsW2l0ZW0udHJhbnNhY3Rpb25fbnVtYmVyLGl0ZW0uY3VzdG9tZXI/LmN1c3RvbWVyX25hbWUsaXRlbS52ZWhpY2xlPy52ZWhpY2xlX25hbWVdLmZpbHRlcihCb29sZWFuKS5qb2luKCIg77yPICIpKSk7CiAgICAgIGhlYWQuYXBwZW5kKGxlZnQsZWwoInNwYW4iLGBiYWRnZSAke2l0ZW0uc3RhdHVzPT09ImNvbXBsZXRlZCI/ImFjdGl2ZSI6b3ZlcmR1ZT8iZGFuZ2VyIjoid2FybiJ9YCxDQVIyMV9TVEFUVVNfTEFCRUxbaXRlbS5zdGF0dXNdfHxpdGVtLnN0YXR1cykpO2NhcmQuYXBwZW5kKGhlYWQpOwogICAgICBjb25zdCBhbW91bnRCb3g9ZWwoImRpdiIsYHBheW1lbnQtYW1vdW50ICR7aXRlbS5kaXJlY3Rpb259YCk7YW1vdW50Qm94LmFwcGVuZChlbCgic3BhbiIsIiIsQ0FSMjFfVFlQRV9MQUJFTFtpdGVtLnRyYW5zYWN0aW9uX3R5cGVdfHxpdGVtLnRyYW5zYWN0aW9uX3R5cGUpLGVsKCJzdHJvbmciLCIiLG1vbmV5KGl0ZW0uYW1vdW50KSkpO2NhcmQuYXBwZW5kKGFtb3VudEJveCk7CiAgICAgIGNvbnN0IG1ldGFHcmlkPWVsKCJkaXYiLCJwYXltZW50LW1ldGEiKTsKICAgICAgW1si5pyf6ZmQIixpdGVtLmR1ZV9kYXRlP2RhdGUoaXRlbS5kdWVfZGF0ZSk6IuacquioreWumiJdLFsi5a6M5LqG5pel5pmCIixpdGVtLnBhaWRfYXQ/ZGF0ZVRpbWUoaXRlbS5wYWlkX2F0KToi5pyq5a6M5LqGIl0sWyLmlrnms5UiLGl0ZW0ucGF5bWVudF9tZXRob2R8fCLmnKroqK3lrpoiXV0uZm9yRWFjaCgoW2ssdl0pPT57Y29uc3QgYm94PWVsKCJkaXYiKTtib3guYXBwZW5kKGVsKCJzcGFuIiwiIixrKSxlbCgic3Ryb25nIiwiIix2KSk7bWV0YUdyaWQuYXBwZW5kKGJveCl9KTtjYXJkLmFwcGVuZChtZXRhR3JpZCk7CiAgICAgIGlmKGl0ZW0ucHVibGljX25vdGUpY2FyZC5hcHBlbmQoZWwoInAiLCJpbnRlcm5hbC1ub3RlIixpdGVtLnB1YmxpY19ub3RlKSk7CiAgICAgIGNvbnN0IGFjdGlvbnM9ZWwoImRpdiIsInBheW1lbnQtYWN0aW9ucyIpOwogICAgICBpZihbInBsYW5uZWQiLCJkdWUiXS5pbmNsdWRlcyhpdGVtLnN0YXR1cykpewogICAgICAgIGNvbnN0IGNvbXBsZXRlPWVsKCJidXR0b24iLCJidXR0b24gcHJpbWFyeSIsIuWujOS6huOBqOOBl+OBpuiomOmMsiIpO2NvbXBsZXRlLnR5cGU9ImJ1dHRvbiI7CiAgICAgICAgY29tcGxldGUuYWRkRXZlbnRMaXN0ZW5lcigiY2xpY2siLGFzeW5jKCk9PnsKICAgICAgICAgIGlmKCFjb25maXJtKCLlrp/pmpvjga7lhaXlh7rph5HjgpLnorroqo3muIjjgb/jgafjgZnjgYvvvJ8iKSlyZXR1cm47CiAgICAgICAgICBjb21wbGV0ZS5kaXNhYmxlZD10cnVlOwogICAgICAgICAgdHJ5e2NvbnN0IHJlc3VsdD1hd2FpdCBhcGkoYC9hcGkvYWRtaW4vcGF5bWVudHMvJHtpdGVtLmlkfS9jb21wbGV0ZWAse21ldGhvZDoiUE9TVCIsYm9keToie30ifSk7c2hvd1RvYXN0KHJlc3VsdC5tZXNzYWdlKTthd2FpdCBjYXIyMUxvYWQoKTtjYXIyMVJlbmRlclBhZ2UoZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoInZpZXctcGF5bWVudHMiKSl9Y2F0Y2goZXJyb3Ipe3Nob3dUb2FzdChlcnJvci5tZXNzYWdlLHRydWUpfWZpbmFsbHl7Y29tcGxldGUuZGlzYWJsZWQ9ZmFsc2V9CiAgICAgICAgfSk7CiAgICAgICAgY29uc3QgY2FuY2VsPWVsKCJidXR0b24iLCJidXR0b24gZGFuZ2VyIiwi5Lit5q2iIik7Y2FuY2VsLnR5cGU9ImJ1dHRvbiI7CiAgICAgICAgY2FuY2VsLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIixhc3luYygpPT57CiAgICAgICAgICBjb25zdCByZWFzb249cHJvbXB0KCLkuK3mraLnkIbnlLHjgpLlhaXlipvjgZfjgabjgY/jgaDjgZXjgYTjgIIiKTtpZighcmVhc29uKXJldHVybjsKICAgICAgICAgIGNhbmNlbC5kaXNhYmxlZD10cnVlOwogICAgICAgICAgdHJ5e2NvbnN0IHJlc3VsdD1hd2FpdCBhcGkoYC9hcGkvYWRtaW4vcGF5bWVudHMvJHtpdGVtLmlkfS9jYW5jZWxgLHttZXRob2Q6IlBPU1QiLGJvZHk6SlNPTi5zdHJpbmdpZnkoe3JlYXNvbn0pfSk7c2hvd1RvYXN0KHJlc3VsdC5tZXNzYWdlKTthd2FpdCBjYXIyMUxvYWQoKTtjYXIyMVJlbmRlclBhZ2UoZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoInZpZXctcGF5bWVudHMiKSl9Y2F0Y2goZXJyb3Ipe3Nob3dUb2FzdChlcnJvci5tZXNzYWdlLHRydWUpfWZpbmFsbHl7Y2FuY2VsLmRpc2FibGVkPWZhbHNlfQogICAgICAgIH0pOwogICAgICAgIGFjdGlvbnMuYXBwZW5kKGNvbXBsZXRlLGNhbmNlbCk7CiAgICAgIH0KICAgICAgY2FyZC5hcHBlbmQoYWN0aW9ucyk7cmV0dXJuIGNhcmQ7CiAgICB9Cg==").decode("utf-8")
+
+          if "DPRO CAR STEP CAR-21 PAYMENT CASHFLOW" not in owner:
+              if owner.count("</style>") != 1:
+                  raise SystemExit("owner.htmlのstyle終了位置を確認できません。")
+              owner=owner.replace("</style>",css+"\n  </style>",1)
+
+          view_marker='        <section class="section-view" id="view-communications" hidden></section>'
+          if 'id="view-payments"' not in owner:
+              if owner.count(view_marker)!=1:
+                  raise SystemExit("入出金画面の追加位置を確認できません。")
+              owner=owner.replace(view_marker,view_marker+'\n        <section class="section-view" id="view-payments" hidden></section>',1)
+
+          section_marker='      {id:"communications",icon:"連",label:"連絡管理",kicker:"CUSTOMER COMMUNICATION",title:"LINE連絡・送信履歴",description:"テンプレート、送信予定、文章コピー、送信済み履歴を一元管理します。",count:()=>0},'
+          section_new=section_marker+'\n      {id:"payments",icon:"払",label:"入出金",kicker:"PAYMENT & CASHFLOW",title:"入出金・未収金",description:"販売代金、買取支払、経費、返金、未収金、支払予定を管理します。",count:()=>0},'
+          if 'id:"payments"' not in owner:
+              if owner.count(section_marker)!=1:
+                  raise SystemExit("入出金メニューの追加位置を確認できません。")
+              owner=owner.replace(section_marker,section_new,1)
+
+          render_marker='management:renderManagement,communications:renderCommunications,team:renderTeam'
+          if 'payments:renderPayments' not in owner:
+              if owner.count(render_marker)!=1:
+                  raise SystemExit("入出金レンダラーの追加位置を確認できません。")
+              owner=owner.replace(render_marker,'management:renderManagement,communications:renderCommunications,payments:renderPayments,team:renderTeam',1)
+
+          if "const CAR21_STATUS_LABEL" not in owner:
+              marker='    function renderTeam(){'
+              if owner.count(marker)!=1:
+                  raise SystemExit("CAR-21 JavaScript追加位置を確認できません。")
+              owner=owner.replace(marker,owner_js+"\n"+marker,1)
+
+          owner=owner.replace(OLD_VERSION,VERSION)
+          owner=owner.replace(
+              "<title>オーナーPC管理 CAR-20｜DPRO中古車センター</title>",
+              "<title>オーナーPC管理 CAR-21｜DPRO中古車センター</title>",
+              1,
+          )
+          owner=owner.replace(
+              "買取からLINE連絡管理まで、一元管理。",
+              "買取から入出金管理まで、一元管理。",
+              1,
+          )
+          owner=owner.replace(
+              "査定・在庫・商談・契約・納車・アフターケア・経営分析・連絡履歴を同じ画面で確認します。",
+              "査定・在庫・商談・契約・納車・アフターケア・経営分析・連絡・入出金を同じ画面で確認します。",
+              1,
+          )
+
+          config=config.replace(
+              " * STEP CAR-20 LINE連絡テンプレート・送信予定・対応履歴管理",
+              " * STEP CAR-21 入出金・未収金・支払・精算管理",
+              1,
+          )
+          config=re.sub(
+              r'version:\s*"[^"]+"',
+              f'version: "{VERSION}"',
+              config,
+              count=1,
+          )
+          config=config.replace(
+              "  communicationAutoSend: false,",
+              "  communicationAutoSend: false,\n  ownerPaymentOverview: true,\n  ownerReceivableManagement: true,\n  ownerPayableManagement: true,\n  ownerCashflow: true,\n  paymentBankAutoSync: false,",
+              1,
+          )
+
+          system=system.replace(
+              "<title>システム確認 CAR-20｜DPRO中古車センター</title>",
+              "<title>システム確認 CAR-21｜DPRO中古車センター</title>",
+              1,
+          )
+          system=system.replace(
+              "CAR-20 営業前システム確認",
+              "CAR-21 営業前システム確認",
+              1,
+          )
+          system=system.replace(
+              "CAR-20 LINE連絡テンプレート・送信予定・対応履歴管理",
+              "CAR-21 入出金・未収金・支払・精算管理",
+              1,
+          )
+          label_marker='communication_internal_recipient_guard:"連絡先内部情報ガード",admin_guard:'
+          label_new='communication_internal_recipient_guard:"連絡先内部情報ガード",car21_payment_cashflow_schema:"CAR-21安全DB",owner_payment_overview:"入出金一覧API",owner_payment_create:"入出金登録API",payment_completion_idempotency:"入出金完了二重記録防止",payment_cancellation_guard:"完了履歴の中止禁止",payment_member_visibility_guard:"会員向け入金情報ガード",admin_guard:'
+          if "car21_payment_cashflow_schema" not in system:
+              if system.count(label_marker)!=1:
+                  raise SystemExit("system-checkのCAR-21ラベル追加位置を確認できません。")
+              system=system.replace(label_marker,label_new,1)
+
+          count_marker='communication_logs:"連絡履歴",open_tasks:"未完了タスク"'
+          count_new='communication_logs:"連絡履歴",payment_transactions:"入出金履歴",open_tasks:"未完了タスク"'
+          if 'payment_transactions:"入出金履歴"' not in system:
+              if system.count(count_marker)!=1:
+                  raise SystemExit("system-check件数追加位置を確認できません。")
+              system=system.replace(count_marker,count_new,1)
+
+          required_owner=[
+              VERSION,
+              'id="view-payments"',
+              'id:"payments"',
+              "renderPayments",
+              "入出金・未収金",
+              "完了として記録",
+          ]
+          missing=[value for value in required_owner if value not in owner]
+          if missing:
+              raise SystemExit(f"owner.html検査失敗: {missing}")
+          if VERSION not in config:
+              raise SystemExit("config.jsのCAR-21更新を確認できません。")
+          if "car21_payment_cashflow_schema" not in system:
+              raise SystemExit("system-checkのCAR-21更新を確認できません。")
+
+          OWNER.write_text(owner,encoding="utf-8")
+          CONFIG.write_text(config,encoding="utf-8")
+          SYSTEM.write_text(system,encoding="utf-8")
+          print("CAR-21 owner/config/system-check update: OK")
+          PY
+
+      - name: Validate CAR-21 frontend
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          owner=Path("owner.html").read_text(encoding="utf-8")
+          config=Path("config.js").read_text(encoding="utf-8")
+          system=Path("system-check.html").read_text(encoding="utf-8")
+
+          owner_scripts=re.findall(r"<script>(.*?)</script>",owner,flags=re.S)
+          system_scripts=[
+              value for value in re.findall(
+                  r"<script(?:\s+[^>]*)?>(.*?)</script>",
+                  system,
+                  flags=re.S,
+              )
+              if value.strip()
+          ]
+          if not owner_scripts or not system_scripts:
+              raise SystemExit("JavaScript抽出に失敗しました。")
+
+          Path("/tmp/car21-owner.js").write_text(owner_scripts[-1],encoding="utf-8")
+          Path("/tmp/car21-system.js").write_text(system_scripts[-1],encoding="utf-8")
+
+          ids=re.findall(r'\bid="([^"]+)"',owner)
+          duplicates=sorted({value for value in ids if ids.count(value)>1})
+          if duplicates:
+              raise SystemExit(f"owner.htmlに重複IDがあります: {duplicates}")
+
+          required={
+              "owner.html":[
+                  "CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724",
+                  "view-payments",
+                  "renderPayments",
+                  "入出金・未収金",
+                  "paymentBankAutoSync",
+              ],
+              "config.js":[
+                  "CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724",
+                  "ownerPaymentOverview",
+                  "ownerCashflow",
+                  "paymentBankAutoSync: false",
+              ],
+              "system-check.html":[
+                  "CAR-21",
+                  "car21_payment_cashflow_schema",
+                  "owner_payment_overview",
+                  "payment_completion_idempotency",
+                  "payment_transactions",
+              ],
+          }
+          for filename,markers in required.items():
+              text=Path(filename).read_text(encoding="utf-8")
+              missing=[marker for marker in markers if marker not in text]
+              if missing:
+                  raise SystemExit(f"{filename}検査失敗: {missing}")
+
+          print("CAR-21 frontend structure: OK")
+          PY
+
+          node --check /tmp/car21-owner.js
+          node --check /tmp/car21-system.js
+          node --check config.js
+
+      - name: Normalize and inspect
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for filename in ("owner.html","config.js","system-check.html"):
+              path=Path(filename)
+              text=path.read_text(encoding="utf-8")
+              path.write_text(
+                  "\n".join(line.rstrip(" \t") for line in text.splitlines())+"\n",
+                  encoding="utf-8",
+              )
+          PY
+
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Commit CAR-21 and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name "DPRO CAR Automation"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add owner.html config.js system-check.html
+          git rm --ignore-unmatch .github/workflows/step-car-21-payment-cashflow.yml
+
+          if git diff --cached --quiet; then
+            echo "コミット対象の変更はありません。"
+            exit 0
+          fi
+
+          git commit -m "CAR-21: add payment cashflow management"
+          git push origin main
