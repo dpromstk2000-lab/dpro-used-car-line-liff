@@ -25,6 +25,14 @@
     @media(max-width:820px){.summary{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.privacy{grid-template-columns:1fr}.demo-bar{align-items:flex-start;flex-direction:column}.member-main{grid-template-columns:1fr}.member-code{text-align:left}.next-panel{grid-template-columns:auto 1fr}.next-number{grid-column:2}}
     @media(max-width:560px){body{font-size:17px}.topbar-inner,.hero-inner,main,.demo-bar{width:min(100% - 22px,1120px)}.topbar{min-height:62px}.topbar-inner{min-height:62px}.brand{font-size:14px}.hero{padding:34px 0 78px}.hero h1{font-size:31px}.demo-bar{margin-top:-49px;margin-bottom:65px}.demo-bar+main{margin-top:-42px}.member-main{padding:21px}.member-note{padding:12px 21px}.summary-card{min-height:104px;padding:15px}.summary-card strong{font-size:28px}.next-panel{padding:18px;grid-template-columns:1fr}.next-icon{width:42px;height:42px}.next-number{grid-column:auto}.section-head{align-items:flex-start;flex-direction:column;gap:2px}.data-card{padding:18px}.meta{grid-template-columns:1fr}.row-card{grid-template-columns:1fr}.row-status{text-align:left}.state-panel{padding:32px 19px}.button{width:100%}.bottom-actions .button{width:100%}.privacy{padding:20px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.spinner{animation:none}}
+
+    /* DPRO CAR STEP CAR-22 MEMBER FINANCIAL DOCUMENTS */
+    .financial-document-list{display:grid;gap:10px}
+    .financial-document-row{padding:17px 18px;border:1px solid var(--line);border-radius:14px;background:#fff;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+    .financial-document-row h3{margin:0;font-size:18px}.financial-document-row p{margin:2px 0 0;color:var(--muted);font-size:13px}
+    .financial-document-action{text-align:right}.financial-document-action strong{display:block;font-size:20px}.financial-document-action button{margin-top:7px;min-height:42px;padding:6px 12px}
+    @media(max-width:560px){.financial-document-row{grid-template-columns:1fr}.financial-document-action{text-align:left}}
+
   </style>
   <!-- DPRO CAR STEP CAR-18 AFTERCARE MAINTENANCE RETENTION -->
   <!-- DPRO CAR STEP CAR-20 COMMUNICATION HISTORY -->
@@ -46,7 +54,7 @@
 
       <section class="next-panel" id="nextPanel"><div class="next-icon" aria-hidden="true">✓</div><div class="next-copy"><p>NEXT ACTION</p><h2 id="nextTitle">現在の状況を確認しています</h2><div id="nextDetail"></div></div><div class="next-number" id="nextNumber"></div></section>
 
-      <nav class="jump-nav" aria-label="マイページ内メニュー"><a href="#reservations">予約</a><a href="#appraisals">査定・買取</a><a href="#sales">購入・納車</a><a href="#documents">必要書類</a><a href="#vehicles">登録車両</a><a href="#aftercare">愛車サポート</a><a href="#followups">フォロー予定</a><a href="#communications">ご案内履歴</a></nav>
+      <nav class="jump-nav" aria-label="マイページ内メニュー"><a href="#reservations">予約</a><a href="#appraisals">査定・買取</a><a href="#sales">購入・納車</a><a href="#documents">必要書類</a><a href="#vehicles">登録車両</a><a href="#aftercare">愛車サポート</a><a href="#followups">フォロー予定</a><a href="#communications">ご案内履歴</a><a href="#financial-documents">発行帳票</a></nav>
 
       <section class="section" id="reservations"><div class="section-head"><div><p class="section-kicker">RESERVATIONS</p><h2>ご予約・ご来店予定</h2></div><p>査定・試乗・納車予定</p></div><div class="grid" id="reservationGrid"></div></section>
       <section class="section" id="appraisals"><div class="section-head"><div><p class="section-kicker">APPRAISAL & PURCHASE</p><h2>査定・買取状況</h2></div><p>内部査定額は表示しません</p></div><div class="grid" id="appraisalGrid"></div><div class="grid" id="purchaseGrid" style="margin-top:14px"></div></section>
@@ -56,6 +64,7 @@
       <section class="section" id="aftercare"><div class="section-head"><div><p class="section-kicker">MY CAR AFTERCARE</p><h2>点検・車検・整備履歴</h2></div><p>愛車の次回予定と実施履歴</p></div><div class="grid" id="aftercareGrid"></div><div class="follow-list" id="serviceList" style="margin-top:14px"></div></section>
       <section class="section" id="followups"><div class="section-head"><div><p class="section-kicker">AFTER SUPPORT</p><h2>納車後フォロー</h2></div><p>点検・車検・オイル交換</p></div><div class="follow-list" id="followList"></div></section>
       <section class="section" id="communications"><div class="section-head"><div><p class="section-kicker">MESSAGE HISTORY</p><h2>店舗からのご案内</h2></div><p>送信済みのご案内だけを表示</p></div><div class="follow-list" id="communicationList"></div></section>
+      <section class="section" id="financial-documents"><div class="section-head"><div><p class="section-kicker">ISSUED DOCUMENTS</p><h2>請求書・領収書・精算書</h2></div><p>発行済み・公開許可済みの帳票だけを表示</p></div><div class="financial-document-list" id="financialDocumentList"></div></section>
 
       <section class="privacy"><div><p class="section-kicker">PRIVACY GUARD</p><h2>本人確認と情報分離</h2><p>LINEの本人確認後、ご本人に関係する情報だけをWorker経由で取得します。</p></div><div class="privacy-list"><div><b>01</b>内部査定額・仕入原価・内部メモを除外</div><div><b>02</b>非公開写真の保存先を画面へ返しません</div><div><b>03</b>氏名・電話番号を端末内へ保存しません</div></div></section>
       <div class="bottom-actions"><a class="button amber" id="inventoryLink" href="inventory.html">販売在庫を見る</a><a class="button primary" id="sellLink" href="sell.html">無料査定を申し込む</a><a class="button" href="tel:0920001234">店舗へ電話</a></div>
@@ -93,7 +102,7 @@
       function renderMember(data){
         const c=data.customer;document.getElementById("memberName").textContent=`${c.customer_name} 様`;document.getElementById("memberCode").textContent=c.customer_code;document.getElementById("memberContact").textContent=[c.phone_masked,c.email_masked].filter(Boolean).join(" ／ ")||"LINE連携済み";const memberNote=document.getElementById("memberNote");memberNote.textContent=c.public_note||"査定・商談・納車予定の最新状況をご確認いただけます。";
         document.getElementById("summaryAppraisals").textContent=data.summary.active_appraisals;document.getElementById("summaryLeads").textContent=data.summary.active_sales_leads;document.getElementById("summaryReservations").textContent=data.summary.upcoming_reservations;document.getElementById("summaryDocuments").textContent=data.summary.pending_documents;
-        renderNext(data);renderReservations(data.reservations);renderAppraisals(data.appraisals);renderPurchaseContracts(data.purchase_contracts);renderSales(data.sales_leads);renderSaleContracts(data.sale_contracts);renderDocuments(data.documents);renderVehicles(data.vehicles);renderAftercare(data.aftercare_profiles||[],data.service_records||[]);renderFollowups(data.followups);renderCommunications(data.communications||[]);
+        renderNext(data);renderReservations(data.reservations);renderAppraisals(data.appraisals);renderPurchaseContracts(data.purchase_contracts);renderSales(data.sales_leads);renderSaleContracts(data.sale_contracts);renderDocuments(data.documents);renderVehicles(data.vehicles);renderAftercare(data.aftercare_profiles||[],data.service_records||[]);renderFollowups(data.followups);renderCommunications(data.communications||[]);renderFinancialDocuments(data.financial_documents||[]);
         loading.hidden=true;messagePanel.hidden=true;dashboard.hidden=false;
       }
 
@@ -112,6 +121,33 @@
       function renderVehicles(items){const list=document.getElementById("vehicleList");clear(list);if(!items.length){empty(list,"登録車両はありません。");return;}items.forEach(item=>{const row=el("article","row-card"),left=el("div"),right=el("div","row-status");left.append(el("h3","",vehicleName(item)),el("p","",[item.model_year?`${item.model_year}年式`:null,item.mileage_km!==null?`${new Intl.NumberFormat("ja-JP").format(item.mileage_km)}km`:null,item.color].filter(Boolean).join("・")));right.append(el("strong","",item.registration_number_masked||item.vehicle_code),el("small","",item.inspection_expiry?`車検 ${date(item.inspection_expiry)}`:""));row.append(left,right);list.append(row)});}
       function renderFollowups(items){const list=document.getElementById("followList");clear(list);if(!items.length){empty(list,"現在、予定されているフォローはありません。");return;}items.forEach(item=>{const row=el("article","row-card"),left=el("div"),right=el("div","row-status");left.append(el("h3","",item.followup_type_label),el("p","",item.message_text||vehicleName(item.inventory)));right.append(el("strong","",date(item.scheduled_date)),el("small","",item.status==="completed"?"完了":"予定"));row.append(left,right);list.append(row)});}
 
+
+
+      const CAR22_MEMBER_TYPE_LABEL={invoice:"請求書",receipt:"領収書",purchase_payment_statement:"買取支払明細",settlement_statement:"精算書"};
+
+      function renderFinancialDocuments(items){
+        const list=document.getElementById("financialDocumentList");clear(list);
+        if(!items.length){empty(list,"現在、表示できる発行済み帳票はありません。");return;}
+        items.forEach(item=>{
+          const row=el("article","financial-document-row"),left=el("div"),right=el("div","financial-document-action");
+          left.append(el("h3","",item.title||CAR22_MEMBER_TYPE_LABEL[item.document_type]||item.document_type),el("p","",[item.document_number,item.issue_date?`発行日 ${date(item.issue_date)}`:null].filter(Boolean).join(" ／ ")));
+          right.append(el("strong","",money(item.total_amount)));
+          const button=el("button","button","表示・印刷／PDF保存");button.type="button";button.addEventListener("click",()=>printMemberFinancialDocument(item));right.append(button);
+          row.append(left,right);list.append(row);
+        });
+      }
+
+      function memberFinancialEscape(value){
+        return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+      }
+
+      function printMemberFinancialDocument(item){
+        const source=item.snapshot||item,recipient=source.recipient||{},issuer=source.issuer||{},amounts=source.amounts||{total_amount:item.total_amount},lines=Array.isArray(source.line_items)?source.line_items:(item.line_items||[]);
+        const rows=lines.map(line=>`<tr><td>${memberFinancialEscape(line.label)}</td><td>${memberFinancialEscape(line.quantity??1)}</td><td>${memberFinancialEscape(money(line.amount))}</td></tr>`).join("");
+        const popup=window.open("","_blank","noopener,noreferrer");if(!popup)return;
+        popup.document.write(`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>${memberFinancialEscape(item.document_number)}</title><style>@page{size:A4;margin:16mm}body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#172436;font-size:14px}h1{text-align:center;margin:0 0 28px}.top{display:grid;grid-template-columns:1fr 1fr;gap:30px}.right{text-align:right}.number{margin:20px 0;padding:10px;border-top:1px solid #9aa8b4;border-bottom:1px solid #9aa8b4}.total{margin:24px 0;padding:16px;background:#f4ead4;font-size:22px;font-weight:800}table{width:100%;border-collapse:collapse}th,td{border:1px solid #aeb8c0;padding:9px}</style></head><body><h1>${memberFinancialEscape(CAR22_MEMBER_TYPE_LABEL[item.document_type]||item.document_type)}</h1><div class="top"><div><strong>${memberFinancialEscape(recipient.name||"お客様")}</strong> 御中</div><div class="right"><strong>${memberFinancialEscape(issuer.name||"")}</strong><br>${memberFinancialEscape(issuer.address||"")}<br>${memberFinancialEscape(issuer.phone||"")}</div></div><div class="number">帳票番号：${memberFinancialEscape(item.document_number)}　発行日：${memberFinancialEscape(source.issue_date||item.issue_date||"")}</div><div class="total">合計 ${memberFinancialEscape(money(amounts.total_amount))}</div><table><thead><tr><th>明細</th><th>数量</th><th>金額</th></tr></thead><tbody>${rows}</tbody></table><script>addEventListener("load",()=>setTimeout(()=>print(),250));<\/script></body></html>`);
+        popup.document.close();
+      }
 
       function renderCommunications(items){
         const list=document.getElementById("communicationList");clear(list);

@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-21 入出金・未収金・支払・精算管理
+ * STEP CAR-22 請求書・領収書・買取支払明細・精算書管理
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724",
+  version: "CAR-22-FINANCIAL-DOCUMENTS-PRINT-MEMBER-20260724",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -68,4 +68,8 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   ownerPayableManagement: true,
   ownerCashflow: true,
   paymentBankAutoSync: false,
+  ownerFinancialDocuments: true,
+  memberFinancialDocuments: true,
+  financialDocumentBrowserPrintPdf: true,
+  financialDocumentServerPdfGeneration: false,
 });

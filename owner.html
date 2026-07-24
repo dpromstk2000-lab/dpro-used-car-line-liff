@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111d29">
   <meta name="description" content="DPRO中古車センターのオーナーPC管理画面。査定、在庫、商談、試乗、契約、納車、顧客検索を一元管理します。">
-  <title>オーナーPC管理 CAR-21｜DPRO中古車センター</title>
+  <title>オーナーPC管理 CAR-22｜DPRO中古車センター</title>
   <style>
     :root{--navy:#10243e;--navy2:#173858;--charcoal:#111d29;--amber:#e5a12b;--amber2:#fff1d2;--green:#117b61;--green2:#e2f3ed;--red:#b44235;--red2:#fff0ed;--canvas:#f4f2ed;--paper:#fff;--soft:#eef2f5;--line:#d5dee5;--ink:#102033;--muted:#617083;--shadow:0 15px 38px rgba(15,35,56,.11);--tap:52px;--side:244px}
     *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.68;-webkit-text-size-adjust:100%}button,input,select,textarea,a{font:inherit}button,a{touch-action:manipulation}:focus-visible{outline:4px solid rgba(229,161,43,.42);outline-offset:2px}a{color:inherit}
@@ -266,21 +266,55 @@
     @media(max-width:1100px){.payment-kpis{grid-template-columns:repeat(2,1fr)}.payment-grid{grid-template-columns:1fr}}
     @media(max-width:650px){.payment-kpis,.payment-form,.payment-meta{grid-template-columns:1fr}.payment-field.full{grid-column:auto}}
 
+
+    /* DPRO CAR STEP CAR-22 FINANCIAL DOCUMENTS */
+    .financial-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .financial-kpi{padding:15px;border:1px solid var(--line);border-radius:15px;background:#fff}
+    .financial-kpi span{display:block;color:var(--muted);font-size:13px;font-weight:850}
+    .financial-kpi strong{display:block;font-size:28px}
+    .financial-layout{margin-top:15px;display:grid;grid-template-columns:minmax(330px,.72fr) minmax(0,1.28fr);gap:15px}
+    .financial-panel{padding:18px;border:1px solid var(--line);border-radius:17px;background:#fff}
+    .financial-panel h3{margin:0;font-size:21px}.financial-panel>p{margin:3px 0 14px;color:var(--muted);font-size:13px}
+    .financial-form{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .financial-field{display:grid;gap:4px}.financial-field.full{grid-column:1/-1}
+    .financial-field label{font-size:13px;font-weight:850}
+    .financial-field input,.financial-field select,.financial-field textarea{width:100%;min-height:46px;padding:8px 10px;border:1px solid #b9c6d0;border-radius:10px;background:#fff}
+    .financial-field textarea{min-height:78px;resize:vertical}
+    .financial-filter{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+    .financial-filter button{min-height:40px;padding:6px 11px;border:1px solid #bdc9d2;border-radius:999px;background:#fff;font-weight:850;cursor:pointer}
+    .financial-filter button.active{border-color:var(--amber);background:var(--amber2)}
+    .financial-list{display:grid;gap:10px}
+    .financial-card{padding:15px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    .financial-card.voided{background:#f4f5f6;color:#5f6973}
+    .financial-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .financial-card h4{margin:0;font-size:19px}.financial-card p{margin:2px 0 0;color:var(--muted);font-size:12px}
+    .financial-money{margin-top:10px;padding:11px 13px;border-radius:11px;background:var(--amber2)}
+    .financial-money span{display:block;color:#755516;font-size:12px;font-weight:850}.financial-money strong{display:block;font-size:24px}
+    .financial-meta{margin-top:9px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+    .financial-meta div{padding:8px;border-radius:9px;background:var(--soft)}
+    .financial-meta span{display:block;color:var(--muted);font-size:11px}.financial-meta strong{display:block;overflow-wrap:anywhere}
+    .financial-actions{margin-top:11px;display:flex;flex-wrap:wrap;gap:7px}
+    .financial-actions .button{min-height:43px;padding:7px 12px;font-size:13px}
+    .financial-safe{margin-top:15px;padding:14px;border-radius:12px;background:var(--navy);color:#fff}
+    .financial-safe strong{display:block}.financial-safe span{display:block;color:#d2dfe8;font-size:13px}
+    @media(max-width:1100px){.financial-layout{grid-template-columns:1fr}}
+    @media(max-width:700px){.financial-kpis,.financial-form,.financial-meta{grid-template-columns:1fr}.financial-field.full{grid-column:auto}}
+
   </style>
-  <!-- CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724 -->
-  <!-- CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724 -->
+  <!-- CAR-22-FINANCIAL-DOCUMENTS-PRINT-MEMBER-20260724 -->
+  <!-- CAR-22-FINANCIAL-DOCUMENTS-PRINT-MEMBER-20260724 -->
   <!-- DPRO CAR STEP CAR-18 AFTERCARE MAINTENANCE RETENTION -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
 
   <main class="gate-wrap" id="gateView">
-    <section class="gate" aria-labelledby="gateTitle"><div class="gate-head"><p class="gate-kicker">OWNER CONTROL CENTER</p><h1 id="gateTitle">買取から入出金管理まで、一元管理。</h1><p>査定・在庫・商談・契約・納車・アフターケア・経営分析・連絡・入出金を同じ画面で確認します。</p></div><div class="gate-body"><form id="loginForm"><label class="field-label" for="adminCode">管理コード</label><div class="code-row"><input class="code-input" id="adminCode" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="管理コードを入力"><button class="button" id="clearCode" type="button">削除</button></div><p class="gate-note">管理コードはこの画面の通信中だけ使用し、端末内へ保存しません。営業デモURLではデモ用コードを自動設定します。</p><div class="gate-actions"><button class="button primary" id="loginButton" type="submit">管理画面を開く</button><a class="button" href="index.html">総合入口へ戻る</a></div><div class="form-message" id="loginError" hidden></div><div class="loading-line" id="loginLoading" hidden>Supabaseから最新情報を取得しています…</div></form></div></section>
+    <section class="gate" aria-labelledby="gateTitle"><div class="gate-head"><p class="gate-kicker">OWNER CONTROL CENTER</p><h1 id="gateTitle">買取から帳票発行まで、一元管理。</h1><p>査定・在庫・契約・入出金・請求書・領収書・精算書を同じ画面で確認します。</p></div><div class="gate-body"><form id="loginForm"><label class="field-label" for="adminCode">管理コード</label><div class="code-row"><input class="code-input" id="adminCode" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="管理コードを入力"><button class="button" id="clearCode" type="button">削除</button></div><p class="gate-note">管理コードはこの画面の通信中だけ使用し、端末内へ保存しません。営業デモURLではデモ用コードを自動設定します。</p><div class="gate-actions"><button class="button primary" id="loginButton" type="submit">管理画面を開く</button><a class="button" href="index.html">総合入口へ戻る</a></div><div class="form-message" id="loginError" hidden></div><div class="loading-line" id="loginLoading" hidden>Supabaseから最新情報を取得しています…</div></form></div></section>
   </main>
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-22-FINANCIAL-DOCUMENTS-PRINT-MEMBER-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -294,6 +328,7 @@
         <section class="section-view" id="view-management" hidden></section>
         <section class="section-view" id="view-communications" hidden></section>
         <section class="section-view" id="view-payments" hidden></section>
+        <section class="section-view" id="view-financials" hidden></section>
         <section class="section-view" id="view-search" hidden></section>
         <section class="section-view" id="view-team" hidden></section>
       </main>
@@ -350,6 +385,7 @@
       {id:"management",icon:"経",label:"経営分析",kicker:"MANAGEMENT ANALYTICS",title:"経営・在庫・粗利",description:"査定、買取、販売、在庫回転、粗利、成約率を経営数値で確認します。",count:()=>0},
       {id:"communications",icon:"連",label:"連絡管理",kicker:"CUSTOMER COMMUNICATION",title:"LINE連絡・送信履歴",description:"テンプレート、送信予定、文章コピー、送信済み履歴を一元管理します。",count:()=>0},
       {id:"payments",icon:"払",label:"入出金",kicker:"PAYMENT & CASHFLOW",title:"入出金・未収金",description:"販売代金、買取支払、経費、返金、未収金、支払予定を管理します。",count:()=>0},
+      {id:"financials",icon:"票",label:"帳票",kicker:"FINANCIAL DOCUMENTS",title:"請求書・領収書・精算書",description:"入出金・契約から帳票を作成し、発行・再発行・無効化を管理します。",count:()=>0},
       {id:"team",icon:"設",label:"設定",kicker:"STORE SETTINGS",title:"店舗・担当者設定",description:"営業時間・定休日・受付上限と担当者を確認します。",count:d=>(d.staff||[]).length},
     ];
       const statusLabels={
@@ -378,7 +414,7 @@
       function renderSection(id,force=false){
       if(!state.data)return;
       if(!force&&state.rendered.has(id))return;
-      const renderers={dashboard:renderDashboard,today:renderToday,appraisals:renderAppraisals,search:renderSearch,inventory:renderInventory,sales:renderSales,contracts:renderContracts,delivery:renderDelivery,aftercare:renderAftercare,management:renderManagement,communications:renderCommunications,payments:renderPayments,team:renderTeam};
+      const renderers={dashboard:renderDashboard,today:renderToday,appraisals:renderAppraisals,search:renderSearch,inventory:renderInventory,sales:renderSales,contracts:renderContracts,delivery:renderDelivery,aftercare:renderAftercare,management:renderManagement,communications:renderCommunications,payments:renderPayments,financials:renderFinancials,team:renderTeam};
       const render=renderers[id];
       if(render){render();state.rendered.add(id)}
     }
@@ -1216,6 +1252,177 @@
         actions.append(complete,cancel);
       }
       card.append(actions);return card;
+    }
+
+
+    const CAR22_TYPE_LABEL={invoice:"請求書",receipt:"領収書",purchase_payment_statement:"買取支払明細",settlement_statement:"精算書"};
+    const CAR22_STATUS_LABEL={draft:"下書き",issued:"発行済み",voided:"無効"};
+    let car22Data=null,car22Filter="all";
+
+    async function car22Load(){
+      car22Data=await api("/api/admin/financial-documents");
+      return car22Data;
+    }
+
+    function car22Kpi(labelText,value){
+      const card=el("article","financial-kpi");
+      card.append(el("span","",labelText),el("strong","",String(value||0)));
+      return card;
+    }
+
+    function renderFinancials(){
+      const root=document.getElementById("view-financials");
+      clear(root);
+      root.append(sectionHeader("請求書・領収書・精算書","CAR-21入出金台帳と契約から帳票を作成します",0));
+      root.append(el("div","empty","帳票情報を取得しています。"));
+      car22Load().then(()=>car22RenderPage(root)).catch(error=>{
+        clear(root);root.append(el("div","empty",error.message));showToast(error.message,true);
+      });
+    }
+
+    function car22RenderPage(root){
+      clear(root);
+      const data=car22Data||{},summary=data.summary||{},documents=data.documents||[];
+      root.append(sectionHeader("請求書・領収書・精算書","発行後は内容を固定し、再発行・無効化の履歴を残します",documents.length));
+      const kpis=el("div","financial-kpis");
+      kpis.append(
+        car22Kpi("下書き",summary.draft),
+        car22Kpi("発行済み",summary.issued),
+        car22Kpi("再発行回数",summary.reissued),
+        car22Kpi("無効",summary.voided)
+      );
+      root.append(kpis);
+
+      const layout=el("div","financial-layout"),formPanel=el("section","financial-panel"),listPanel=el("section","financial-panel");
+      formPanel.append(el("h3","","帳票下書きを作成"),el("p","","入出金・契約を選ぶと金額や宛名をWorkerが補完します。"));
+      formPanel.append(car22CreateForm());
+      const safe=el("div","financial-safe");
+      safe.append(el("strong","","PDFはブラウザの印刷機能で保存します"),el("span","","発行時点の内容を固定し、サーバーではPDFを自動生成・自動送信しません。"));
+      formPanel.append(safe);
+
+      listPanel.append(el("h3","","帳票一覧"),el("p","","下書き・発行・再発行・無効化を履歴管理"));
+      const filter=el("div","financial-filter");
+      [["all","すべて"],["draft","下書き"],["issued","発行済み"],["voided","無効"]].forEach(([value,labelText])=>{
+        const button=el("button",car22Filter===value?"active":"",labelText);button.type="button";
+        button.addEventListener("click",()=>{car22Filter=value;car22RenderPage(root)});
+        filter.append(button);
+      });
+      listPanel.append(filter);
+      const list=el("div","financial-list");
+      documents.filter(item=>car22Filter==="all"||item.status===car22Filter).forEach(item=>list.append(car22Card(item)));
+      if(!list.children.length)list.append(empty("該当する帳票はありません。"));
+      listPanel.append(list);
+      layout.append(formPanel,listPanel);root.append(layout);
+    }
+
+    function car22CreateForm(){
+      const form=el("form","financial-form");
+      const make=(labelText,node,full=false)=>{const wrap=el("div",`financial-field${full?" full":""}`);wrap.append(el("label","",labelText),node);return wrap};
+      const type=document.createElement("select");
+      Object.entries(CAR22_TYPE_LABEL).forEach(([value,labelText])=>{const option=el("option","",labelText);option.value=value;type.append(option)});
+      const payment=document.createElement("select"),paymentEmpty=el("option","","入出金履歴なし");paymentEmpty.value="";payment.append(paymentEmpty);
+      (car22Data?.options?.payment_transactions||[]).forEach(item=>{const option=el("option","",`${item.transaction_number}／${item.direction==="in"?"入金":"出金"}／${money(item.amount)}`);option.value=item.id;payment.append(option)});
+      const sale=document.createElement("select"),saleEmpty=el("option","","販売契約なし");saleEmpty.value="";sale.append(saleEmpty);
+      (car22Data?.options?.sale_contracts||[]).forEach(item=>{const option=el("option","",`${item.contract_number}／${money(item.total_price)}`);option.value=item.id;sale.append(option)});
+      const purchase=document.createElement("select"),purchaseEmpty=el("option","","買取契約なし");purchaseEmpty.value="";purchase.append(purchaseEmpty);
+      (car22Data?.options?.purchase_contracts||[]).forEach(item=>{const option=el("option","",`${item.contract_number}／${money(item.purchase_price)}`);option.value=item.id;purchase.append(option)});
+      const customer=document.createElement("select"),customerEmpty=el("option","","顧客未指定");customerEmpty.value="";customer.append(customerEmpty);
+      (car22Data?.options?.customers||[]).forEach(item=>{const option=el("option","",`${item.customer_code} ${item.customer_name}`);option.value=item.id;customer.append(option)});
+      const amount=document.createElement("input");amount.type="number";amount.min="1";amount.placeholder="参照先から自動補完";
+      const due=document.createElement("input");due.type="date";
+      const title=document.createElement("input");title.maxLength=180;title.placeholder="未入力時は帳票種別名";
+      const note=document.createElement("textarea");note.maxLength=1200;note.placeholder="お客様向けの補足";
+      const member=document.createElement("input");member.type="checkbox";
+      const memberWrap=el("label","check-field");memberWrap.append(member,document.createTextNode(" 発行後にお客様マイページへ表示可能"));
+      const submit=el("button","button amber","帳票下書きを作成");submit.type="submit";
+
+      form.append(
+        make("帳票種別",type),
+        make("入出金履歴",payment),
+        make("販売契約",sale),
+        make("買取契約",purchase),
+        make("顧客",customer),
+        make("合計金額（円）",amount),
+        make("期限",due),
+        make("帳票タイトル",title),
+        make("補足",note,true),
+        memberWrap,
+        submit
+      );
+
+      form.addEventListener("submit",async event=>{
+        event.preventDefault();submit.disabled=true;
+        try{
+          const body={
+            document_type:type.value,
+            payment_transaction_id:payment.value||null,
+            sale_contract_id:sale.value||null,
+            purchase_contract_id:purchase.value||null,
+            customer_id:customer.value||null,
+            total_amount:amount.value?Number(amount.value):null,
+            due_date:due.value||null,
+            title:title.value||null,
+            public_note:note.value||null,
+            member_visible:member.checked
+          };
+          Object.keys(body).forEach(key=>body[key]===null&&delete body[key]);
+          const result=await api("/api/admin/financial-documents",{method:"POST",body:JSON.stringify(body)});
+          showToast(result.message||"帳票下書きを作成しました。");
+          await car22Load();car22RenderPage(document.getElementById("view-financials"));
+        }catch(error){showToast(error.message,true)}finally{submit.disabled=false}
+      });
+      return form;
+    }
+
+    function car22Card(item){
+      const card=el("article",`financial-card${item.status==="voided"?" voided":""}`),head=el("div","financial-card-head"),left=el("div");
+      left.append(el("h4","",`${CAR22_TYPE_LABEL[item.document_type]||item.document_type}／${item.title}`),el("p","",[item.document_number,item.customer?.customer_name,item.vehicle?.vehicle_name].filter(Boolean).join(" ／ ")));
+      head.append(left,el("span",`badge ${item.status==="issued"?"active":item.status==="voided"?"danger":"warn"}`,CAR22_STATUS_LABEL[item.status]||item.status));card.append(head);
+      const amountBox=el("div","financial-money");amountBox.append(el("span","","合計金額"),el("strong","",money(item.total_amount)));card.append(amountBox);
+      const metaGrid=el("div","financial-meta");
+      [["発行日",item.issue_date?date(item.issue_date):"未設定"],["期限",item.due_date?date(item.due_date):"未設定"],["再発行",`${item.reissue_count||0}回`]].forEach(([key,value])=>{const box=el("div");box.append(el("span","",key),el("strong","",value));metaGrid.append(box)});card.append(metaGrid);
+      if(item.public_note)card.append(el("p","internal-note",item.public_note));
+      if(item.status==="voided"&&item.void_reason)card.append(el("p","internal-note",`無効理由：${item.void_reason}`));
+      const actions=el("div","financial-actions");
+      const preview=el("button","button primary",item.status==="draft"?"下書きを表示・印刷":"表示・印刷／PDF保存");preview.type="button";preview.addEventListener("click",()=>car22Print(item));actions.append(preview);
+      if(item.status==="draft"){
+        const issue=el("button","button amber","内容を確定して発行");issue.type="button";
+        issue.addEventListener("click",async()=>{
+          if(!confirm("発行後は金額・宛名・明細を変更できません。発行しますか？"))return;
+          issue.disabled=true;
+          try{const result=await api(`/api/admin/financial-documents/${item.id}/issue`,{method:"POST",body:JSON.stringify({confirmed:true})});showToast(result.message);await car22Load();car22RenderPage(document.getElementById("view-financials"))}catch(error){showToast(error.message,true)}finally{issue.disabled=false}
+        });actions.append(issue);
+      }
+      if(item.status==="issued"){
+        const reissue=el("button","button","再発行を記録");reissue.type="button";
+        reissue.addEventListener("click",async()=>{
+          const note=prompt("再発行理由・用途を入力してください。","お客様控え再発行");if(note===null)return;
+          reissue.disabled=true;
+          try{const result=await api(`/api/admin/financial-documents/${item.id}/reissue`,{method:"POST",body:JSON.stringify({note})});showToast(result.message);await car22Load();car22RenderPage(document.getElementById("view-financials"));car22Print(result.document)}catch(error){showToast(error.message,true)}finally{reissue.disabled=false}
+        });actions.append(reissue);
+      }
+      if(item.status!=="voided"){
+        const voidButton=el("button","button danger","無効化");voidButton.type="button";
+        voidButton.addEventListener("click",async()=>{
+          const reason=prompt("無効化理由を入力してください。");if(!reason)return;
+          voidButton.disabled=true;
+          try{const result=await api(`/api/admin/financial-documents/${item.id}/void`,{method:"POST",body:JSON.stringify({reason})});showToast(result.message);await car22Load();car22RenderPage(document.getElementById("view-financials"))}catch(error){showToast(error.message,true)}finally{voidButton.disabled=false}
+        });actions.append(voidButton);
+      }
+      card.append(actions);return card;
+    }
+
+    function car22Escape(value){
+      return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    }
+
+    function car22Print(item){
+      const source=item.snapshot||item,recipient=source.recipient||{name:item.recipient_name,postal_code:item.recipient_postal_code,address:item.recipient_address},issuer=source.issuer||{name:item.issuer_name,postal_code:item.issuer_postal_code,address:item.issuer_address,phone:item.issuer_phone,invoice_registration_number:item.invoice_registration_number},amounts=source.amounts||{subtotal:item.subtotal,tax_amount:item.tax_amount,total_amount:item.total_amount},items=Array.isArray(source.line_items)?source.line_items:(item.line_items||[]);
+      const rows=items.map(line=>`<tr><td>${car22Escape(line.label)}</td><td class="num">${car22Escape(line.quantity??1)}</td><td class="num">${car22Escape(money(line.unit_price??line.amount))}</td><td class="num">${car22Escape(money(line.amount))}</td></tr>`).join("");
+      const popup=window.open("","_blank","noopener,noreferrer");
+      if(!popup){showToast("印刷画面を開けませんでした。ポップアップを許可してください。",true);return}
+      popup.document.write(`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>${car22Escape(item.document_number)}</title><style>@page{size:A4;margin:16mm}body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#172436;font-size:14px}h1{text-align:center;font-size:28px;letter-spacing:.12em;margin:0 0 28px}.top{display:grid;grid-template-columns:1fr 1fr;gap:30px}.right{text-align:right}.number{margin:20px 0;padding:10px;border-top:1px solid #9aa8b4;border-bottom:1px solid #9aa8b4}.total{margin:24px 0;padding:16px;background:#f4ead4;font-size:22px;font-weight:800}table{width:100%;border-collapse:collapse}th,td{border:1px solid #aeb8c0;padding:9px}th{background:#eef2f5}.num{text-align:right}.summary{width:48%;margin:18px 0 0 auto}.summary div{display:flex;justify-content:space-between;padding:7px;border-bottom:1px solid #c8d0d6}.note{margin-top:24px;white-space:pre-wrap}.stamp{margin-top:28px;color:#687786;font-size:12px}</style></head><body><h1>${car22Escape(CAR22_TYPE_LABEL[item.document_type]||item.document_type)}</h1><div class="top"><div><strong>${car22Escape(recipient?.name||"")}</strong> 御中<br>${car22Escape(recipient?.postal_code||"")}<br>${car22Escape(recipient?.address||"")}</div><div class="right"><strong>${car22Escape(issuer?.name||"")}</strong><br>${car22Escape(issuer?.postal_code||"")}<br>${car22Escape(issuer?.address||"")}<br>${car22Escape(issuer?.phone||"")}</div></div><div class="number">帳票番号：${car22Escape(item.document_number)}　発行日：${car22Escape(source.issue_date||item.issue_date||"")}</div><p>${car22Escape(source.title||item.title||"")}</p><div class="total">合計 ${car22Escape(money(amounts.total_amount))}</div><table><thead><tr><th>明細</th><th>数量</th><th>単価</th><th>金額</th></tr></thead><tbody>${rows}</tbody></table><div class="summary"><div><span>税抜</span><strong>${car22Escape(money(amounts.subtotal))}</strong></div><div><span>消費税</span><strong>${car22Escape(money(amounts.tax_amount))}</strong></div><div><span>合計</span><strong>${car22Escape(money(amounts.total_amount))}</strong></div></div><div class="note">${car22Escape(source.public_note||item.public_note||"")}</div><div class="stamp">${item.status==="draft"?"下書き・未発行":item.status==="voided"?"無効帳票":`発行済み／再発行 ${item.reissue_count||0}回`}<br>ブラウザの印刷画面から「PDFに保存」を選択できます。</div><script>addEventListener("load",()=>setTimeout(()=>print(),250));<\/script></body></html>`);
+      popup.document.close();
     }
 
     function renderTeam(){const root=document.getElementById("view-team");clear(root);root.append(sectionHeader("店舗・担当者","営業時間・定休日・受付上限と担当者",state.data.stores.length));const grid=el("div","store-grid");state.data.stores.forEach(store=>{const card=el("article","store-card");card.append(el("h3","",store.store_name),el("p","",store.address||"住所未設定"),el("p","",`営業時間 ${String(store.opening_time||"").slice(0,5)}〜${String(store.closing_time||"").slice(0,5)}／${store.phone||"電話未設定"}`));const edit=el("button","button editor-open","店舗設定を編集");edit.type="button";edit.addEventListener("click",()=>openStoreEditor(store));card.append(edit);const list=el("div","staff-list"),members=state.data.staff.filter(x=>x.store_id===store.id);members.forEach(s=>{const row=el("div","staff-row"),left=el("div");left.append(el("strong","",s.staff_name),el("span","",s.staff_code));row.append(left,el("span","",{staff:"スタッフ",manager:"店長",admin:"管理者"}[s.role]||s.role));list.append(row)});if(!members.length)list.append(empty("担当者は未登録です。"));card.append(list);grid.append(card)});if(!grid.children.length)grid.append(empty("店舗情報はありません。"));root.append(grid);const safe=el("section","safe-panel");safe.append(el("h3","","管理画面の安全設計"),el("p","","お客様画面と管理情報を分離し、管理コードが一致した場合だけWorkerがデータを返します。"));const list=el("div","safe-list");["管理コードを端末内に保存しない","更新操作を監査ログへ記録","査定用の非公開写真と掲載写真を分離"].forEach((x,i)=>{const n=el("div");n.append(el("b","",`0${i+1} `),document.createTextNode(x));list.append(n)});safe.append(list);root.append(safe)}
