@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-23 顧客・車両・在庫CSV移行・重複検査・取込履歴
+ * STEP CAR-24 総合完成検査・本番導入前仕上げ・リリース判定
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-23-DATA-MIGRATION-CSV-IMPORT-EXPORT-20260724",
+  version: "CAR-24-PRODUCTION-READINESS-FINAL-QUALITY-GATE-20260724",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -78,4 +78,9 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   inventoryCsvImport: true,
   dataMigrationPreviewBeforeCommit: true,
   dataMigrationAutomaticCommit: false,
+  ownerProductionReadiness: true,
+  releaseAutomaticQualityGate: true,
+  releaseManualSignoff: true,
+  releaseDemoGuard: true,
+  releaseEnvironmentAutoMutation: false,
 });

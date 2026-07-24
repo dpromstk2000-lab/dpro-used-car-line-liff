@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111d29">
   <meta name="description" content="DPRO中古車センターのオーナーPC管理画面。査定、在庫、商談、試乗、契約、納車、顧客検索を一元管理します。">
-  <title>オーナーPC管理 CAR-23｜DPRO中古車センター</title>
+  <title>オーナーPC管理 CAR-24｜DPRO中古車センター</title>
   <style>
     :root{--navy:#10243e;--navy2:#173858;--charcoal:#111d29;--amber:#e5a12b;--amber2:#fff1d2;--green:#117b61;--green2:#e2f3ed;--red:#b44235;--red2:#fff0ed;--canvas:#f4f2ed;--paper:#fff;--soft:#eef2f5;--line:#d5dee5;--ink:#102033;--muted:#617083;--shadow:0 15px 38px rgba(15,35,56,.11);--tap:52px;--side:244px}
     *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.68;-webkit-text-size-adjust:100%}button,input,select,textarea,a{font:inherit}button,a{touch-action:manipulation}:focus-visible{outline:4px solid rgba(229,161,43,.42);outline-offset:2px}a{color:inherit}
@@ -322,21 +322,47 @@
     @media(max-width:1050px){.migration-layout{grid-template-columns:1fr}}
     @media(max-width:700px){.migration-kpis,.migration-summary,.migration-actions,.migration-export{grid-template-columns:1fr}}
 
+
+    /* DPRO CAR STEP CAR-24 PRODUCTION READINESS */
+    .release-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .release-kpi{padding:15px;border:1px solid var(--line);border-radius:15px;background:#fff}
+    .release-kpi.good{border-color:#8fceb9;background:#effaf6}.release-kpi.danger{border-color:#dfa39b;background:#fff5f3}
+    .release-kpi span{display:block;color:var(--muted);font-size:13px;font-weight:850}.release-kpi strong{display:block;font-size:27px}
+    .release-layout{margin-top:15px;display:grid;grid-template-columns:1fr 1fr;gap:15px}
+    .release-panel{padding:18px;border:1px solid var(--line);border-radius:17px;background:#fff}
+    .release-panel.full{grid-column:1/-1}.release-panel h3{margin:0;font-size:21px}.release-panel>p{margin:3px 0 14px;color:var(--muted);font-size:13px}
+    .release-check-list{display:grid;gap:8px}.release-check{padding:11px 12px;display:grid;grid-template-columns:auto 1fr;gap:9px;align-items:start;border:1px solid var(--line);border-radius:11px;background:#fff}
+    .release-check.pass{border-color:#9acdbb;background:#f1faf7}.release-check.block{border-color:#dfa9a2;background:#fff5f3}
+    .release-check-icon{width:27px;height:27px;display:grid;place-items:center;border-radius:999px;background:var(--soft);font-weight:900}
+    .release-check.pass .release-check-icon{background:#d9f0e8;color:#087052}.release-check.block .release-check-icon{background:#ffe0dc;color:#a33127}
+    .release-check strong{display:block}.release-check span{display:block;color:var(--muted);font-size:12px}
+    .release-manual{display:grid;gap:8px}.release-manual label{padding:11px 12px;display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:850}
+    .release-manual input{width:21px;height:21px;margin-top:2px}.release-form-field{display:grid;gap:5px;margin-top:10px}.release-form-field label{font-size:13px;font-weight:900}
+    .release-form-field input,.release-form-field textarea{width:100%;min-height:46px;padding:8px 10px;border:1px solid #b9c6d0;border-radius:10px}.release-form-field textarea{min-height:85px;resize:vertical}
+    .release-actions{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}.release-actions .button{min-height:46px}
+    .release-blockers{display:grid;gap:8px}.release-blocker{padding:11px 13px;border-left:5px solid var(--red);border-radius:0 10px 10px 0;background:var(--red2)}
+    .release-warning{padding:11px 13px;border-left:5px solid var(--amber);border-radius:0 10px 10px 0;background:var(--amber2)}
+    .release-environment{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.release-environment div{padding:10px;border-radius:10px;background:var(--soft)}
+    .release-environment span{display:block;color:var(--muted);font-size:11px}.release-environment strong{display:block;overflow-wrap:anywhere}
+    .release-safe{margin-top:14px;padding:14px;border-radius:12px;background:var(--navy);color:#fff}.release-safe strong{display:block}.release-safe span{display:block;color:#d2dfe8;font-size:13px}
+    @media(max-width:1050px){.release-layout{grid-template-columns:1fr}.release-panel.full{grid-column:auto}}
+    @media(max-width:700px){.release-kpis,.release-environment{grid-template-columns:1fr}}
+
   </style>
-  <!-- CAR-23-DATA-MIGRATION-CSV-IMPORT-EXPORT-20260724 -->
-  <!-- CAR-23-DATA-MIGRATION-CSV-IMPORT-EXPORT-20260724 -->
+  <!-- CAR-24-PRODUCTION-READINESS-FINAL-QUALITY-GATE-20260724 -->
+  <!-- CAR-24-PRODUCTION-READINESS-FINAL-QUALITY-GATE-20260724 -->
   <!-- DPRO CAR STEP CAR-18 AFTERCARE MAINTENANCE RETENTION -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
 
   <main class="gate-wrap" id="gateView">
-    <section class="gate" aria-labelledby="gateTitle"><div class="gate-head"><p class="gate-kicker">OWNER CONTROL CENTER</p><h1 id="gateTitle">買取からデータ移行まで、一元管理。</h1><p>査定・在庫・契約・帳票・既存データ移行を同じ画面で管理します。</p></div><div class="gate-body"><form id="loginForm"><label class="field-label" for="adminCode">管理コード</label><div class="code-row"><input class="code-input" id="adminCode" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="管理コードを入力"><button class="button" id="clearCode" type="button">削除</button></div><p class="gate-note">管理コードはこの画面の通信中だけ使用し、端末内へ保存しません。営業デモURLではデモ用コードを自動設定します。</p><div class="gate-actions"><button class="button primary" id="loginButton" type="submit">管理画面を開く</button><a class="button" href="index.html">総合入口へ戻る</a></div><div class="form-message" id="loginError" hidden></div><div class="loading-line" id="loginLoading" hidden>Supabaseから最新情報を取得しています…</div></form></div></section>
+    <section class="gate" aria-labelledby="gateTitle"><div class="gate-head"><p class="gate-kicker">OWNER CONTROL CENTER</p><h1 id="gateTitle">買取から本番準備まで、一元管理。</h1><p>査定・在庫・契約・帳票・データ移行・本番準備を同じ画面で管理します。</p></div><div class="gate-body"><form id="loginForm"><label class="field-label" for="adminCode">管理コード</label><div class="code-row"><input class="code-input" id="adminCode" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="管理コードを入力"><button class="button" id="clearCode" type="button">削除</button></div><p class="gate-note">管理コードはこの画面の通信中だけ使用し、端末内へ保存しません。営業デモURLではデモ用コードを自動設定します。</p><div class="gate-actions"><button class="button primary" id="loginButton" type="submit">管理画面を開く</button><a class="button" href="index.html">総合入口へ戻る</a></div><div class="form-message" id="loginError" hidden></div><div class="loading-line" id="loginLoading" hidden>Supabaseから最新情報を取得しています…</div></form></div></section>
   </main>
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-23-DATA-MIGRATION-CSV-IMPORT-EXPORT-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-24-PRODUCTION-READINESS-FINAL-QUALITY-GATE-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -352,6 +378,7 @@
         <section class="section-view" id="view-payments" hidden></section>
         <section class="section-view" id="view-financials" hidden></section>
         <section class="section-view" id="view-migration" hidden></section>
+        <section class="section-view" id="view-release" hidden></section>
         <section class="section-view" id="view-search" hidden></section>
         <section class="section-view" id="view-team" hidden></section>
       </main>
@@ -410,6 +437,7 @@
       {id:"payments",icon:"払",label:"入出金",kicker:"PAYMENT & CASHFLOW",title:"入出金・未収金",description:"販売代金、買取支払、経費、返金、未収金、支払予定を管理します。",count:()=>0},
       {id:"financials",icon:"票",label:"帳票",kicker:"FINANCIAL DOCUMENTS",title:"請求書・領収書・精算書",description:"入出金・契約から帳票を作成し、発行・再発行・無効化を管理します。",count:()=>car22Data?.documents?.length||0},
       {id:"migration",icon:"移",label:"データ移行",kicker:"CSV DATA MIGRATION",title:"顧客・車両・在庫CSV移行",description:"CSVを事前検査し、重複処理を確認してから安全に取り込みます。",count:()=>car23Data?.jobs?.length||0},
+      {id:"release",icon:"完",label:"本番準備",kicker:"PRODUCTION READINESS",title:"総合完成検査・本番導入準備",description:"全STEPの安全性・環境設定・導入準備を一括判定します。",count:()=>car24Data?.summary?.blocker_count||0},
       {id:"team",icon:"設",label:"設定",kicker:"STORE SETTINGS",title:"店舗・担当者設定",description:"営業時間・定休日・受付上限と担当者を確認します。",count:d=>(d.staff||[]).length},
     ];
       const statusLabels={
@@ -438,7 +466,7 @@
       function renderSection(id,force=false){
       if(!state.data)return;
       if(!force&&state.rendered.has(id))return;
-      const renderers={dashboard:renderDashboard,today:renderToday,appraisals:renderAppraisals,search:renderSearch,inventory:renderInventory,sales:renderSales,contracts:renderContracts,delivery:renderDelivery,aftercare:renderAftercare,management:renderManagement,communications:renderCommunications,payments:renderPayments,financials:renderFinancials,migration:renderMigration,team:renderTeam};
+      const renderers={dashboard:renderDashboard,today:renderToday,appraisals:renderAppraisals,search:renderSearch,inventory:renderInventory,sales:renderSales,contracts:renderContracts,delivery:renderDelivery,aftercare:renderAftercare,management:renderManagement,communications:renderCommunications,payments:renderPayments,financials:renderFinancials,migration:renderMigration,release:renderRelease,team:renderTeam};
       const render=renderers[id];
       if(render){render();state.rendered.add(id)}
     }
@@ -1564,6 +1592,87 @@
         wrap.append(el("div","notice",`エラー${job.error_rows}件があります。CSVを修正して再度事前検査してください。`));
       }
       return wrap;
+    }
+
+
+    const CAR24_STATUS_LABEL={blocked:"未完了",ready:"準備完了",released:"本番準備完了記録済み"};
+    let car24Data=null;
+
+    async function car24Load(){
+      car24Data=await api("/api/admin/release-readiness");
+      makeNav(document.getElementById("desktopNav"));
+      makeNav(document.getElementById("mobileNav"));
+      return car24Data;
+    }
+
+    function car24DownloadReport(){
+      if(!car24Data)return;
+      const report={
+        generated_at:new Date().toISOString(),
+        frontend_version:window.DPRO_CAR_CONFIG?.version||null,
+        api_version:car24Data.version,
+        summary:car24Data.summary,
+        readiness:car24Data.readiness,
+        safety:car24Data.safety
+      };
+      const blob=new Blob([JSON.stringify(report,null,2)],{type:"application/json;charset=utf-8"});
+      const url=URL.createObjectURL(blob),anchor=document.createElement("a");
+      anchor.href=url;anchor.download=`dpro-car-release-readiness-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+
+    function renderRelease(){
+      const root=document.getElementById("view-release");clear(root);
+      root.append(sectionHeader("本番準備・総合完成検査","全STEPの安全性と導入準備を一括判定します",0));
+      root.append(el("div","empty","本番準備状況を取得しています。"));
+      car24Load().then(()=>car24Render(root)).catch(error=>{clear(root);root.append(empty(error.message));showToast(error.message,true)});
+    }
+
+    function car24Render(root){
+      clear(root);
+      const summary=car24Data?.summary||{},readiness=car24Data?.readiness||{},status=summary.status||"blocked";
+      root.append(sectionHeader("本番準備・総合完成検査","環境を自動変更せず、阻害事項と手動確認を可視化します",summary.blocker_count||0));
+      const kpis=el("div","release-kpis");
+      [["状態",CAR24_STATUS_LABEL[status]||status,status==="ready"||status==="released"?"good":"danger"],["阻害事項",summary.blocker_count||0,summary.blocker_count?"danger":"good"],["自動検査",`${summary.automatic_passed||0}/${summary.automatic_total||0}`,summary.automatic_passed===summary.automatic_total?"good":""],["手動確認",`${summary.manual_passed||0}/${summary.manual_total||0}`,summary.manual_passed===summary.manual_total?"good":""]].forEach(([labelText,value,className])=>{const card=el("article",`release-kpi ${className||""}`);card.append(el("span","",labelText),el("strong","",String(value)));kpis.append(card)});
+      root.append(kpis);
+
+      const layout=el("div","release-layout"),autoPanel=el("section","release-panel"),manualPanel=el("section","release-panel");
+      autoPanel.append(el("h3","","自動総合検査"),el("p","","DB・ストレージ・スキーマ・セキュリティ・環境変数を確認"));
+      const autoList=el("div","release-check-list");
+      Object.entries(readiness.automatic_checks||{}).forEach(([key,value])=>{const row=el("div",`release-check ${value?"pass":"block"}`);row.append(el("span","release-check-icon",value?"✓":"!"),el("div","",`${readiness.automatic_labels?.[key]||key}`));autoList.append(row)});
+      autoPanel.append(autoList);
+
+      manualPanel.append(el("h3","","本番導入時の手動確認"),el("p","","実際のLINE・担当者・バックアップだけを確認"));
+      const form=document.createElement("form"),manualList=el("div","release-manual");
+      const inputs={};
+      Object.entries(readiness.manual_labels||{}).forEach(([key,labelText])=>{const label=document.createElement("label"),input=document.createElement("input");input.type="checkbox";input.checked=readiness.manual_checks?.[key]===true;inputs[key]=input;label.append(input,document.createTextNode(labelText));manualList.append(label)});
+      const by=document.createElement("input");by.value=readiness.confirmed_by||"";by.placeholder="確認担当者名";
+      const notes=document.createElement("textarea");notes.value=readiness.release_notes||"";notes.placeholder="導入先固有の注意事項・引継ぎ内容";
+      const field=(labelText,node)=>{const wrap=el("div","release-form-field");wrap.append(el("label","",labelText),node);return wrap};
+      const save=el("button","button amber","準備状況を保存");save.type="submit";
+      form.append(manualList,field("確認担当者",by),field("本番導入メモ",notes),save);
+      form.addEventListener("submit",async event=>{event.preventDefault();save.disabled=true;try{const manual_checks=Object.fromEntries(Object.entries(inputs).map(([key,input])=>[key,input.checked]));car24Data=await api("/api/admin/release-readiness",{method:"PATCH",body:JSON.stringify({manual_checks,confirmed_by:by.value||null,release_notes:notes.value||null})});showToast("本番準備状況を保存しました。");car24Render(document.getElementById("view-release"))}catch(error){showToast(error.message,true)}finally{save.disabled=false}});
+      manualPanel.append(form);
+      layout.append(autoPanel,manualPanel);
+
+      const blockerPanel=el("section","release-panel full");blockerPanel.append(el("h3","","阻害事項・注意事項"),el("p","","0件になるまで本番準備完了は記録できません"));
+      const blockerList=el("div","release-blockers");
+      (readiness.blockers||[]).forEach(item=>blockerList.append(el("div","release-blocker",`${item.kind==="manual"?"手動確認":"自動検査"}：${item.label}`)));
+      (readiness.warnings||[]).forEach(item=>blockerList.append(el("div","release-warning",item.label)));
+      if(!blockerList.children.length)blockerList.append(el("div","release-check pass","阻害事項はありません。"));
+      blockerPanel.append(blockerList);
+
+      const environment=el("div","release-environment");environment.style.marginTop="14px";
+      [["事業者",readiness.environment?.company_name],["事業者コード",readiness.environment?.company_code],["環境",readiness.environment?.is_demo?"デモ":"本番"],["管理コード",readiness.environment?.admin_key_source],["許可オリジン",readiness.environment?.allowed_origins_configured?"設定済み":"未設定"],["Worker",readiness.environment?.worker_version]].forEach(([labelText,value])=>{const box=el("div");box.append(el("span","",labelText),el("strong","",String(value??"未設定")));environment.append(box)});
+      blockerPanel.append(environment);
+
+      const actions=el("div","release-actions");
+      const verify=el("button","button","総合検査を再実行");verify.type="button";verify.addEventListener("click",async()=>{verify.disabled=true;try{car24Data=await api("/api/admin/release-readiness/verify",{method:"POST",body:"{}"});showToast(car24Data.message);car24Render(document.getElementById("view-release"))}catch(error){showToast(error.message,true)}finally{verify.disabled=false}});
+      const report=el("button","button","検査レポートをダウンロード");report.type="button";report.addEventListener("click",car24DownloadReport);
+      const release=el("button","button primary","本番準備完了を記録");release.type="button";release.disabled=Number(summary.blocker_count||0)>0||readiness.environment?.is_demo===true;release.addEventListener("click",async()=>{if(!confirm("全阻害事項が解消済みです。本番準備完了を記録しますか？"))return;release.disabled=true;try{const result=await api("/api/admin/release-readiness/release",{method:"POST",body:JSON.stringify({confirmed:true})});showToast(result.message);await car24Load();car24Render(document.getElementById("view-release"))}catch(error){showToast(error.message,true)}finally{release.disabled=false}});
+      actions.append(verify,report,release);blockerPanel.append(actions);
+      const safe=el("div","release-safe");safe.append(el("strong","","本番環境を自動変更しません"),el("span","","許可オリジン・LIFF・管理コード・デモ解除は、内容を確認して人が設定します。"));blockerPanel.append(safe);
+      layout.append(blockerPanel);root.append(layout);
     }
 
     function renderTeam(){const root=document.getElementById("view-team");clear(root);root.append(sectionHeader("店舗・担当者","営業時間・定休日・受付上限と担当者",state.data.stores.length));const grid=el("div","store-grid");state.data.stores.forEach(store=>{const card=el("article","store-card");card.append(el("h3","",store.store_name),el("p","",store.address||"住所未設定"),el("p","",`営業時間 ${String(store.opening_time||"").slice(0,5)}〜${String(store.closing_time||"").slice(0,5)}／${store.phone||"電話未設定"}`));const edit=el("button","button editor-open","店舗設定を編集");edit.type="button";edit.addEventListener("click",()=>openStoreEditor(store));card.append(edit);const list=el("div","staff-list"),members=state.data.staff.filter(x=>x.store_id===store.id);members.forEach(s=>{const row=el("div","staff-row"),left=el("div");left.append(el("strong","",s.staff_name),el("span","",s.staff_code));row.append(left,el("span","",{staff:"スタッフ",manager:"店長",admin:"管理者"}[s.role]||s.role));list.append(row)});if(!members.length)list.append(empty("担当者は未登録です。"));card.append(list);grid.append(card)});if(!grid.children.length)grid.append(empty("店舗情報はありません。"));root.append(grid);const safe=el("section","safe-panel");safe.append(el("h3","","管理画面の安全設計"),el("p","","お客様画面と管理情報を分離し、管理コードが一致した場合だけWorkerがデータを返します。"));const list=el("div","safe-list");["管理コードを端末内に保存しない","更新操作を監査ログへ記録","査定用の非公開写真と掲載写真を分離"].forEach((x,i)=>{const n=el("div");n.append(el("b","",`0${i+1} `),document.createTextNode(x));list.append(n)});safe.append(list);root.append(safe)}
