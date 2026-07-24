@@ -1,0 +1,147 @@
+name: DPRO CAR STEP CAR-21 R2 Payment Method Labels
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/step-car-21-r2-payment-method-label.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dpro-car-step-car-21-r2
+  cancel-in-progress: false
+
+jobs:
+  update-payment-method-labels:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply CAR-21-R2 frontend fix
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          owner_path = Path("owner.html")
+          config_path = Path("config.js")
+
+          if not owner_path.exists() or not config_path.exists():
+              raise SystemExit("owner.html または config.js が見つかりません。")
+
+          owner = owner_path.read_text(encoding="utf-8")
+          config = config_path.read_text(encoding="utf-8")
+
+          old_version = "CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724"
+          new_version = "CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724"
+
+          if old_version not in owner or old_version not in config:
+              raise SystemExit("CAR-21の現行フロントエンドを確認できません。")
+
+          category_line = '    const CAR21_CATEGORY_LABEL={deposit:"申込金・頭金",balance:"残金",loan_proceeds:"ローン入金",purchase_price:"買取代金",reconditioning:"商品化費",registration:"登録費",warranty:"保証",insurance:"保険",tax_fee:"税・諸費用",refund:"返金",other:"その他"};'
+          method_line = '    const CAR21_METHOD_LABEL={cash:"現金",bank_transfer:"銀行振込",card:"カード",loan:"ローン",other:"その他"};'
+
+          if "const CAR21_METHOD_LABEL=" not in owner:
+              if owner.count(category_line) != 1:
+                  raise SystemExit("支払方法ラベルの追加位置を確認できません。")
+              owner = owner.replace(
+                  category_line,
+                  category_line + "\n" + method_line,
+                  1,
+              )
+
+          old_display = '["方法",item.payment_method||"未設定"]'
+          new_display = '["方法",CAR21_METHOD_LABEL[item.payment_method]||item.payment_method||"未設定"]'
+
+          if old_display in owner:
+              owner = owner.replace(old_display, new_display, 1)
+          elif new_display not in owner:
+              raise SystemExit("支払方法表示の修正位置を確認できません。")
+
+          owner = owner.replace(old_version, new_version)
+          config = config.replace(old_version, new_version)
+
+          required_owner = [
+              new_version,
+              'const CAR21_METHOD_LABEL={cash:"現金",bank_transfer:"銀行振込",card:"カード",loan:"ローン",other:"その他"};',
+              'CAR21_METHOD_LABEL[item.payment_method]||item.payment_method||"未設定"',
+          ]
+          missing = [marker for marker in required_owner if marker not in owner]
+          if missing:
+              raise SystemExit(f"owner.html検査失敗: {missing}")
+
+          if new_version not in config:
+              raise SystemExit("config.jsのバージョン更新を確認できません。")
+
+          owner_path.write_text(owner, encoding="utf-8")
+          config_path.write_text(config, encoding="utf-8")
+          print("CAR-21-R2 支払方法日本語表示: OK")
+          PY
+
+      - name: Validate CAR-21-R2 frontend
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          owner = Path("owner.html").read_text(encoding="utf-8")
+          config = Path("config.js").read_text(encoding="utf-8")
+
+          required = [
+              "CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724",
+              'const CAR21_METHOD_LABEL={cash:"現金",bank_transfer:"銀行振込",card:"カード",loan:"ローン",other:"その他"};',
+              'CAR21_METHOD_LABEL[item.payment_method]||item.payment_method||"未設定"',
+              "銀行振込",
+          ]
+          missing = [marker for marker in required if marker not in owner]
+          if missing:
+              raise SystemExit(f"owner.html検査失敗: {missing}")
+
+          if "CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724" not in config:
+              raise SystemExit("config.js検査失敗")
+
+          scripts = re.findall(r"<script>(.*?)</script>", owner, flags=re.S)
+          if not scripts:
+              raise SystemExit("owner.htmlのJavaScript抽出に失敗しました。")
+
+          Path("/tmp/car21-r2-owner.js").write_text(
+              scripts[-1],
+              encoding="utf-8",
+          )
+
+          ids = re.findall(r'\bid="([^"]+)"', owner)
+          duplicates = sorted({value for value in ids if ids.count(value) > 1})
+          if duplicates:
+              raise SystemExit(f"owner.htmlに重複IDがあります: {duplicates}")
+
+          print("CAR-21-R2 frontend validation: OK")
+          PY
+          node --check /tmp/car21-r2-owner.js
+          node --check config.js
+          git diff --check
+
+      - name: Commit CAR-21-R2 and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name "DPRO CAR Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add owner.html config.js
+          git rm --ignore-unmatch .github/workflows/step-car-21-r2-payment-method-label.yml
+          if git diff --cached --quiet; then
+            echo "コミット対象の変更はありません。"
+            exit 0
+          fi
+          git commit -m "CAR-21-R2: localize payment method labels"
+          git push origin main
