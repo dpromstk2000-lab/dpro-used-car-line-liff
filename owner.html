@@ -301,8 +301,8 @@
     @media(max-width:700px){.financial-kpis,.financial-form,.financial-meta{grid-template-columns:1fr}.financial-field.full{grid-column:auto}}
 
   </style>
-  <!-- CAR-22-R1-FINANCIAL-NAV-COUNT-20260724 -->
-  <!-- CAR-22-R1-FINANCIAL-NAV-COUNT-20260724 -->
+  <!-- CAR-22-R2-PRINT-WINDOW-BLANK-FIX-20260724 -->
+  <!-- CAR-22-R2-PRINT-WINDOW-BLANK-FIX-20260724 -->
   <!-- DPRO CAR STEP CAR-18 AFTERCARE MAINTENANCE RETENTION -->
 </head>
 <body>
@@ -314,7 +314,7 @@
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-22-R1-FINANCIAL-NAV-COUNT-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-22-R2-PRINT-WINDOW-BLANK-FIX-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -1421,8 +1421,10 @@
     function car22Print(item){
       const source=item.snapshot||item,recipient=source.recipient||{name:item.recipient_name,postal_code:item.recipient_postal_code,address:item.recipient_address},issuer=source.issuer||{name:item.issuer_name,postal_code:item.issuer_postal_code,address:item.issuer_address,phone:item.issuer_phone,invoice_registration_number:item.invoice_registration_number},amounts=source.amounts||{subtotal:item.subtotal,tax_amount:item.tax_amount,total_amount:item.total_amount},items=Array.isArray(source.line_items)?source.line_items:(item.line_items||[]);
       const rows=items.map(line=>`<tr><td>${car22Escape(line.label)}</td><td class="num">${car22Escape(line.quantity??1)}</td><td class="num">${car22Escape(money(line.unit_price??line.amount))}</td><td class="num">${car22Escape(money(line.amount))}</td></tr>`).join("");
-      const popup=window.open("","_blank","noopener,noreferrer");
+      const popup=window.open("about:blank","_blank");
       if(!popup){showToast("印刷画面を開けませんでした。ポップアップを許可してください。",true);return}
+      try{popup.opener=null}catch(error){}
+      popup.document.open();
       popup.document.write(`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>${car22Escape(item.document_number)}</title><style>@page{size:A4;margin:16mm}body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#172436;font-size:14px}h1{text-align:center;font-size:28px;letter-spacing:.12em;margin:0 0 28px}.top{display:grid;grid-template-columns:1fr 1fr;gap:30px}.right{text-align:right}.number{margin:20px 0;padding:10px;border-top:1px solid #9aa8b4;border-bottom:1px solid #9aa8b4}.total{margin:24px 0;padding:16px;background:#f4ead4;font-size:22px;font-weight:800}table{width:100%;border-collapse:collapse}th,td{border:1px solid #aeb8c0;padding:9px}th{background:#eef2f5}.num{text-align:right}.summary{width:48%;margin:18px 0 0 auto}.summary div{display:flex;justify-content:space-between;padding:7px;border-bottom:1px solid #c8d0d6}.note{margin-top:24px;white-space:pre-wrap}.stamp{margin-top:28px;color:#687786;font-size:12px}</style></head><body><h1>${car22Escape(CAR22_TYPE_LABEL[item.document_type]||item.document_type)}</h1><div class="top"><div><strong>${car22Escape(recipient?.name||"")}</strong> 御中<br>${car22Escape(recipient?.postal_code||"")}<br>${car22Escape(recipient?.address||"")}</div><div class="right"><strong>${car22Escape(issuer?.name||"")}</strong><br>${car22Escape(issuer?.postal_code||"")}<br>${car22Escape(issuer?.address||"")}<br>${car22Escape(issuer?.phone||"")}</div></div><div class="number">帳票番号：${car22Escape(item.document_number)}　発行日：${car22Escape(source.issue_date||item.issue_date||"")}</div><p>${car22Escape(source.title||item.title||"")}</p><div class="total">合計 ${car22Escape(money(amounts.total_amount))}</div><table><thead><tr><th>明細</th><th>数量</th><th>単価</th><th>金額</th></tr></thead><tbody>${rows}</tbody></table><div class="summary"><div><span>税抜</span><strong>${car22Escape(money(amounts.subtotal))}</strong></div><div><span>消費税</span><strong>${car22Escape(money(amounts.tax_amount))}</strong></div><div><span>合計</span><strong>${car22Escape(money(amounts.total_amount))}</strong></div></div><div class="note">${car22Escape(source.public_note||item.public_note||"")}</div><div class="stamp">${item.status==="draft"?"下書き・未発行":item.status==="voided"?"無効帳票":`発行済み／再発行 ${item.reissue_count||0}回`}<br>ブラウザの印刷画面から「PDFに保存」を選択できます。</div><script>addEventListener("load",()=>setTimeout(()=>print(),250));<\/script></body></html>`);
       popup.document.close();
     }
