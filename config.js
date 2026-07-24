@@ -3,7 +3,7 @@
  * STEP CAR-21 入出金・未収金・支払・精算管理
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724",
+  version: "CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",

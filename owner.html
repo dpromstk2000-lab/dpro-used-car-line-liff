@@ -267,8 +267,8 @@
     @media(max-width:650px){.payment-kpis,.payment-form,.payment-meta{grid-template-columns:1fr}.payment-field.full{grid-column:auto}}
 
   </style>
-  <!-- CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724 -->
-  <!-- CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724 -->
+  <!-- CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724 -->
+  <!-- CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724 -->
   <!-- DPRO CAR STEP CAR-18 AFTERCARE MAINTENANCE RETENTION -->
 </head>
 <body>
@@ -280,7 +280,7 @@
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-21-R2-PAYMENT-METHOD-JAPANESE-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -1078,6 +1078,7 @@
     const CAR21_DIRECTION_LABEL={in:"入金",out:"出金"};
     const CAR21_TYPE_LABEL={customer_payment:"お客様入金",purchase_payment:"買取支払",expense:"経費",refund:"返金",adjustment:"調整"};
     const CAR21_CATEGORY_LABEL={deposit:"申込金・頭金",balance:"残金",loan_proceeds:"ローン入金",purchase_price:"買取代金",reconditioning:"商品化費",registration:"登録費",warranty:"保証",insurance:"保険",tax_fee:"税・諸費用",refund:"返金",other:"その他"};
+    const CAR21_METHOD_LABEL={cash:"現金",bank_transfer:"銀行振込",card:"カード",loan:"ローン",other:"その他"};
     let car21Data=null,car21Filter="active";
 
     async function car21Load(){
@@ -1196,7 +1197,7 @@
       head.append(left,el("span",`badge ${item.status==="completed"?"active":overdue?"danger":"warn"}`,CAR21_STATUS_LABEL[item.status]||item.status));card.append(head);
       const amountBox=el("div",`payment-amount ${item.direction}`);amountBox.append(el("span","",CAR21_TYPE_LABEL[item.transaction_type]||item.transaction_type),el("strong","",money(item.amount)));card.append(amountBox);
       const metaGrid=el("div","payment-meta");
-      [["期限",item.due_date?date(item.due_date):"未設定"],["完了日時",item.paid_at?dateTime(item.paid_at):"未完了"],["方法",item.payment_method||"未設定"]].forEach(([k,v])=>{const box=el("div");box.append(el("span","",k),el("strong","",v));metaGrid.append(box)});card.append(metaGrid);
+      [["期限",item.due_date?date(item.due_date):"未設定"],["完了日時",item.paid_at?dateTime(item.paid_at):"未完了"],["方法",CAR21_METHOD_LABEL[item.payment_method]||item.payment_method||"未設定"]].forEach(([k,v])=>{const box=el("div");box.append(el("span","",k),el("strong","",v));metaGrid.append(box)});card.append(metaGrid);
       if(item.public_note)card.append(el("p","internal-note",item.public_note));
       const actions=el("div","payment-actions");
       if(["planned","due"].includes(item.status)){
