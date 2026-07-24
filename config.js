@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-22 請求書・領収書・買取支払明細・精算書管理
+ * STEP CAR-23 顧客・車両・在庫CSV移行・重複検査・取込履歴
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-22-R2-PRINT-WINDOW-BLANK-FIX-20260724",
+  version: "CAR-23-DATA-MIGRATION-CSV-IMPORT-EXPORT-20260724",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -72,4 +72,10 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   memberFinancialDocuments: true,
   financialDocumentBrowserPrintPdf: true,
   financialDocumentServerPdfGeneration: false,
+  ownerDataMigration: true,
+  customerCsvImport: true,
+  customerVehicleCsvImport: true,
+  inventoryCsvImport: true,
+  dataMigrationPreviewBeforeCommit: true,
+  dataMigrationAutomaticCommit: false,
 });
