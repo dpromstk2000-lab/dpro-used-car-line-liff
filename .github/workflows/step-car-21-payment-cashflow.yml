@@ -1,4 +1,4 @@
-name: DPRO CAR STEP CAR-21 Payment Cashflow
+name: DPRO CAR STEP CAR-21 R1 Payment Cashflow
 
 on:
   push:
@@ -257,7 +257,7 @@ jobs:
                   "view-payments",
                   "renderPayments",
                   "入出金・未収金",
-                  "paymentBankAutoSync",
+                  "銀行・会計ソフトとは自動連携しません",
               ],
               "config.js":[
                   "CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724",
