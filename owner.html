@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111d29">
   <meta name="description" content="DPRO中古車センターのオーナーPC管理画面。査定、在庫、商談、試乗、契約、納車、顧客検索を一元管理します。">
-  <title>オーナーPC管理 CAR-20｜DPRO中古車センター</title>
+  <title>オーナーPC管理 CAR-21｜DPRO中古車センター</title>
   <style>
     :root{--navy:#10243e;--navy2:#173858;--charcoal:#111d29;--amber:#e5a12b;--amber2:#fff1d2;--green:#117b61;--green2:#e2f3ed;--red:#b44235;--red2:#fff0ed;--canvas:#f4f2ed;--paper:#fff;--soft:#eef2f5;--line:#d5dee5;--ink:#102033;--muted:#617083;--shadow:0 15px 38px rgba(15,35,56,.11);--tap:52px;--side:244px}
     *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:17px;line-height:1.68;-webkit-text-size-adjust:100%}button,input,select,textarea,a{font:inherit}button,a{touch-action:manipulation}:focus-visible{outline:4px solid rgba(229,161,43,.42);outline-offset:2px}a{color:inherit}
@@ -228,21 +228,59 @@
     @media(max-width:1050px){.communication-kpis{grid-template-columns:repeat(2,1fr)}.communication-grid{grid-template-columns:1fr}.communication-panel.full{grid-column:auto}}
     @media(max-width:650px){.communication-kpis,.communication-meta{grid-template-columns:1fr}.communication-actions .button{width:100%}}
 
+
+    /* DPRO CAR STEP CAR-21 PAYMENT CASHFLOW */
+    .payment-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+    .payment-kpi{padding:15px;border:1px solid var(--line);border-radius:15px;background:#fff}
+    .payment-kpi.warn{border-color:#e1b45c;background:#fffaf0}
+    .payment-kpi.danger{border-color:#dfa39b;background:#fff5f3}
+    .payment-kpi.good{border-color:#8fceb9;background:#effaf6}
+    .payment-kpi span{display:block;color:var(--muted);font-size:13px;font-weight:850}
+    .payment-kpi strong{display:block;font-size:27px;overflow-wrap:anywhere}
+    .payment-grid{margin-top:15px;display:grid;grid-template-columns:minmax(330px,.75fr) minmax(0,1.25fr);gap:15px}
+    .payment-panel{padding:18px;border:1px solid var(--line);border-radius:17px;background:#fff}
+    .payment-panel h3{margin:0;font-size:21px}.payment-panel>p{margin:3px 0 14px;color:var(--muted);font-size:13px}
+    .payment-form{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .payment-field{display:grid;gap:4px}.payment-field.full{grid-column:1/-1}
+    .payment-field label{font-size:13px;font-weight:850}
+    .payment-field input,.payment-field select,.payment-field textarea{width:100%;min-height:46px;padding:8px 10px;border:1px solid #b9c6d0;border-radius:10px;background:#fff}
+    .payment-field textarea{min-height:82px;resize:vertical}
+    .payment-list{display:grid;gap:10px}
+    .payment-card{padding:14px;border:1px solid var(--line);border-radius:13px;background:#fff}
+    .payment-card.overdue{border-color:#dfa39b;background:#fff5f3}
+    .payment-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .payment-card h4{margin:0;font-size:18px}.payment-card p{margin:2px 0 0;color:var(--muted);font-size:12px}
+    .payment-amount{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--soft)}
+    .payment-amount.in{background:#eaf7f2}.payment-amount.out{background:#fff3e8}
+    .payment-amount span{display:block;color:var(--muted);font-size:12px}.payment-amount strong{display:block;font-size:23px}
+    .payment-meta{margin-top:9px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+    .payment-meta div{padding:8px;border-radius:9px;background:var(--soft)}
+    .payment-meta span{display:block;color:var(--muted);font-size:11px}.payment-meta strong{display:block;overflow-wrap:anywhere}
+    .payment-actions{margin-top:10px;display:flex;flex-wrap:wrap;gap:7px}
+    .payment-actions .button{min-height:43px;padding:7px 12px;font-size:13px}
+    .payment-filter{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+    .payment-filter button{min-height:40px;padding:6px 11px;border:1px solid #bdc9d2;border-radius:999px;background:#fff;font-weight:850;cursor:pointer}
+    .payment-filter button.active{border-color:var(--amber);background:var(--amber2)}
+    .payment-safe{margin-top:15px;padding:14px;border-radius:12px;background:var(--navy);color:#fff}
+    .payment-safe strong{display:block}.payment-safe span{display:block;color:#d2dfe8;font-size:13px}
+    @media(max-width:1100px){.payment-kpis{grid-template-columns:repeat(2,1fr)}.payment-grid{grid-template-columns:1fr}}
+    @media(max-width:650px){.payment-kpis,.payment-form,.payment-meta{grid-template-columns:1fr}.payment-field.full{grid-column:auto}}
+
   </style>
-  <!-- CAR-20-COMMUNICATION-TEMPLATES-HISTORY-20260723 -->
-  <!-- CAR-20-COMMUNICATION-TEMPLATES-HISTORY-20260723 -->
+  <!-- CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724 -->
+  <!-- CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724 -->
   <!-- DPRO CAR STEP CAR-18 AFTERCARE MAINTENANCE RETENTION -->
 </head>
 <body>
   <header class="topbar"><div class="topbar-inner"><div class="brand"><span class="brand-mark" aria-hidden="true">車</span><div>DPRO中古車センター<small>オーナーPC管理</small></div></div><div class="top-links"><a class="top-link" id="systemCheckLink" href="system-check.html">システム確認</a><a class="top-link" id="ipadLink" href="owner-ipad.html">iPad現場画面</a><a class="top-link public-link" href="index.html" target="_blank" rel="noopener">お客様画面</a><button class="top-link mode-button on" id="simpleModeToggle" type="button" aria-pressed="true">簡単モード ON</button><button class="top-link logout-label" id="topLogout" type="button" hidden>管理コードを消去・終了</button></div></div></header>
 
   <main class="gate-wrap" id="gateView">
-    <section class="gate" aria-labelledby="gateTitle"><div class="gate-head"><p class="gate-kicker">OWNER CONTROL CENTER</p><h1 id="gateTitle">買取からLINE連絡管理まで、一元管理。</h1><p>査定・在庫・商談・契約・納車・アフターケア・経営分析・連絡履歴を同じ画面で確認します。</p></div><div class="gate-body"><form id="loginForm"><label class="field-label" for="adminCode">管理コード</label><div class="code-row"><input class="code-input" id="adminCode" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="管理コードを入力"><button class="button" id="clearCode" type="button">削除</button></div><p class="gate-note">管理コードはこの画面の通信中だけ使用し、端末内へ保存しません。営業デモURLではデモ用コードを自動設定します。</p><div class="gate-actions"><button class="button primary" id="loginButton" type="submit">管理画面を開く</button><a class="button" href="index.html">総合入口へ戻る</a></div><div class="form-message" id="loginError" hidden></div><div class="loading-line" id="loginLoading" hidden>Supabaseから最新情報を取得しています…</div></form></div></section>
+    <section class="gate" aria-labelledby="gateTitle"><div class="gate-head"><p class="gate-kicker">OWNER CONTROL CENTER</p><h1 id="gateTitle">買取から入出金管理まで、一元管理。</h1><p>査定・在庫・商談・契約・納車・アフターケア・経営分析・連絡・入出金を同じ画面で確認します。</p></div><div class="gate-body"><form id="loginForm"><label class="field-label" for="adminCode">管理コード</label><div class="code-row"><input class="code-input" id="adminCode" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="管理コードを入力"><button class="button" id="clearCode" type="button">削除</button></div><p class="gate-note">管理コードはこの画面の通信中だけ使用し、端末内へ保存しません。営業デモURLではデモ用コードを自動設定します。</p><div class="gate-actions"><button class="button primary" id="loginButton" type="submit">管理画面を開く</button><a class="button" href="index.html">総合入口へ戻る</a></div><div class="form-message" id="loginError" hidden></div><div class="loading-line" id="loginLoading" hidden>Supabaseから最新情報を取得しています…</div></form></div></section>
   </main>
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-20-COMMUNICATION-TEMPLATES-HISTORY-20260723</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -255,6 +293,7 @@
         <section class="section-view" id="view-aftercare" hidden></section>
         <section class="section-view" id="view-management" hidden></section>
         <section class="section-view" id="view-communications" hidden></section>
+        <section class="section-view" id="view-payments" hidden></section>
         <section class="section-view" id="view-search" hidden></section>
         <section class="section-view" id="view-team" hidden></section>
       </main>
@@ -310,6 +349,7 @@
       {id:"aftercare",icon:"巡",label:"納車後管理",kicker:"AFTERCARE & RETENTION",title:"点検・車検・乗り換え",description:"納車後フォロー、点検、車検、保証、整備履歴、乗り換え見込みを管理します。",count:d=>(d.followups||[]).filter(x=>["pending","prepared"].includes(x.status)).length},
       {id:"management",icon:"経",label:"経営分析",kicker:"MANAGEMENT ANALYTICS",title:"経営・在庫・粗利",description:"査定、買取、販売、在庫回転、粗利、成約率を経営数値で確認します。",count:()=>0},
       {id:"communications",icon:"連",label:"連絡管理",kicker:"CUSTOMER COMMUNICATION",title:"LINE連絡・送信履歴",description:"テンプレート、送信予定、文章コピー、送信済み履歴を一元管理します。",count:()=>0},
+      {id:"payments",icon:"払",label:"入出金",kicker:"PAYMENT & CASHFLOW",title:"入出金・未収金",description:"販売代金、買取支払、経費、返金、未収金、支払予定を管理します。",count:()=>0},
       {id:"team",icon:"設",label:"設定",kicker:"STORE SETTINGS",title:"店舗・担当者設定",description:"営業時間・定休日・受付上限と担当者を確認します。",count:d=>(d.staff||[]).length},
     ];
       const statusLabels={
@@ -338,7 +378,7 @@
       function renderSection(id,force=false){
       if(!state.data)return;
       if(!force&&state.rendered.has(id))return;
-      const renderers={dashboard:renderDashboard,today:renderToday,appraisals:renderAppraisals,search:renderSearch,inventory:renderInventory,sales:renderSales,contracts:renderContracts,delivery:renderDelivery,aftercare:renderAftercare,management:renderManagement,communications:renderCommunications,team:renderTeam};
+      const renderers={dashboard:renderDashboard,today:renderToday,appraisals:renderAppraisals,search:renderSearch,inventory:renderInventory,sales:renderSales,contracts:renderContracts,delivery:renderDelivery,aftercare:renderAftercare,management:renderManagement,communications:renderCommunications,payments:renderPayments,team:renderTeam};
       const render=renderers[id];
       if(render){render();state.rendered.add(id)}
     }
@@ -1031,6 +1071,150 @@
         }catch(error){showToast(error.message,true)}finally{save.disabled=false}
       });
       actions.append(save);details.append(summary,textarea,actions);return details;
+    }
+
+
+    const CAR21_STATUS_LABEL={planned:"予定",due:"期限対応",completed:"完了",cancelled:"中止"};
+    const CAR21_DIRECTION_LABEL={in:"入金",out:"出金"};
+    const CAR21_TYPE_LABEL={customer_payment:"お客様入金",purchase_payment:"買取支払",expense:"経費",refund:"返金",adjustment:"調整"};
+    const CAR21_CATEGORY_LABEL={deposit:"申込金・頭金",balance:"残金",loan_proceeds:"ローン入金",purchase_price:"買取代金",reconditioning:"商品化費",registration:"登録費",warranty:"保証",insurance:"保険",tax_fee:"税・諸費用",refund:"返金",other:"その他"};
+    let car21Data=null,car21Filter="active";
+
+    async function car21Load(){
+      car21Data=await api("/api/admin/payments");
+      return car21Data;
+    }
+
+    function car21Kpi(labelText,value,kind=""){
+      const card=el("article",`payment-kpi ${kind}`.trim());
+      card.append(el("span","",labelText),el("strong","",money(value)));
+      return card;
+    }
+
+    function renderPayments(){
+      const root=document.getElementById("view-payments");
+      clear(root);
+      root.append(sectionHeader("入出金・未収金・支払","入金予定、買取支払、経費、完了履歴を管理",0));
+      root.append(el("div","empty","入出金情報を取得しています。"));
+      car21Load().then(()=>car21RenderPage(root)).catch(error=>{
+        clear(root);root.append(el("div","empty",error.message));showToast(error.message,true);
+      });
+    }
+
+    function car21RenderPage(root){
+      clear(root);
+      const data=car21Data||{},summary=data.summary||{},transactions=data.transactions||[];
+      root.append(sectionHeader("入出金・未収金・支払","銀行自動連携ではなく、店舗が確認した事実を台帳へ記録します",transactions.length));
+      const kpis=el("div","payment-kpis");
+      kpis.append(
+        car21Kpi("未収金",summary.receivables,summary.receivables?"warn":""),
+        car21Kpi("支払予定",summary.payables,summary.payables?"warn":""),
+        car21Kpi("期間入金",summary.completed_income,"good"),
+        car21Kpi("期間出金",summary.completed_outflow),
+        car21Kpi("差引資金",summary.net_cashflow,summary.net_cashflow<0?"danger":"good")
+      );
+      root.append(kpis);
+
+      const grid=el("div","payment-grid"),formPanel=el("section","payment-panel"),listPanel=el("section","payment-panel");
+      formPanel.append(el("h3","","入出金予定を登録"),el("p","","完了は登録後に「完了として記録」から確定します。"));
+      formPanel.append(car21CreateForm());
+      const safe=el("div","payment-safe");
+      safe.append(el("strong","","銀行・会計ソフトとは自動連携しません"),el("span","","実際の入出金確認後に完了として記録し、完了履歴は削除せず監査ログへ残します。"));
+      formPanel.append(safe);
+
+      listPanel.append(el("h3","","入出金台帳"),el("p","","未収金・支払予定・完了・中止を一元管理"));
+      const filter=el("div","payment-filter");
+      [["active","未完了"],["all","すべて"],["in","入金"],["out","出金"],["completed","完了"],["cancelled","中止"]].forEach(([value,labelText])=>{
+        const button=el("button",car21Filter===value?"active":"",labelText);button.type="button";
+        button.addEventListener("click",()=>{car21Filter=value;car21RenderPage(root)});
+        filter.append(button);
+      });
+      listPanel.append(filter);
+      const list=el("div","payment-list");
+      transactions.filter(item=>{
+        if(car21Filter==="all")return true;
+        if(car21Filter==="active")return["planned","due"].includes(item.status);
+        if(["in","out"].includes(car21Filter))return item.direction===car21Filter;
+        return item.status===car21Filter;
+      }).forEach(item=>list.append(car21Card(item)));
+      if(!list.children.length)list.append(empty("該当する入出金履歴はありません。"));
+      listPanel.append(list);
+      grid.append(formPanel,listPanel);root.append(grid);
+    }
+
+    function car21CreateForm(){
+      const form=el("form","payment-form");
+      const make=(labelText,node,full=false)=>{const wrap=el("div",`payment-field${full?" full":""}`);wrap.append(el("label","",labelText),node);return wrap};
+      const direction=document.createElement("select");
+      [["in","入金"],["out","出金"]].forEach(([v,t])=>{const o=el("option","",t);o.value=v;direction.append(o)});
+      const type=document.createElement("select");
+      Object.entries(CAR21_TYPE_LABEL).forEach(([v,t])=>{const o=el("option","",t);o.value=v;type.append(o)});
+      const category=document.createElement("select");
+      Object.entries(CAR21_CATEGORY_LABEL).forEach(([v,t])=>{const o=el("option","",t);o.value=v;category.append(o)});
+      const customer=document.createElement("select"),customerEmpty=el("option","","顧客未指定");customerEmpty.value="";customer.append(customerEmpty);
+      (car21Data?.options?.customers||[]).forEach(item=>{const o=el("option","",`${item.customer_code} ${item.customer_name}`);o.value=item.id;customer.append(o)});
+      const sale=document.createElement("select"),saleEmpty=el("option","","販売契約なし");saleEmpty.value="";sale.append(saleEmpty);
+      (car21Data?.options?.sale_contracts||[]).forEach(item=>{const o=el("option","",`${item.contract_number} ${money(item.total_price)}`);o.value=item.id;sale.append(o)});
+      const purchase=document.createElement("select"),purchaseEmpty=el("option","","買取契約なし");purchaseEmpty.value="";purchase.append(purchaseEmpty);
+      (car21Data?.options?.purchase_contracts||[]).forEach(item=>{const o=el("option","",`${item.contract_number} ${money(item.purchase_price)}`);o.value=item.id;purchase.append(o)});
+      const amount=document.createElement("input");amount.type="number";amount.min="1";amount.required=true;
+      const due=document.createElement("input");due.type="date";
+      const method=document.createElement("select");const methodOptions=[["","未設定"],["cash","現金"],["bank_transfer","銀行振込"],["card","カード"],["loan","ローン"],["other","その他"]];methodOptions.forEach(([v,t])=>{const o=el("option","",t);o.value=v;method.append(o)});
+      const note=document.createElement("textarea");note.maxLength=800;note.placeholder="お客様向け表示・社内確認用の補足";
+      const member=document.createElement("input");member.type="checkbox";
+      const memberWrap=el("label","check-field");memberWrap.append(member,document.createTextNode(" お客様マイページへ表示可能"));
+      const submit=el("button","button amber","入出金予定を登録");submit.type="submit";
+      form.append(make("入出金",direction),make("取引種別",type),make("費目",category),make("金額（円）",amount),make("期限",due),make("支払方法",method),make("顧客",customer),make("販売契約",sale),make("買取契約",purchase),make("補足",note,true),memberWrap,submit);
+      direction.addEventListener("change",()=>{if(direction.value==="out")member.checked=false});
+      form.addEventListener("submit",async event=>{
+        event.preventDefault();submit.disabled=true;
+        try{
+          const result=await api("/api/admin/payments",{method:"POST",body:JSON.stringify({
+            direction:direction.value,
+            transaction_type:type.value,
+            category:category.value,
+            amount:Number(amount.value),
+            due_date:due.value||null,
+            payment_method:method.value||null,
+            customer_id:customer.value||null,
+            sale_contract_id:sale.value||null,
+            purchase_contract_id:purchase.value||null,
+            public_note:note.value||null,
+            member_visible:member.checked
+          })});
+          showToast(result.message||"入出金予定を登録しました。");
+          await car21Load();car21RenderPage(document.getElementById("view-payments"));
+        }catch(error){showToast(error.message,true)}finally{submit.disabled=false}
+      });
+      return form;
+    }
+
+    function car21Card(item){
+      const overdue=["planned","due"].includes(item.status)&&item.due_date&&item.due_date<new Date().toISOString().slice(0,10);
+      const card=el("article",`payment-card${overdue?" overdue":""}`),head=el("div","payment-card-head"),left=el("div");
+      left.append(el("h4","",`${CAR21_DIRECTION_LABEL[item.direction]||item.direction}／${CAR21_CATEGORY_LABEL[item.category]||item.category}`),el("p","",[item.transaction_number,item.customer?.customer_name,item.vehicle?.vehicle_name].filter(Boolean).join(" ／ ")));
+      head.append(left,el("span",`badge ${item.status==="completed"?"active":overdue?"danger":"warn"}`,CAR21_STATUS_LABEL[item.status]||item.status));card.append(head);
+      const amountBox=el("div",`payment-amount ${item.direction}`);amountBox.append(el("span","",CAR21_TYPE_LABEL[item.transaction_type]||item.transaction_type),el("strong","",money(item.amount)));card.append(amountBox);
+      const metaGrid=el("div","payment-meta");
+      [["期限",item.due_date?date(item.due_date):"未設定"],["完了日時",item.paid_at?dateTime(item.paid_at):"未完了"],["方法",item.payment_method||"未設定"]].forEach(([k,v])=>{const box=el("div");box.append(el("span","",k),el("strong","",v));metaGrid.append(box)});card.append(metaGrid);
+      if(item.public_note)card.append(el("p","internal-note",item.public_note));
+      const actions=el("div","payment-actions");
+      if(["planned","due"].includes(item.status)){
+        const complete=el("button","button primary","完了として記録");complete.type="button";
+        complete.addEventListener("click",async()=>{
+          if(!confirm("実際の入出金を確認済みですか？"))return;
+          complete.disabled=true;
+          try{const result=await api(`/api/admin/payments/${item.id}/complete`,{method:"POST",body:"{}"});showToast(result.message);await car21Load();car21RenderPage(document.getElementById("view-payments"))}catch(error){showToast(error.message,true)}finally{complete.disabled=false}
+        });
+        const cancel=el("button","button danger","中止");cancel.type="button";
+        cancel.addEventListener("click",async()=>{
+          const reason=prompt("中止理由を入力してください。");if(!reason)return;
+          cancel.disabled=true;
+          try{const result=await api(`/api/admin/payments/${item.id}/cancel`,{method:"POST",body:JSON.stringify({reason})});showToast(result.message);await car21Load();car21RenderPage(document.getElementById("view-payments"))}catch(error){showToast(error.message,true)}finally{cancel.disabled=false}
+        });
+        actions.append(complete,cancel);
+      }
+      card.append(actions);return card;
     }
 
     function renderTeam(){const root=document.getElementById("view-team");clear(root);root.append(sectionHeader("店舗・担当者","営業時間・定休日・受付上限と担当者",state.data.stores.length));const grid=el("div","store-grid");state.data.stores.forEach(store=>{const card=el("article","store-card");card.append(el("h3","",store.store_name),el("p","",store.address||"住所未設定"),el("p","",`営業時間 ${String(store.opening_time||"").slice(0,5)}〜${String(store.closing_time||"").slice(0,5)}／${store.phone||"電話未設定"}`));const edit=el("button","button editor-open","店舗設定を編集");edit.type="button";edit.addEventListener("click",()=>openStoreEditor(store));card.append(edit);const list=el("div","staff-list"),members=state.data.staff.filter(x=>x.store_id===store.id);members.forEach(s=>{const row=el("div","staff-row"),left=el("div");left.append(el("strong","",s.staff_name),el("span","",s.staff_code));row.append(left,el("span","",{staff:"スタッフ",manager:"店長",admin:"管理者"}[s.role]||s.role));list.append(row)});if(!members.length)list.append(empty("担当者は未登録です。"));card.append(list);grid.append(card)});if(!grid.children.length)grid.append(empty("店舗情報はありません。"));root.append(grid);const safe=el("section","safe-panel");safe.append(el("h3","","管理画面の安全設計"),el("p","","お客様画面と管理情報を分離し、管理コードが一致した場合だけWorkerがデータを返します。"));const list=el("div","safe-list");["管理コードを端末内に保存しない","更新操作を監査ログへ記録","査定用の非公開写真と掲載写真を分離"].forEach((x,i)=>{const n=el("div");n.append(el("b","",`0${i+1} `),document.createTextNode(x));list.append(n)});safe.append(list);root.append(safe)}

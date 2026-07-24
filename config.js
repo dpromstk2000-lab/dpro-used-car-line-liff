@@ -1,9 +1,9 @@
 /**
  * DPRO 中古車買取・販売 LINE
- * STEP CAR-20 LINE連絡テンプレート・送信予定・対応履歴管理
+ * STEP CAR-21 入出金・未収金・支払・精算管理
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-20-COMMUNICATION-TEMPLATES-HISTORY-20260723",
+  version: "CAR-21-PAYMENT-RECEIVABLE-PAYABLE-CASHFLOW-20260724",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
@@ -63,4 +63,9 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   ownerCommunicationHistory: true,
   memberCommunicationHistory: true,
   communicationAutoSend: false,
+  ownerPaymentOverview: true,
+  ownerReceivableManagement: true,
+  ownerPayableManagement: true,
+  ownerCashflow: true,
+  paymentBankAutoSync: false,
 });
