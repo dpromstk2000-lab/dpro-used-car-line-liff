@@ -1,0 +1,191 @@
+name: DPRO CAR STEP CAR-22 R2 Print Blank Fix
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/step-car-22-r2-print-blank-fix.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dpro-car-step-car-22-r2
+  cancel-in-progress: false
+
+jobs:
+  fix-print-window:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Apply CAR-22-R2 print fix
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          owner_path = Path("owner.html")
+          member_path = Path("member.html")
+          config_path = Path("config.js")
+
+          for path in (owner_path, member_path, config_path):
+              if not path.exists():
+                  raise SystemExit(f"{path.name} が見つかりません。")
+
+          owner = owner_path.read_text(encoding="utf-8")
+          member = member_path.read_text(encoding="utf-8")
+          config = config_path.read_text(encoding="utf-8")
+
+          old_version = "CAR-22-R1-FINANCIAL-NAV-COUNT-20260724"
+          new_version = "CAR-22-R2-PRINT-WINDOW-BLANK-FIX-20260724"
+
+          if old_version not in owner or old_version not in config:
+              raise SystemExit("CAR-22-R1の現行フロントエンドを確認できません。")
+
+          owner_old = '''      const popup=window.open("","_blank","noopener,noreferrer");
+                if(!popup){showToast("印刷画面を開けませんでした。ポップアップを許可してください。",true);return}
+                popup.document.write(`<!doctype html>'''
+
+          owner_new = '''      const popup=window.open("about:blank","_blank");
+                if(!popup){showToast("印刷画面を開けませんでした。ポップアップを許可してください。",true);return}
+                try{popup.opener=null}catch(error){}
+                popup.document.open();
+                popup.document.write(`<!doctype html>'''
+
+          if owner_old in owner:
+              owner = owner.replace(owner_old, owner_new, 1)
+          elif owner_new not in owner:
+              raise SystemExit("owner.htmlの印刷処理修正位置を確認できません。")
+
+          member_old = '''        const popup=window.open("","_blank","noopener,noreferrer");if(!popup)return;
+                  popup.document.write(`<!doctype html>'''
+
+          member_new = '''        const popup=window.open("about:blank","_blank");if(!popup)return;
+                  try{popup.opener=null}catch(error){}
+                  popup.document.open();
+                  popup.document.write(`<!doctype html>'''
+
+          if member_old in member:
+              member = member.replace(member_old, member_new, 1)
+          elif member_new not in member:
+              raise SystemExit("member.htmlの印刷処理修正位置を確認できません。")
+
+          owner = owner.replace(old_version, new_version)
+          config = config.replace(old_version, new_version)
+
+          required_owner = [
+              new_version,
+              'window.open("about:blank","_blank")',
+              "popup.document.open();",
+              "try{popup.opener=null}catch(error){}",
+          ]
+          missing = [marker for marker in required_owner if marker not in owner]
+          if missing:
+              raise SystemExit(f"owner.html検査失敗: {missing}")
+
+          required_member = [
+              'window.open("about:blank","_blank")',
+              "popup.document.open();",
+              "try{popup.opener=null}catch(error){}",
+          ]
+          missing = [marker for marker in required_member if marker not in member]
+          if missing:
+              raise SystemExit(f"member.html検査失敗: {missing}")
+
+          if 'noopener,noreferrer' in owner or 'noopener,noreferrer' in member:
+              raise SystemExit("旧印刷処理が残っています。")
+
+          if new_version not in config:
+              raise SystemExit("config.jsのバージョン更新を確認できません。")
+
+          owner_path.write_text(owner, encoding="utf-8")
+          member_path.write_text(member, encoding="utf-8")
+          config_path.write_text(config, encoding="utf-8")
+
+          print("CAR-22-R2 印刷画面の白画面修正: OK")
+          PY
+
+      - name: Validate CAR-22-R2 frontend
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          owner = Path("owner.html").read_text(encoding="utf-8")
+          member = Path("member.html").read_text(encoding="utf-8")
+          config = Path("config.js").read_text(encoding="utf-8")
+
+          required_owner = [
+              "CAR-22-R2-PRINT-WINDOW-BLANK-FIX-20260724",
+              'window.open("about:blank","_blank")',
+              "popup.document.open();",
+              "popup.document.close();",
+              "car22Print",
+          ]
+          missing = [marker for marker in required_owner if marker not in owner]
+          if missing:
+              raise SystemExit(f"owner.html検査失敗: {missing}")
+
+          required_member = [
+              'window.open("about:blank","_blank")',
+              "popup.document.open();",
+              "popup.document.close();",
+              "printMemberFinancialDocument",
+          ]
+          missing = [marker for marker in required_member if marker not in member]
+          if missing:
+              raise SystemExit(f"member.html検査失敗: {missing}")
+
+          if "noopener,noreferrer" in owner or "noopener,noreferrer" in member:
+              raise SystemExit("旧noopener印刷処理が残っています。")
+
+          if "CAR-22-R2-PRINT-WINDOW-BLANK-FIX-20260724" not in config:
+              raise SystemExit("config.js検査失敗")
+
+          for filename, text, temp in (
+              ("owner.html", owner, "/tmp/car22-r2-owner.js"),
+              ("member.html", member, "/tmp/car22-r2-member.js"),
+          ):
+              scripts = [
+                  value
+                  for value in re.findall(
+                      r"<script(?:\s+[^>]*)?>(.*?)</script>",
+                      text,
+                      flags=re.S,
+                  )
+                  if value.strip()
+              ]
+              if not scripts:
+                  raise SystemExit(f"{filename}のJavaScript抽出に失敗しました。")
+              Path(temp).write_text(scripts[-1], encoding="utf-8")
+
+          print("CAR-22-R2 frontend validation: OK")
+          PY
+          node --check /tmp/car22-r2-owner.js
+          node --check /tmp/car22-r2-member.js
+          node --check config.js
+          git diff --check
+
+      - name: Commit CAR-22-R2 and remove temporary workflow
+        shell: bash
+        run: |
+          git config user.name "DPRO CAR Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add owner.html member.html config.js
+          git rm --ignore-unmatch .github/workflows/step-car-22-r2-print-blank-fix.yml
+          if git diff --cached --quiet; then
+            echo "コミット対象の変更はありません。"
+            exit 0
+          fi
+          git commit -m "CAR-22-R2: fix blank print window"
+          git push origin main
