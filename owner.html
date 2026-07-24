@@ -301,8 +301,8 @@
     @media(max-width:700px){.financial-kpis,.financial-form,.financial-meta{grid-template-columns:1fr}.financial-field.full{grid-column:auto}}
 
   </style>
-  <!-- CAR-22-FINANCIAL-DOCUMENTS-PRINT-MEMBER-20260724 -->
-  <!-- CAR-22-FINANCIAL-DOCUMENTS-PRINT-MEMBER-20260724 -->
+  <!-- CAR-22-R1-FINANCIAL-NAV-COUNT-20260724 -->
+  <!-- CAR-22-R1-FINANCIAL-NAV-COUNT-20260724 -->
   <!-- DPRO CAR STEP CAR-18 AFTERCARE MAINTENANCE RETENTION -->
 </head>
 <body>
@@ -314,7 +314,7 @@
 
   <div class="app" id="appView" hidden>
     <div class="app-shell">
-      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-22-FINANCIAL-DOCUMENTS-PRINT-MEMBER-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
+      <aside class="sidebar"><div class="side-title"><strong id="sideCompany">DPRO中古車センター</strong><span>本日の業務と進行状況</span></div><nav class="nav" id="desktopNav" aria-label="管理メニュー"></nav><div class="side-foot"><b>CAR-22-R1-FINANCIAL-NAV-COUNT-20260724</b>17px・行間1.68・ボタン52px<br>在庫・公開写真・店舗設定を管理</div></aside>
       <main class="content"><header class="page-head"><div><p class="page-kicker" id="pageKicker">TODAY'S CONTROL</p><h1 id="pageTitle">本日の全体状況</h1><p id="pageDescription">優先対応と予約状況を先に確認できます。</p></div><div class="updated" id="updatedAt">更新確認中</div></header>
         <section class="section-view" id="view-dashboard"></section>
         <section class="section-view" id="view-today" hidden></section>
@@ -385,7 +385,7 @@
       {id:"management",icon:"経",label:"経営分析",kicker:"MANAGEMENT ANALYTICS",title:"経営・在庫・粗利",description:"査定、買取、販売、在庫回転、粗利、成約率を経営数値で確認します。",count:()=>0},
       {id:"communications",icon:"連",label:"連絡管理",kicker:"CUSTOMER COMMUNICATION",title:"LINE連絡・送信履歴",description:"テンプレート、送信予定、文章コピー、送信済み履歴を一元管理します。",count:()=>0},
       {id:"payments",icon:"払",label:"入出金",kicker:"PAYMENT & CASHFLOW",title:"入出金・未収金",description:"販売代金、買取支払、経費、返金、未収金、支払予定を管理します。",count:()=>0},
-      {id:"financials",icon:"票",label:"帳票",kicker:"FINANCIAL DOCUMENTS",title:"請求書・領収書・精算書",description:"入出金・契約から帳票を作成し、発行・再発行・無効化を管理します。",count:()=>0},
+      {id:"financials",icon:"票",label:"帳票",kicker:"FINANCIAL DOCUMENTS",title:"請求書・領収書・精算書",description:"入出金・契約から帳票を作成し、発行・再発行・無効化を管理します。",count:()=>car22Data?.documents?.length||0},
       {id:"team",icon:"設",label:"設定",kicker:"STORE SETTINGS",title:"店舗・担当者設定",description:"営業時間・定休日・受付上限と担当者を確認します。",count:d=>(d.staff||[]).length},
     ];
       const statusLabels={
@@ -1261,6 +1261,8 @@
 
     async function car22Load(){
       car22Data=await api("/api/admin/financial-documents");
+      makeNav(document.getElementById("desktopNav"));
+      makeNav(document.getElementById("mobileNav"));
       return car22Data;
     }
 

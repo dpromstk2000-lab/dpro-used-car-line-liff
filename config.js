@@ -3,7 +3,7 @@
  * STEP CAR-22 請求書・領収書・買取支払明細・精算書管理
  */
 window.DPRO_CAR_CONFIG = Object.freeze({
-  version: "CAR-22-FINANCIAL-DOCUMENTS-PRINT-MEMBER-20260724",
+  version: "CAR-22-R1-FINANCIAL-NAV-COUNT-20260724",
   apiBase: "https://dpro-used-car-line-api.dpromstk2000.workers.dev",
   companyCode: "dpro_used_car_demo",
   liffId: "",
