@@ -1,0 +1,176 @@
+name: DPRO CAR STEP CAR-24 R4 Repair System Check Newlines
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/step-car-24-r4-repair-system-check-newlines.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dpro-car-step-car-24-r4-system-check-repair
+  cancel-in-progress: false
+
+jobs:
+  repair-system-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Restore real newlines
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path("system-check.html")
+          if not path.exists():
+              raise SystemExit("system-check.html が見つかりません。")
+
+          raw = path.read_text(encoding="utf-8-sig")
+          real_newlines = raw.count("\n")
+          escaped_newlines = raw.count("\\n")
+
+          print({
+              "real_newlines_before": real_newlines,
+              "escaped_newlines_before": escaped_newlines,
+          })
+
+          if escaped_newlines < 20:
+              raise SystemExit(
+                  "修復対象の文字列改行が見つかりません。"
+              )
+
+          if real_newlines > 10:
+              raise SystemExit(
+                  "実改行が既に多いため、安全のため処理を中止します。"
+              )
+
+          repaired = raw.replace("\\n", "\n")
+          repaired = repaired.lstrip("\ufeff")
+
+          required = [
+              "<!doctype html>",
+              '<html lang="ja">',
+              "<style>",
+              "</style>",
+              '<main class="gate-wrap" id="loginPanel">',
+              'id="clearAdminCode"',
+              'type="button">削除</button>',
+              '<script src="config.js"></script>',
+              "</html>",
+          ]
+          missing = [
+              marker for marker in required
+              if marker not in repaired
+          ]
+          if missing:
+              raise SystemExit(
+                  f"修復後HTML検査失敗: {missing}"
+              )
+
+          if repaired.count('<html lang="ja">') != 1:
+              raise SystemExit("htmlタグが重複しています。")
+          if repaired.count('id="adminCode"') != 1:
+              raise SystemExit("管理コード欄が重複しています。")
+          if repaired.count('id="clearAdminCode"') != 1:
+              raise SystemExit("削除ボタンが重複しています。")
+          if repaired.startswith("\\n") or "\\n<html" in repaired:
+              raise SystemExit(
+                  "文字列改行が先頭付近に残っています。"
+              )
+
+          scripts = [
+              script
+              for script in re.findall(
+                  r"<script(?:\s+[^>]*)?>(.*?)</script>",
+                  repaired,
+                  flags=re.S,
+              )
+              if script.strip()
+          ]
+          if not scripts:
+              raise SystemExit(
+                  "インラインJavaScriptを抽出できません。"
+              )
+
+          Path("/tmp/car24-r4-system-check.js").write_text(
+              scripts[-1],
+              encoding="utf-8",
+          )
+
+          path.write_text(repaired, encoding="utf-8")
+
+          print({
+              "real_newlines_after": repaired.count("\n"),
+              "escaped_newlines_after": repaired.count("\\n"),
+              "clear_button": True,
+          })
+          PY
+
+      - name: Validate repaired page
+        shell: bash
+        run: |
+          node --check /tmp/car24-r4-system-check.js
+          python - <<'PY'
+          from pathlib import Path
+
+          text = Path("system-check.html").read_text(
+              encoding="utf-8"
+          )
+          lines = text.splitlines()
+
+          if len(lines) < 40:
+              raise SystemExit(
+                  f"改行復元後の行数が少なすぎます: {len(lines)}"
+              )
+          if any(line == "\\n" for line in lines):
+              raise SystemExit(
+                  "単独の文字列改行が残っています。"
+              )
+          if (
+              "grid-template-columns:1fr auto auto"
+              not in text
+          ):
+              raise SystemExit(
+                  "削除ボタン用レイアウトがありません。"
+              )
+          if 'code.value=""' not in text:
+              raise SystemExit(
+                  "削除ボタン処理がありません。"
+              )
+
+          print("CAR-24-R4 system-check repair: OK")
+          PY
+          git diff --check
+          git status --short
+
+      - name: Commit repair and remove workflow
+        shell: bash
+        run: |
+          git config user.name "DPRO CAR Automation"
+          git config user.email \
+            "actions@users.noreply.github.com"
+
+          git add system-check.html
+          git rm --ignore-unmatch \
+            .github/workflows/step-car-24-r4-repair-system-check-newlines.yml
+
+          if git diff --cached --quiet; then
+            echo "コミット対象の変更はありません。"
+            exit 0
+          fi
+
+          git commit -m \
+            "CAR-24-R4: repair system-check newline corruption"
+          git push origin main
