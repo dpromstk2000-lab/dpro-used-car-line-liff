@@ -1,0 +1,1 @@
+{"ok":true,"version":"USED_CAR-STAFF-AUTHORITY-R2-20260824","staff":{"staff_code":"CAR-ST001","role":"manager"},"checks":{"individual_session":true,"capability":true,"revoke":true,"critical_audit":true,"cleanup":true}}

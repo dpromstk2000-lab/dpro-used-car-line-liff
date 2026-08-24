@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "checkedAt": "2026-08-24T04:28:38.095891+00:00",
+  "sourceHead": "236d3b9e36e590ac6b1e5d830e570a5e91144956",
+  "runtimeOk": true,
+  "publicHttpOk": true,
+  "flyerOk": true,
+  "browserOk": true,
+  "closesReadyItems": [
+    "READY-006",
+    "READY-018",
+    "READY-019",
+    "READY-020",
+    "READY-021",
+    "READY-023",
+    "READY-028"
+  ],
+  "nonblockingAlsoRefreshed": [
+    "READY-032"
+  ],
+  "centralFinalLockSelfConfirmed": false
+}
