@@ -1,0 +1,109 @@
+name: USED_CAR Product READY R2 QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "config.js"
+      - ".github/workflows/ready-r2-qa.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Wait for GitHub Pages to publish R2 config
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/config.js?qa=${GITHUB_SHA}"
+          for i in $(seq 1 36); do
+            if curl -fsS "$URL" | grep -q 'CAR-25-PRODUCT-READY-R2-20260824'; then
+              echo "R2 config is live"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "GitHub Pages did not publish R2 config in the QA window" >&2
+          exit 1
+      - name: Adapter Product READY check
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS "https://cbknucemarcpbscirzyv.supabase.co/functions/v1/used-car-product-ready-adapter/api/product-ready/check" -o /tmp/adapter.json
+          cat /tmp/adapter.json
+          node -e 'const d=require("/tmp/adapter.json"); if(!d.ok || !d.result?.all_passed) process.exit(1)'
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.62.1
+          npx playwright install --with-deps chromium
+      - name: Fresh Chromium 1440 / 390 / 320 / 1024
+        shell: bash
+        run: |
+          mkdir -p qa/used-car-product-ready-r2
+          cat > /tmp/qa.js <<'JS'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const base = 'https://dpromstk2000-lab.github.io/dpro-used-car-line-liff';
+          const cases = [
+            { key:'pc', file:'owner.html?demo=1', width:1440, height:1000 },
+            { key:'mobile390', file:'?demo=1', width:390, height:844 },
+            { key:'mobile320', file:'member.html?demo=1&line_user_id=demo_car_line_001', width:320, height:720 },
+            { key:'ipad', file:'owner-ipad.html?demo=1', width:1024, height:768 },
+          ];
+          const blocking = /通信エラー|取得できませんでした|確認が必要な項目があります|ADAPTER_ERROR|ADMIN_AUTH|LINE_VERIFY|undefined/i;
+          const technical = /Supabase|PostgREST|service_role|stack trace/i;
+          (async()=>{
+            const browser = await chromium.launch({headless:true});
+            const results=[];
+            for(const c of cases){
+              const page=await browser.newPage({viewport:{width:c.width,height:c.height}});
+              const pageErrors=[];
+              page.on('pageerror',e=>pageErrors.push(String(e)));
+              const url = c.file.startsWith('?') ? `${base}/${c.file}` : `${base}/${c.file}`;
+              let status=0, navError=null;
+              try {
+                const res=await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});
+                status=res?.status()||0;
+                await page.waitForTimeout(5000);
+              } catch(e){ navError=String(e); }
+              const metrics=await page.evaluate(()=>({
+                innerWidth:window.innerWidth,
+                scrollWidth:document.documentElement.scrollWidth,
+                bodyText:(document.body?.innerText||'').slice(0,20000),
+                title:document.title,
+              })).catch(()=>({innerWidth:c.width,scrollWidth:999999,bodyText:'',title:''}));
+              const overflow=metrics.scrollWidth>metrics.innerWidth+1;
+              const technicalText=technical.test(metrics.bodyText);
+              const blockingText=blocking.test(metrics.bodyText);
+              const ok=status>=200&&status<400&&!navError&&!overflow&&!technicalText&&!blockingText&&pageErrors.length===0;
+              await page.screenshot({path:`qa/used-car-product-ready-r2/${c.key}.png`,fullPage:true}).catch(()=>{});
+              results.push({key:c.key,url,status,viewport:[c.width,c.height],ok,overflow,technicalText,blockingText,pageErrors,navError,metrics:{innerWidth:metrics.innerWidth,scrollWidth:metrics.scrollWidth,title:metrics.title}});
+              await page.close();
+            }
+            await browser.close();
+            const payload={ok:results.every(x=>x.ok),playwright:'1.62.1',chromium:'Playwright bundled Chromium',checkedAt:new Date().toISOString(),results};
+            fs.writeFileSync('qa/used-car-product-ready-r2/browser.json',JSON.stringify(payload,null,2)+'\n');
+            console.log(JSON.stringify(payload,null,2));
+            if(!payload.ok) process.exit(1);
+          })();
+          JS
+          node /tmp/qa.js
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: USED_CAR_PRODUCT_READY_R2_QA
+          path: qa/used-car-product-ready-r2
+          if-no-files-found: error
+          retention-days: 14
