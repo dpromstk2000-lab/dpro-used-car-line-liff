@@ -15,11 +15,14 @@ jobs:
   chromium-qa:
     runs-on: ubuntu-latest
     timeout-minutes: 12
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+
       - name: Wait for GitHub Pages to publish R2 config
         shell: bash
         run: |
@@ -34,76 +37,180 @@ jobs:
           done
           echo "GitHub Pages did not publish R2 config in the QA window" >&2
           exit 1
+
       - name: Adapter Product READY check
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsS "https://cbknucemarcpbscirzyv.supabase.co/functions/v1/used-car-product-ready-adapter/api/product-ready/check" -o /tmp/adapter.json
-          cat /tmp/adapter.json
-          node -e 'const d=require("/tmp/adapter.json"); if(!d.ok || !d.result?.all_passed) process.exit(1)'
+          curl -fsS "https://cbknucemarcpbscirzyv.supabase.co/functions/v1/used-car-product-ready-adapter/api/product-ready/check" -o adapter-product-ready.json
+          cat adapter-product-ready.json
+          node -e 'const d=require("./adapter-product-ready.json"); if(!d.ok || !d.result?.all_passed) process.exit(1)'
+
       - name: Install Playwright Chromium
         shell: bash
         run: |
+          set -euo pipefail
           npm init -y >/dev/null 2>&1
           npm install --no-save playwright@1.62.1
           npx playwright install --with-deps chromium
+
       - name: Fresh Chromium 1440 / 390 / 320 / 1024
         shell: bash
         run: |
+          set -euo pipefail
           mkdir -p qa/used-car-product-ready-r2
-          cat > /tmp/qa.js <<'JS'
+
+          # IMPORTANT:
+          # Keep the runner inside the repository workspace so Node can resolve
+          # ./node_modules/playwright installed by the previous step.
+          cat > qa-runner.cjs <<'JS'
           const { chromium } = require('playwright');
           const fs = require('fs');
+          const path = require('path');
+
+          const outDir = path.join(process.cwd(), 'qa', 'used-car-product-ready-r2');
+          fs.mkdirSync(outDir, { recursive: true });
+
           const base = 'https://dpromstk2000-lab.github.io/dpro-used-car-line-liff';
           const cases = [
-            { key:'pc', file:'owner.html?demo=1', width:1440, height:1000 },
-            { key:'mobile390', file:'?demo=1', width:390, height:844 },
-            { key:'mobile320', file:'member.html?demo=1&line_user_id=demo_car_line_001', width:320, height:720 },
-            { key:'ipad', file:'owner-ipad.html?demo=1', width:1024, height:768 },
+            { key: 'pc',        file: 'owner.html?demo=1',                                      width: 1440, height: 1000 },
+            { key: 'mobile390', file: 'index.html?demo=1',                                      width: 390,  height: 844  },
+            { key: 'mobile320', file: 'member.html?demo=1&line_user_id=demo_car_line_001',        width: 320,  height: 720  },
+            { key: 'ipad',      file: 'owner-ipad.html?demo=1',                                 width: 1024, height: 768  },
           ];
+
           const blocking = /通信エラー|取得できませんでした|確認が必要な項目があります|ADAPTER_ERROR|ADMIN_AUTH|LINE_VERIFY|undefined/i;
           const technical = /Supabase|PostgREST|service_role|stack trace/i;
-          (async()=>{
-            const browser = await chromium.launch({headless:true});
-            const results=[];
-            for(const c of cases){
-              const page=await browser.newPage({viewport:{width:c.width,height:c.height}});
-              const pageErrors=[];
-              page.on('pageerror',e=>pageErrors.push(String(e)));
-              const url = c.file.startsWith('?') ? `${base}/${c.file}` : `${base}/${c.file}`;
-              let status=0, navError=null;
-              try {
-                const res=await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});
-                status=res?.status()||0;
-                await page.waitForTimeout(5000);
-              } catch(e){ navError=String(e); }
-              const metrics=await page.evaluate(()=>({
-                innerWidth:window.innerWidth,
-                scrollWidth:document.documentElement.scrollWidth,
-                bodyText:(document.body?.innerText||'').slice(0,20000),
-                title:document.title,
-              })).catch(()=>({innerWidth:c.width,scrollWidth:999999,bodyText:'',title:''}));
-              const overflow=metrics.scrollWidth>metrics.innerWidth+1;
-              const technicalText=technical.test(metrics.bodyText);
-              const blockingText=blocking.test(metrics.bodyText);
-              const ok=status>=200&&status<400&&!navError&&!overflow&&!technicalText&&!blockingText&&pageErrors.length===0;
-              await page.screenshot({path:`qa/used-car-product-ready-r2/${c.key}.png`,fullPage:true}).catch(()=>{});
-              results.push({key:c.key,url,status,viewport:[c.width,c.height],ok,overflow,technicalText,blockingText,pageErrors,navError,metrics:{innerWidth:metrics.innerWidth,scrollWidth:metrics.scrollWidth,title:metrics.title}});
-              await page.close();
+
+          const payload = {
+            ok: false,
+            playwright: '1.62.1',
+            chromium: 'Playwright bundled Chromium',
+            checkedAt: new Date().toISOString(),
+            results: [],
+            fatalError: null
+          };
+
+          let browser = null;
+
+          (async () => {
+            try {
+              browser = await chromium.launch({ headless: true });
+
+              for (const c of cases) {
+                const item = {
+                  key: c.key,
+                  url: `${base}/${c.file}`,
+                  status: 0,
+                  viewport: [c.width, c.height],
+                  ok: false,
+                  overflow: null,
+                  technicalText: null,
+                  blockingText: null,
+                  pageErrors: [],
+                  consoleErrors: [],
+                  failedRequests: [],
+                  navError: null,
+                  metrics: null
+                };
+
+                let page = null;
+
+                try {
+                  page = await browser.newPage({ viewport: { width: c.width, height: c.height } });
+
+                  page.on('pageerror', e => item.pageErrors.push(String(e)));
+                  page.on('console', msg => {
+                    if (msg.type() === 'error') item.consoleErrors.push(msg.text());
+                  });
+                  page.on('requestfailed', req => {
+                    item.failedRequests.push({
+                      url: req.url(),
+                      failure: req.failure()?.errorText || 'request_failed'
+                    });
+                  });
+
+                  const res = await page.goto(item.url, {
+                    waitUntil: 'domcontentloaded',
+                    timeout: 60000
+                  });
+
+                  item.status = res?.status() || 0;
+                  await page.waitForTimeout(5000);
+
+                  item.metrics = await page.evaluate(() => ({
+                    innerWidth: window.innerWidth,
+                    scrollWidth: document.documentElement.scrollWidth,
+                    bodyText: (document.body?.innerText || '').slice(0, 20000),
+                    title: document.title
+                  }));
+
+                  item.overflow = item.metrics.scrollWidth > item.metrics.innerWidth + 1;
+                  item.technicalText = technical.test(item.metrics.bodyText);
+                  item.blockingText = blocking.test(item.metrics.bodyText);
+
+                  item.ok =
+                    item.status >= 200 &&
+                    item.status < 400 &&
+                    !item.overflow &&
+                    !item.technicalText &&
+                    !item.blockingText &&
+                    item.pageErrors.length === 0;
+
+                  await page.screenshot({
+                    path: path.join(outDir, `${c.key}.png`),
+                    fullPage: true
+                  });
+
+                } catch (e) {
+                  item.navError = String(e);
+                  item.ok = false;
+
+                  if (page) {
+                    await page.screenshot({
+                      path: path.join(outDir, `${c.key}-error.png`),
+                      fullPage: true
+                    }).catch(() => {});
+                  }
+                } finally {
+                  if (page) await page.close().catch(() => {});
+                }
+
+                payload.results.push(item);
+              }
+
+              payload.ok = payload.results.length === cases.length &&
+                           payload.results.every(x => x.ok);
+
+            } catch (e) {
+              payload.fatalError = String(e);
+              payload.ok = false;
+
+            } finally {
+              if (browser) await browser.close().catch(() => {});
+              payload.checkedAt = new Date().toISOString();
+
+              fs.writeFileSync(
+                path.join(outDir, 'browser.json'),
+                JSON.stringify(payload, null, 2) + '\n'
+              );
+
+              console.log(JSON.stringify(payload, null, 2));
+
+              if (!payload.ok) process.exitCode = 1;
             }
-            await browser.close();
-            const payload={ok:results.every(x=>x.ok),playwright:'1.62.1',chromium:'Playwright bundled Chromium',checkedAt:new Date().toISOString(),results};
-            fs.writeFileSync('qa/used-car-product-ready-r2/browser.json',JSON.stringify(payload,null,2)+'\n');
-            console.log(JSON.stringify(payload,null,2));
-            if(!payload.ok) process.exit(1);
           })();
           JS
-          node /tmp/qa.js
+
+          node qa-runner.cjs
+
       - name: Upload QA evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: USED_CAR_PRODUCT_READY_R2_QA
-          path: qa/used-car-product-ready-r2
+          path: |
+            qa/used-car-product-ready-r2
+            adapter-product-ready.json
           if-no-files-found: error
           retention-days: 14
