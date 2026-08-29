@@ -1,6 +1,7 @@
 /* DPRO CAR TUTORIAL / R3 STANDARD V1.1 / 20260829 */
 /* R3 MOBILE TARGET SETTLE PATCH V1.2 / 20260829 */
 /* R3 MOBILE INSTANT TARGET SCROLL PATCH V1.3 / 20260829 */
+/* R3 MOBILE FORCED INSTANT SCROLL + RETRY PATCH V1.4 / 20260829 */
 (() => {
   "use strict";
   if (window.DPRO_CAR_TUTORIAL) return;
@@ -22,6 +23,7 @@
 
   let card, highlight, launcher, titleNode, copyNode, kickerNode, noteNode, nextButton, backButton;
   let drag = null;
+  let savedScrollBehavior = null;
 
   function safeParse(raw){try{return JSON.parse(raw)}catch{return null}}
   function readState(){
@@ -33,25 +35,44 @@
   function fileName(){const p=location.pathname.split("/").filter(Boolean).pop()||"index.html";return p.includes(".")?p:"index.html"}
   function routeUrl(route){const params=new URLSearchParams(location.search);params.set("demo","1");params.delete("tutorial");return `${route}?${params.toString()}`}
   function isVisible(el){if(!el)return false;const style=getComputedStyle(el);if(style.display==="none"||style.visibility==="hidden"||Number(style.opacity)===0)return false;const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&r.bottom>0&&r.right>0&&r.top<innerHeight&&r.left<innerWidth}
+  function enableInstantScroll(){
+    if(savedScrollBehavior)return;
+    const root=document.documentElement,body=document.body;
+    savedScrollBehavior={
+      rootValue:root.style.getPropertyValue("scroll-behavior"),rootPriority:root.style.getPropertyPriority("scroll-behavior"),
+      bodyValue:body?.style.getPropertyValue("scroll-behavior")||"",bodyPriority:body?.style.getPropertyPriority("scroll-behavior")||""
+    };
+    root.style.setProperty("scroll-behavior","auto","important");
+    body?.style.setProperty("scroll-behavior","auto","important");
+  }
+  function disableInstantScroll(){
+    if(!savedScrollBehavior)return;
+    const root=document.documentElement,body=document.body,s=savedScrollBehavior;
+    if(s.rootValue)root.style.setProperty("scroll-behavior",s.rootValue,s.rootPriority);else root.style.removeProperty("scroll-behavior");
+    if(body){if(s.bodyValue)body.style.setProperty("scroll-behavior",s.bodyValue,s.bodyPriority);else body.style.removeProperty("scroll-behavior");}
+    savedScrollBehavior=null;
+  }
   function scrollTargetNow(el){
     if(!el)return;
+    enableInstantScroll();
     const scroller=document.scrollingElement||document.documentElement;
     const r=el.getBoundingClientRect();
     const currentTop=Number(scroller.scrollTop||scrollY||0);
     const maxTop=Math.max(0,scroller.scrollHeight-innerHeight);
     const targetTop=Math.max(0,Math.min(maxTop,currentTop+r.top-((innerHeight-r.height)/2)));
+    try{window.scrollTo({left:0,top:targetTop,behavior:"auto"})}catch{window.scrollTo(0,targetTop)}
     scroller.scrollTop=targetTop;
   }
   function resolveTarget(step){
     const selectors=[step.primary,step.fallback].filter(Boolean);
-    for(const selector of selectors){const el=document.querySelector(selector);if(el&&isVisible(el))return {el,selector};}
+    for(const selector of selectors){const el=document.querySelector(selector);if(el&&isVisible(el))return {el,selector,pending:false};}
     for(const selector of selectors){
       const el=document.querySelector(selector);
       if(!el)continue;
       try{scrollTargetNow(el)}catch{}
-      if(isVisible(el))return {el,selector};
+      return {el,selector,pending:!isVisible(el)};
     }
-    return {el:null,selector:null};
+    return {el:null,selector:null,pending:false};
   }
   function clamp(value,min,max){return Math.min(Math.max(value,min),Math.max(min,max))}
   function clampCard(){if(!card||card.hidden)return;const r=card.getBoundingClientRect();const left=clamp(r.left,8,innerWidth-r.width-8);const top=clamp(r.top,8,innerHeight-r.height-8);card.style.left=`${left}px`;card.style.top=`${top}px`;card.style.right="auto";card.style.bottom="auto"}
@@ -70,24 +91,29 @@
   }
   function showLauncher(){if(!launcher)return;launcher.hidden=false;const state=readState();const resume=launcher.querySelector("[data-action=resume]");resume.hidden=!(state.status==="paused"||state.status==="active");const replay=launcher.querySelector("[data-action=replay]");replay.hidden=state.status!=="completed"}
   function hideTutorial(status="paused"){
-    if(card)card.hidden=true;if(highlight)highlight.style.display="none";document.body.classList.remove("dpro-tutorial-active");writeState({status});showLauncher();
+    if(card)card.hidden=true;if(highlight)highlight.style.display="none";document.body.classList.remove("dpro-tutorial-active");disableInstantScroll();writeState({status});showLauncher();
   }
   function renderStep(){
     const state=readState();const index=clamp(state.step,1,10)-1;const step=FIRST10[index];
     if(fileName()!==step.route){location.href=routeUrl(step.route);return;}
+    enableInstantScroll();
     card.hidden=false;document.body.classList.add("dpro-tutorial-active");
     kickerNode.textContent=`${step.id} / ${index+1} of 10`;titleNode.textContent=step.title;copyNode.textContent=step.copy;
     const resolved=resolveTarget(step);
     noteNode.textContent=resolved.el?`対象を確認中：${step.title}`:`対象が画面内に見つからないため、安全にTutorial操作へ戻しました。画面を再読込しても業務操作は実行されません。`;
     positionHighlight(resolved.el);backButton.disabled=index===0;nextButton.textContent=index===9?"完了":"次へ";
     writeState({step:index+1,status:"active"});showLauncher();
-    setTimeout(()=>{
+    const settle=(final=false)=>{
       const latest=resolveTarget(step);
+      if(latest.el&&!isVisible(latest.el)){try{scrollTargetNow(latest.el)}catch{}}
       positionHighlight(latest.el);
       noteNode.textContent=latest.el?`対象を確認中：${step.title}`:`対象が画面内に見つからないため、安全にTutorial操作へ戻しました。画面を再読込しても業務操作は実行されません。`;
       clampCard();
-      focusTarget(step,latest);
-    },60);
+      if(final)focusTarget(step,latest);
+    };
+    setTimeout(()=>settle(false),15);
+    setTimeout(()=>settle(false),55);
+    setTimeout(()=>settle(true),95);
   }
   function goToStep(n){const step=clamp(Number(n)||1,1,10);writeState({step,status:"active"});renderStep()}
   function next(){const state=readState();if(state.step>=10){hideTutorial("completed");return}goToStep(state.step+1)}
