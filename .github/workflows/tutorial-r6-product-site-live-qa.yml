@@ -38,6 +38,22 @@ jobs:
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
 
+      - name: Verify Product Site forward-only without REST API
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/dpro-product-site-r6
+          git init -q /tmp/dpro-product-site-r6
+          git -C /tmp/dpro-product-site-r6 remote add origin "https://github.com/${PRODUCT_REPO}.git"
+          git -C /tmp/dpro-product-site-r6 fetch -q --no-tags --depth=100 origin main
+          PRODUCT_MAIN="$(git -C /tmp/dpro-product-site-r6 rev-parse FETCH_HEAD)"
+          git -C /tmp/dpro-product-site-r6 cat-file -e "${PREWRITE_SHA}^{commit}"
+          git -C /tmp/dpro-product-site-r6 merge-base --is-ancestor "${PREWRITE_SHA}" "${PRODUCT_MAIN}"
+          echo "PRODUCT_MAIN=${PRODUCT_MAIN}" >> "$GITHUB_ENV"
+          echo "FORWARD_ONLY=PASS" >> "$GITHUB_ENV"
+          echo "Product Site main: ${PRODUCT_MAIN}"
+          echo "Forward-only from ${PREWRITE_SHA}: PASS"
+
       - name: Run CAR R6 exact-width LIVE QA
         shell: bash
         run: |
@@ -62,7 +78,9 @@ jobs:
           const result = {
             R6:'HOLD', marker:E.R6_MARKER, product_url:E.PRODUCT_URL,
             product_repo:E.PRODUCT_REPO, prewrite_sha:E.PREWRITE_SHA,
-            product_main:null, forward_only:null, mirror_identical:null,
+            product_main:E.PRODUCT_MAIN || null,
+            forward_only:E.FORWARD_ONLY === 'PASS',
+            mirror_identical:null,
             preserved:{}, resource_http:{}, resource_sha256:{}, viewports:{},
             errors:[], business_mutations:[], finished_at:null
           };
@@ -73,7 +91,6 @@ jobs:
           (async()=>{
             const api = await request.newContext({extraHTTPHeaders:{'Cache-Control':'no-cache','Pragma':'no-cache'}});
             try {
-              // Wait for GitHub Pages to publish the R6 marker.
               let published=false;
               for (let i=0;i<48;i++) {
                 try {
@@ -85,20 +102,9 @@ jobs:
               }
               if (!published) fail('Product Site R6 marker not published');
 
-              // Verify Product Site main is forward-only from the R6 prewrite lock.
-              try {
-                const br=await api.get(`https://api.github.com/repos/${E.PRODUCT_REPO}/branches/main`,{timeout:30000});
-                const bj=await br.json(); result.product_main=bj?.commit?.sha || null;
-                if (!result.product_main) fail('Product Site main SHA unavailable');
-                else {
-                  const cr=await api.get(`https://api.github.com/repos/${E.PRODUCT_REPO}/compare/${E.PREWRITE_SHA}...${result.product_main}`,{timeout:30000});
-                  const cj=await cr.json();
-                  result.forward_only=['ahead','identical'].includes(cj?.status);
-                  if (!result.forward_only) fail(`forward-only failed: ${cj?.status}`);
-                }
-              } catch(e) { fail(`forward-only check failed: ${e.message}`); }
+              if (!result.product_main) fail('Product Site main SHA unavailable');
+              if (!result.forward_only) fail('forward-only failed');
 
-              // Verify HTML/TEXT mirror bytes are identical at current main.
               try {
                 const h=await api.get(`https://raw.githubusercontent.com/${E.PRODUCT_REPO}/main/systems/used-car.html?x=${Date.now()}`,{timeout:30000});
                 const t=await api.get(`https://raw.githubusercontent.com/${E.PRODUCT_REPO}/main/systems/used-car.html.txt?x=${Date.now()}`,{timeout:30000});
@@ -107,7 +113,6 @@ jobs:
                 if (!result.mirror_identical) fail('HTML/TEXT mirror mismatch');
               } catch(e) { fail(`mirror check failed: ${e.message}`); }
 
-              // Verify four public resources, including exact PDF hashes from R5 PASS.
               const resources={tutorial:E.TUTORIAL_URL,guide:E.GUIDE_URL,'quick-pdf':E.QUICK_PDF_URL,'detail-pdf':E.DETAIL_PDF_URL};
               for (const [k,url] of Object.entries(resources)) {
                 try {
@@ -166,7 +171,6 @@ jobs:
                     }
                     for (const k of ['price','line','demo','lp','flyerHtml','flyerPdf']) if (!data[k]) fail(`width ${vp.width}: preserved ${k} missing`);
 
-                    // Keyboard reachability: Tab through the document until all four R6 links receive focus.
                     await page.evaluate(()=>{ document.activeElement?.blur?.(); window.scrollTo(0,0); });
                     const focused=[];
                     for (let i=0;i<120 && focused.length<4;i++) {
