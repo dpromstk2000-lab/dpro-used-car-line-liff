@@ -1,0 +1,265 @@
+name: CAR Tutorial R3 Live QA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - tutorial.js
+      - tutorial.css
+      - .github/workflows/tutorial-r3-live-qa.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: car-tutorial-r3-live-qa
+  cancel-in-progress: false
+
+jobs:
+  live-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Static checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tutorial.js
+          test "$(grep -c 'id:\"CAR-' tutorial.js)" -eq 10
+          grep -q 'DPRO-CAR-TUTORIAL-R3-V1.1-20260829' tutorial.js
+          grep -q 'dpro-tutorial-drag' tutorial.css
+
+      - name: Append R3 loader to current config safely
+        id: patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('config.js')
+          text = path.read_text(encoding='utf-8')
+          marker = '/* R3 Tutorial loader / DPRO-CAR-TUTORIAL-R3-V1.1-20260829 */'
+          if marker in text:
+              print('loader already present')
+          else:
+              loader = r'''
+          /* R3 Tutorial loader / DPRO-CAR-TUTORIAL-R3-V1.1-20260829 */
+          (() => {
+            "use strict";
+            const params = new URLSearchParams(location.search);
+            const file = location.pathname.split("/").filter(Boolean).pop() || "index.html";
+            const stateExists = (() => { try { return Boolean(localStorage.getItem("dpro_car_tutorial_v1")); } catch { return false; } })();
+            const enabled = params.get("demo") === "1" || params.get("tutorial") === "1" || file === "demo-guide.html" || stateExists;
+            if (!enabled) return;
+            if (!document.querySelector('link[data-dpro-tutorial-asset="css"]')) {
+              const css = document.createElement("link");
+              css.rel = "stylesheet";
+              css.href = "tutorial.css";
+              css.dataset.dproTutorialAsset = "css";
+              document.head.append(css);
+            }
+            if (!document.querySelector('script[data-dpro-tutorial-asset="js"]')) {
+              const script = document.createElement("script");
+              script.src = "tutorial.js";
+              script.defer = true;
+              script.dataset.dproTutorialAsset = "js";
+              document.head.append(script);
+            }
+          })();
+          '''.lstrip('\n')
+              if not text.endswith('\n'):
+                  text += '\n'
+              text += '\n' + loader
+              path.write_text(text, encoding='utf-8')
+              print('loader appended')
+          PY
+          node --check config.js
+          if git diff --quiet -- config.js; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit loader forward-only
+        if: steps.patch.outputs.changed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "dpro-tutorial-qa-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add config.js
+          git commit -m "Enable CAR R3 tutorial loader"
+          git push origin HEAD:main
+
+      - name: Wait for exact public GitHub Pages assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE='https://dpromstk2000-lab.github.io/dpro-used-car-line-liff'
+          ok=0
+          for i in $(seq 1 72); do
+            q="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${i}"
+            if curl -fsS "$BASE/tutorial.js?qa=$q" | grep -q 'DPRO-CAR-TUTORIAL-R3-V1.1-20260829' \
+              && curl -fsS "$BASE/config.js?qa=$q" | grep -q 'R3 Tutorial loader / DPRO-CAR-TUTORIAL-R3-V1.1-20260829'; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          test "$ok" -eq 1
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium
+
+      - name: Run exact four-width public LIVE QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/car-tutorial-live-qa.mjs <<'NODE'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs';
+
+          const BASE='https://dpromstk2000-lab.github.io/dpro-used-car-line-liff';
+          const widths=[
+            {name:'1440x1000',width:1440,height:1000,kind:'desktop'},
+            {name:'1024x768',width:1024,height:768,kind:'desktop'},
+            {name:'390x844',width:390,height:844,kind:'mobile'},
+            {name:'320x720',width:320,height:720,kind:'mobile'}
+          ];
+          const expectedIds=Array.from({length:10},(_,i)=>`CAR-${String(i+1).padStart(2,'0')}`);
+          const results=[];
+          const assert=(condition,message)=>{if(!condition)throw new Error(message)};
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+          async function waitReady(page){
+            await page.waitForFunction(()=>Boolean(window.DPRO_CAR_TUTORIAL)&&Boolean(document.querySelector('#dproTutorialCard')),{timeout:15000});
+          }
+          async function waitStep(page,n,route){
+            await page.waitForFunction(({n,route})=>{
+              const api=window.DPRO_CAR_TUTORIAL; if(!api)return false;
+              const file=location.pathname.split('/').filter(Boolean).pop()||'index.html';
+              const normalized=file.includes('.')?file:'index.html';
+              return api.getState().step===n && normalized===route && !document.querySelector('#dproTutorialCard')?.hidden;
+            },{n,route},{timeout:15000});
+            await sleep(120);
+          }
+          async function geometry(page,label){
+            const g=await page.evaluate(()=>{
+              const card=document.querySelector('#dproTutorialCard')?.getBoundingClientRect();
+              const hi=document.querySelector('#dproTutorialHighlight')?.getBoundingClientRect();
+              const hs=getComputedStyle(document.querySelector('#dproTutorialHighlight'));
+              return {innerWidth,innerHeight,doc:document.documentElement.scrollWidth,body:document.body.scrollWidth,card:card&&{left:card.left,top:card.top,right:card.right,bottom:card.bottom,width:card.width,height:card.height},hi:hi&&{left:hi.left,top:hi.top,right:hi.right,bottom:hi.bottom,width:hi.width,height:hi.height},hiDisplay:hs.display};
+            });
+            assert(g.card && g.card.left>=-0.5 && g.card.top>=-0.5 && g.card.right<=g.innerWidth+0.5 && g.card.bottom<=g.innerHeight+0.5,`${label}: card outside viewport ${JSON.stringify(g)}`);
+            assert(g.hiDisplay!=='none' && g.hi && g.hi.width>0 && g.hi.height>0,`${label}: highlight missing ${JSON.stringify(g)}`);
+            assert(g.hi.left>=-0.5 && g.hi.top>=-0.5 && g.hi.right<=g.innerWidth+0.5 && g.hi.bottom<=g.innerHeight+0.5,`${label}: highlight outside viewport ${JSON.stringify(g)}`);
+            return g;
+          }
+          async function assertState(page,step,status='active'){
+            const state=await page.evaluate(()=>window.DPRO_CAR_TUTORIAL.getState());
+            assert(state.step===step && state.status===status,`state mismatch expected ${step}/${status}: ${JSON.stringify(state)}`);
+          }
+          async function next(page){await page.locator('#dproTutorialNext').click();}
+
+          const browser=await chromium.launch({headless:true});
+          for(const v of widths){
+            const context=await browser.newContext({viewport:{width:v.width,height:v.height},hasTouch:v.kind==='mobile',isMobile:false});
+            const page=await context.newPage();
+            const pageErrors=[]; const consoleErrors=[]; const unsafe=[];
+            page.on('pageerror',e=>pageErrors.push(String(e)));
+            page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text())});
+            page.on('request',r=>{if(!['GET','HEAD','OPTIONS'].includes(r.method()))unsafe.push(`${r.method()} ${r.url()}`)});
+
+            await page.goto(`${BASE}/?demo=1&qa=${Date.now()}`,{waitUntil:'domcontentloaded'});
+            await waitReady(page);
+            await page.evaluate(()=>localStorage.removeItem(window.DPRO_CAR_TUTORIAL.key));
+            const ids=await page.evaluate(()=>window.DPRO_CAR_TUTORIAL.steps.map(s=>s.id));
+            assert(JSON.stringify(ids)===JSON.stringify(expectedIds),`${v.name}: First10 IDs/count mismatch`);
+            await page.evaluate(()=>window.DPRO_CAR_TUTORIAL.start());
+            await waitStep(page,1,'index.html');
+            await geometry(page,`${v.name} step1`);
+
+            if(v.kind==='desktop'){
+              const handle=page.locator('#dproTutorialDrag'); const hb=await handle.boundingBox(); const before=await page.locator('#dproTutorialCard').boundingBox();
+              await page.mouse.move(hb.x+30,hb.y+22); await page.mouse.down(); await page.mouse.move(24,Math.min(300,v.height-180),{steps:6}); await page.mouse.up();
+              const after=await page.locator('#dproTutorialCard').boundingBox();
+              assert(Math.abs(before.x-after.x)>5 || Math.abs(before.y-after.y)>5,`${v.name}: mouse pointer drag did not move`);
+              await geometry(page,`${v.name} mouse drag clamp`);
+            } else {
+              const before=await page.locator('#dproTutorialCard').boundingBox();
+              await page.evaluate(()=>{
+                const h=document.querySelector('#dproTutorialDrag'),r=h.getBoundingClientRect(),id=77;
+                const fire=(type,x,y,buttons)=>h.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',isPrimary:true,button:0,buttons,clientX:x,clientY:y}));
+                fire('pointerdown',r.left+25,r.top+20,1);fire('pointermove',innerWidth+200,innerHeight+200,1);fire('pointerup',innerWidth+200,innerHeight+200,0);
+              });
+              const after=await page.locator('#dproTutorialCard').boundingBox();
+              assert(Math.abs(before.x-after.x)>2 || Math.abs(before.y-after.y)>2,`${v.name}: touch pointer drag did not move`);
+              await geometry(page,`${v.name} touch drag clamp`);
+            }
+
+            await next(page); await waitStep(page,2,'index.html'); await assertState(page,2); await geometry(page,`${v.name} step2`);
+            await page.locator('#dproTutorialBack').click(); await waitStep(page,1,'index.html'); await assertState(page,1);
+            await next(page); await waitStep(page,2,'index.html');
+            await page.locator('#dproTutorialClose').click(); await assertState(page,2,'paused'); assert(await page.locator('#dproTutorialCard').isHidden(),`${v.name}: close did not hide`);
+            await page.locator('#dproTutorialLauncher [data-action=resume]').click(); await waitStep(page,2,'index.html'); await assertState(page,2);
+            await page.keyboard.press('Escape'); await assertState(page,2,'paused'); assert(await page.locator('#dproTutorialCard').isHidden(),`${v.name}: Escape did not hide`);
+            await page.locator('#dproTutorialLauncher [data-action=resume]').click(); await waitStep(page,2,'index.html');
+
+            await next(page); await waitStep(page,3,'index.html'); await geometry(page,`${v.name} step3`);
+            await next(page); await page.waitForURL(/sell\.html\?/,{timeout:15000}); await waitReady(page); await waitStep(page,4,'sell.html'); await geometry(page,`${v.name} step4 cross-page`);
+            await next(page); await waitStep(page,5,'sell.html'); await geometry(page,`${v.name} step5`);
+            await next(page); await waitStep(page,6,'sell.html'); await geometry(page,`${v.name} step6`);
+            await next(page); await page.waitForURL(/inventory\.html\?/,{timeout:15000}); await waitReady(page); await waitStep(page,7,'inventory.html'); await geometry(page,`${v.name} step7 cross-page`);
+            await next(page); await waitStep(page,8,'inventory.html'); await geometry(page,`${v.name} step8`);
+            await next(page); await waitStep(page,9,'inventory.html'); await geometry(page,`${v.name} step9`);
+            await next(page); await page.waitForURL(/owner-ipad\.html\?/,{timeout:15000}); await waitReady(page); await waitStep(page,10,'owner-ipad.html'); await geometry(page,`${v.name} step10 cross-page`);
+
+            await next(page); await assertState(page,10,'completed'); assert(await page.locator('#dproTutorialCard').isHidden(),`${v.name}: completion did not hide`);
+            assert(await page.locator('#dproTutorialLauncher [data-action=replay]').isVisible(),`${v.name}: replay launcher missing`);
+            await page.locator('#dproTutorialLauncher [data-action=replay]').click(); await page.waitForURL(/dpro-used-car-line-liff\/(?:index\.html)?\?/,{timeout:15000}); await waitReady(page); await waitStep(page,1,'index.html');
+
+            await page.locator('#dproTutorialDrag').focus();
+            for(let i=0;i<3;i++){
+              const active=await page.evaluate(()=>document.activeElement?.id||'');
+              if(active==='dproTutorialNext')break;
+              await page.keyboard.press('Tab');
+            }
+            assert((await page.evaluate(()=>document.activeElement?.id))==='dproTutorialNext',`${v.name}: keyboard focus could not recover to Next`);
+            const outline=await page.evaluate(()=>getComputedStyle(document.activeElement).outlineStyle);
+            assert(outline!=='none',`${v.name}: focus-visible missing`);
+            await page.keyboard.press('Enter'); await waitStep(page,2,'index.html');
+            await page.locator('#dproTutorialSkip').click(); await assertState(page,2,'completed');
+            await page.locator('#dproTutorialLauncher [data-action=replay]').click(); await waitStep(page,1,'index.html');
+
+            const overflow=await page.evaluate(()=>({innerWidth,doc:document.documentElement.scrollWidth,body:document.body.scrollWidth}));
+            if(v.width<=390){assert(overflow.doc<=overflow.innerWidth && overflow.body<=overflow.innerWidth,`${v.name}: horizontal overflow ${JSON.stringify(overflow)}`)}
+            assert(unsafe.length===0,`${v.name}: unsafe write requests ${JSON.stringify(unsafe)}`);
+            assert(pageErrors.length===0,`${v.name}: page errors ${JSON.stringify(pageErrors)}`);
+            assert(consoleErrors.length===0,`${v.name}: console errors ${JSON.stringify(consoleErrors)}`);
+            results.push({viewport:v.name,first10:10,mouse_pointer_drag:v.kind==='desktop'?'PASS':'N/A',touch_pointer_drag:v.kind==='mobile'?'PASS':'N/A',viewport_clamp:'PASS',next_back:'PASS',close:'PASS',esc:'PASS',skip:'PASS',resume:'PASS',replay:'PASS',keyboard_only:'PASS',focus_visible:'PASS',cross_page_resume:'PASS',overflow:v.width<=390?'0':'N/A',pageerror:0,console_error:0,unsafe_write_request:0,business_mutation:0});
+            await context.close();
+          }
+          await browser.close();
+          const report={version:'DPRO-CAR-TUTORIAL-R3-V1.1-20260829',FIRST10_COUNT:10,viewports:results,R3:'PASS',BUSINESS_MUTATION:0,generated_at:new Date().toISOString()};
+          fs.writeFileSync('car-tutorial-r3-live-qa.json',JSON.stringify(report,null,2));
+          console.log(JSON.stringify(report,null,2));
+          NODE
+          node /tmp/car-tutorial-live-qa.mjs
+
+      - name: Upload R3 QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: car-tutorial-r3-live-qa
+          path: car-tutorial-r3-live-qa.json
+          if-no-files-found: error
