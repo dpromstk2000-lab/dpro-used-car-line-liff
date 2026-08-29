@@ -105,8 +105,10 @@ jobs:
           ok=0
           for i in $(seq 1 72); do
             q="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${i}"
-            if curl -fsS "$BASE/tutorial.js?qa=$q" | grep -q 'DPRO-CAR-TUTORIAL-R3-V1.1-20260829' \
-              && curl -fsS "$BASE/config.js?qa=$q" | grep -q 'R3 Tutorial loader / DPRO-CAR-TUTORIAL-R3-V1.1-20260829'; then
+            if curl -fsS "$BASE/tutorial.js?qa=$q" -o /tmp/car-tutorial.js \
+              && curl -fsS "$BASE/config.js?qa=$q" -o /tmp/car-config.js \
+              && grep -q 'DPRO-CAR-TUTORIAL-R3-V1.1-20260829' /tmp/car-tutorial.js \
+              && grep -q 'R3 Tutorial loader / DPRO-CAR-TUTORIAL-R3-V1.1-20260829' /tmp/car-config.js; then
               ok=1
               break
             fi
@@ -126,7 +128,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > /tmp/car-tutorial-live-qa.mjs <<'NODE'
+          cat > car-tutorial-live-qa.mjs <<'NODE'
           import { chromium } from 'playwright';
           import fs from 'node:fs';
 
@@ -255,7 +257,7 @@ jobs:
           fs.writeFileSync('car-tutorial-r3-live-qa.json',JSON.stringify(report,null,2));
           console.log(JSON.stringify(report,null,2));
           NODE
-          node /tmp/car-tutorial-live-qa.mjs
+          node car-tutorial-live-qa.mjs
 
       - name: Upload R3 QA evidence
         uses: actions/upload-artifact@v4
