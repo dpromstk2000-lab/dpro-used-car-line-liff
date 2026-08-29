@@ -1,11 +1,13 @@
 <!doctype html>
 <!-- DPRO LIVE DEMO COMMON TEMPLATE V1.0 LOCK / CONFIGURABLE TEMPLATE -->
+<!-- DPRO CAR GUIDE CENTER / R4 V1.0 / 20260829 -->
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <title id="pageTitle">DPRO 公開操作デモ・画面一覧</title>
+<link rel="stylesheet" href="tutorial.css" data-dpro-tutorial-asset="css">
 <style>
 :root{
   --bg:#f4f2ed;--card:#fff;--ink:#102033;--muted:#617083;--line:#d5dee5;
@@ -41,10 +43,29 @@ a{color:inherit}.page{width:min(1140px,calc(100% - 24px));margin:0 auto;padding:
 .flow-grid{display:grid;grid-template-columns:repeat(var(--flow-cols,5),minmax(0,1fr));gap:8px}
 .flow-step{padding:12px;border-radius:12px;background:var(--soft)}.flow-step b{display:block;color:var(--brand);font-size:10px}.flow-step strong{display:block;margin-top:4px;font-size:11px}.flow-step.same{border:1px dashed #cdbfb6}
 .footer{margin-top:26px;color:#82736c;font-size:10px;text-align:center}
+
+/* R4 Guide Center */
+.guide-shell{margin-top:14px;padding:20px;border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:var(--shadow)}
+.guide-toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:14px}
+.guide-action{min-height:44px;border:1px solid var(--line);border-radius:999px;padding:9px 15px;background:#fff;color:var(--deep);font:inherit;font-size:12px;font-weight:950;cursor:pointer}
+.guide-action.primary{border-color:transparent;color:#fff;background:linear-gradient(135deg,var(--deep),var(--brand2))}
+.guide-action[hidden]{display:none!important}
+.guide-status{margin-left:auto;min-height:44px;display:flex;align-items:center;padding:8px 12px;border-radius:12px;background:var(--soft);color:#675013;font-size:11px;font-weight:850}
+.guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.guide-item{min-width:0;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.guide-item .guide-id{color:var(--brand);font-size:10px;font-weight:1000;letter-spacing:.08em}
+.guide-item h3{margin:6px 0 0;font-size:18px;line-height:1.4}
+.guide-item p{margin:7px 0 0;color:var(--muted);font-size:11px}
+.guide-meta{margin-top:10px;display:grid;gap:5px}
+.guide-meta code{display:block;max-width:100%;overflow-wrap:anywhere;padding:6px 8px;border-radius:9px;background:#f7f8f9;color:#334154;font-size:9px;line-height:1.45}
+.guide-open{width:100%;min-height:44px;margin-top:11px;border:0;border-radius:11px;background:var(--deep);color:#fff;font:inherit;font-size:11px;font-weight:950;cursor:pointer}
+.guide-action:focus-visible,.guide-open:focus-visible{outline:4px solid rgba(229,161,43,.48);outline-offset:3px}
+
 @media(max-width:900px){.flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:760px){.hero{padding:25px 20px}.demo-info,.grid,.flow-grid{grid-template-columns:1fr}}
-@media(max-width:420px){.page{width:min(100% - 16px,1140px)}.card-actions{grid-template-columns:1fr}}
+@media(max-width:760px){.hero{padding:25px 20px}.demo-info,.grid,.flow-grid,.guide-grid{grid-template-columns:1fr}.guide-status{width:100%;margin-left:0}}
+@media(max-width:420px){.page{width:min(100% - 16px,1140px)}.card-actions{grid-template-columns:1fr}.guide-shell{padding:14px}.guide-toolbar{display:grid;grid-template-columns:1fr}.guide-action{width:100%}}
 </style>
+<script src="tutorial.js" defer data-dpro-tutorial-asset="js"></script>
 </head>
 <body>
 <main class="page">
@@ -77,6 +98,21 @@ a{color:inherit}.page{width:min(1140px,calc(100% - 24px));margin:0 auto;padding:
 </div>
 <section class="flow"><div class="flow-grid" id="flowGrid"></div></section>
 
+<div class="section-head">
+  <small>GUIDE CENTER / R4</small>
+  <h2>操作ガイド 10ステップ</h2>
+  <p>R3のTutorialと同じ10ステップ・同じ状態を使います。ここから開始、続きから、最初から、各ステップ指定のすべてが同じTutorialへ接続されます。</p>
+</div>
+<section class="guide-shell" id="guideCenter" aria-label="DPRO CAR Guide Center">
+  <div class="guide-toolbar" id="guideToolbar">
+    <button class="guide-action primary" type="button" data-guide-action="start">Start / 最初から開始</button>
+    <button class="guide-action" type="button" data-guide-action="resume" hidden>Resume / 続きから</button>
+    <button class="guide-action" type="button" data-guide-action="replay">Replay / 最初から</button>
+    <div class="guide-status" id="guideStatus" role="status" aria-live="polite">Tutorialを読み込み中…</div>
+  </div>
+  <div class="guide-grid" id="guideGrid"></div>
+</section>
+
 <div class="footer" id="footer"></div>
 </main>
 
@@ -84,9 +120,8 @@ a{color:inherit}.page{width:min(1140px,calc(100% - 24px));margin:0 auto;padding:
 /*
   DPRO LIVE DEMO COMMON TEMPLATE V1.0
   ------------------------------------------------------------
-  変更してよいのは CONFIG の値とCSS変数のブランド色のみ。
-  DOM骨格・セクション順・公開注意・CHOOSE A SCREEN・
-  RECOMMENDED JOURNEYはCOMMON TEMPLATE V1.0 LOCK対象。
+  既存のCHOOSE A SCREEN / RECOMMENDED JOURNEYを維持。
+  R4 Guide Centerは既存セクションの後に追加し、R3 Tutorial APIを再利用する。
 */
 const CONFIG = {
   "systemName": "DPRO CAR LINE",
@@ -99,99 +134,58 @@ const CONFIG = {
   "journeyIntro": "買取・下取りで受けた車が商品化され、販売・契約・納車・点検／車検フォローへつながる順番で確認します。",
   "adminCode": "1234",
   "quickInfo": [
-    {
-      "label": "CUSTOMER FLOW",
-      "text": "01 査定受付 → 02 公開在庫・試乗 → 03 査定・商品化・商談 → 04–05 契約・納車・アフター"
-    },
-    {
-      "label": "DEMO INFO",
-      "text": "管理系は demo=1 でデモコード1234を自動設定。公開デモは架空の顧客・車両情報のみ。"
-    },
-    {
-      "label": "SCREEN STRUCTURE",
-      "text": "既存の実画面4つで5工程を確認。04–05は同じオーナーPC画面"
-    }
+    {"label":"CUSTOMER FLOW","text":"01 査定受付 → 02 公開在庫・試乗 → 03 査定・商品化・商談 → 04–05 契約・納車・アフター"},
+    {"label":"DEMO INFO","text":"管理系は demo=1 でデモコード1234を自動設定。公開デモは架空の顧客・車両情報のみ。"},
+    {"label":"SCREEN STRUCTURE","text":"既存の実画面4つで5工程を確認。04–05は同じオーナーPC画面"}
   ],
   "screens": [
     {
-      "step": "01 / お客様 / PRIMARY EXPERIENCE",
-      "title": "買取・下取り・写真概算査定",
-      "description": "店頭査定・出張査定・写真概算査定から選び、車両情報・希望日時・写真を含む査定受付の流れを確認できます。",
-      "tags": [
-        "買取査定",
-        "下取り査定",
-        "写真概算査定"
-      ],
-      "note": "最初にここを確認します。氏名・電話番号・登録番号・写真は必ず架空の内容を使用し、実在車両の写真は送らないでください。",
-      "url": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/sell.html?demo=1",
-      "cta": "査定受付を体験する",
-      "officialUrl": "https://dpromstk2000-lab.github.io/dpro-line-systems-site/lp-car.html"
+      "step":"01 / お客様 / PRIMARY EXPERIENCE",
+      "title":"買取・下取り・写真概算査定",
+      "description":"店頭査定・出張査定・写真概算査定から選び、車両情報・希望日時・写真を含む査定受付の流れを確認できます。",
+      "tags":["買取査定","下取り査定","写真概算査定"],
+      "note":"最初にここを確認します。氏名・電話番号・登録番号・写真は必ず架空の内容を使用し、実在車両の写真は送らないでください。",
+      "url":"https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/sell.html?demo=1",
+      "cta":"査定受付を体験する",
+      "officialUrl":"https://dpromstk2000-lab.github.io/dpro-line-systems-site/lp-car.html"
     },
     {
-      "step": "02 / お客様 / INVENTORY",
-      "title": "公開在庫・車両詳細・試乗相談",
-      "description": "販売在庫を支払総額・年式・走行距離・装備で比較し、車両詳細や試乗相談へ進む公開側の流れを確認できます。",
-      "tags": [
-        "販売在庫",
-        "車両詳細",
-        "試乗相談"
-      ],
-      "note": "公開在庫の確認用です。デモ車両だけを使用してください。",
-      "url": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/inventory.html?demo=1",
-      "cta": "販売在庫を見る",
-      "officialUrl": "https://dpromstk2000-lab.github.io/dpro-line-systems-site/lp-car.html"
+      "step":"02 / お客様 / INVENTORY",
+      "title":"公開在庫・車両詳細・試乗相談",
+      "description":"販売在庫を支払総額・年式・走行距離・装備で比較し、車両詳細や試乗相談へ進む公開側の流れを確認できます。",
+      "tags":["販売在庫","車両詳細","試乗相談"],
+      "note":"公開在庫の確認用です。デモ車両だけを使用してください。",
+      "url":"https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/inventory.html?demo=1",
+      "cta":"販売在庫を見る",
+      "officialUrl":"https://dpromstk2000-lab.github.io/dpro-line-systems-site/lp-car.html"
     },
     {
-      "step": "03 / スタッフiPad / OPERATIONS",
-      "title": "査定→商品化・商談の現場管理",
-      "description": "来店、査定、商談、必要書類、在庫準備・商品化を、現場用の大きな操作で進める流れを確認できます。",
-      "tags": [
-        "来店・査定",
-        "商談",
-        "商品化"
-      ],
-      "note": "demo=1 ではデモ用管理コード1234が自動設定されます。架空の営業データだけを操作してください。",
-      "url": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/owner-ipad.html?demo=1",
-      "cta": "iPad現場管理を開く",
-      "officialUrl": "https://dpromstk2000-lab.github.io/dpro-line-systems-site/lp-car.html"
+      "step":"03 / スタッフiPad / OPERATIONS",
+      "title":"査定→商品化・商談の現場管理",
+      "description":"来店、査定、商談、必要書類、在庫準備・商品化を、現場用の大きな操作で進める流れを確認できます。",
+      "tags":["来店・査定","商談","商品化"],
+      "note":"demo=1 ではデモ用管理コード1234が自動設定されます。架空の営業データだけを操作してください。",
+      "url":"https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/owner-ipad.html?demo=1",
+      "cta":"iPad現場管理を開く",
+      "officialUrl":"https://dpromstk2000-lab.github.io/dpro-line-systems-site/lp-car.html"
     },
     {
-      "step": "04–05 / オーナーPC / SAME SCREEN",
-      "title": "契約・納車・アフターフォロー",
-      "description": "販売契約・入金・必要書類・登録・納車準備から、納車完了後の点検・車検・保証・整備履歴・乗り換え見込みまでを同じ管理画面で確認できます。",
-      "tags": [
-        "契約・入金",
-        "納車管理",
-        "点検・車検フォロー"
-      ],
-      "note": "04と05は同じオーナーPC画面です。サイドメニューの「契約・書類」「納車・フォロー」「納車後管理」を順に確認します。",
-      "url": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/owner.html?demo=1",
-      "cta": "オーナーPCを開く",
-      "officialUrl": "https://dpromstk2000-lab.github.io/dpro-line-systems-site/lp-car.html"
+      "step":"04–05 / オーナーPC / SAME SCREEN",
+      "title":"契約・納車・アフターフォロー",
+      "description":"販売契約・入金・必要書類・登録・納車準備から、納車完了後の点検・車検・保証・整備履歴・乗り換え見込みまでを同じ管理画面で確認できます。",
+      "tags":["契約・入金","納車管理","点検・車検フォロー"],
+      "note":"04と05は同じオーナーPC画面です。サイドメニューの「契約・書類」「納車・フォロー」「納車後管理」を順に確認します。",
+      "url":"https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/owner.html?demo=1",
+      "cta":"オーナーPCを開く",
+      "officialUrl":"https://dpromstk2000-lab.github.io/dpro-line-systems-site/lp-car.html"
     }
   ],
   "journey": [
-    {
-      "step": "01",
-      "text": "買取・下取り／写真査定"
-    },
-    {
-      "step": "02",
-      "text": "販売在庫・試乗相談"
-    },
-    {
-      "step": "03",
-      "text": "査定→商品化・商談"
-    },
-    {
-      "step": "04",
-      "text": "契約・入金・納車"
-    },
-    {
-      "step": "05",
-      "text": "点検・車検・乗り換え",
-      "sameScreen": true
-    }
+    {"step":"01","text":"買取・下取り／写真査定"},
+    {"step":"02","text":"販売在庫・試乗相談"},
+    {"step":"03","text":"査定→商品化・商談"},
+    {"step":"04","text":"契約・入金・納車"},
+    {"step":"05","text":"点検・車検・乗り換え","sameScreen":true}
   ]
 };
 
@@ -230,6 +224,85 @@ document.getElementById("flowGrid").innerHTML = CONFIG.journey.map(x => `
     <strong>${x.text}</strong>
   </div>
 `).join("");
+
+/* R4: state machine is NOT duplicated. All actions call the R3 API. */
+(() => {
+  const guideGrid = document.getElementById("guideGrid");
+  const toolbar = document.getElementById("guideToolbar");
+  const statusNode = document.getElementById("guideStatus");
+  let bound = false;
+
+  const esc = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]));
+
+  function syncStatus() {
+    const api = window.DPRO_CAR_TUTORIAL;
+    if (!api) return;
+    const state = api.getState();
+    const resume = toolbar.querySelector('[data-guide-action="resume"]');
+    resume.hidden = !(state.status === "paused" || state.status === "active");
+    statusNode.textContent = `状態：${state.status} / ${state.step} of 10`;
+  }
+
+  function buildGuide() {
+    const api = window.DPRO_CAR_TUTORIAL;
+    if (!api || !Array.isArray(api.steps) || api.steps.length !== 10) return false;
+    guideGrid.innerHTML = api.steps.map((step, index) => `
+      <article class="guide-item"
+        data-guide-step="${index + 1}"
+        data-step-id="${esc(step.id)}"
+        data-route="${esc(step.route)}"
+        data-primary="${esc(step.primary)}"
+        data-fallback="${esc(step.fallback || "")}">
+        <div class="guide-id">${esc(step.id)} / ${index + 1} of 10</div>
+        <h3>${esc(step.title)}</h3>
+        <p>${esc(step.copy)}</p>
+        <div class="guide-meta">
+          <code>route: ${esc(step.route)}</code>
+          <code>target: ${esc(step.primary)}</code>
+          <code>fallback: ${esc(step.fallback || "なし")}</code>
+        </div>
+        <button class="guide-open" type="button" data-guide-go="${index + 1}">
+          このステップから開始
+        </button>
+      </article>
+    `).join("");
+
+    if (!bound) {
+      toolbar.addEventListener("click", event => {
+        const button = event.target.closest("button[data-guide-action]");
+        if (!button) return;
+        const current = window.DPRO_CAR_TUTORIAL;
+        if (!current) return;
+        const action = button.dataset.guideAction;
+        if (action === "start") current.start();
+        if (action === "resume") current.resume();
+        if (action === "replay") current.replay();
+      });
+      guideGrid.addEventListener("click", event => {
+        const button = event.target.closest("button[data-guide-go]");
+        if (!button) return;
+        const current = window.DPRO_CAR_TUTORIAL;
+        if (!current) return;
+        current.goToStep(Number(button.dataset.guideGo));
+      });
+      window.addEventListener("dpro-car-tutorial-state", syncStatus);
+      bound = true;
+    }
+    syncStatus();
+    return true;
+  }
+
+  let tries = 0;
+  const timer = setInterval(() => {
+    tries += 1;
+    if (buildGuide() || tries >= 120) {
+      clearInterval(timer);
+      if (tries >= 120 && !window.DPRO_CAR_TUTORIAL) {
+        statusNode.textContent = "Tutorialを読み込めませんでした。再読込してください。";
+      }
+    }
+  }, 50);
+})();
 </script>
 </body>
 </html>
