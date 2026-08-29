@@ -1,4 +1,5 @@
 /* DPRO CAR TUTORIAL / R3 STANDARD V1.1 / 20260829 */
+/* R3 MOBILE TARGET SETTLE PATCH V1.2 / 20260829 */
 (() => {
   "use strict";
   if (window.DPRO_CAR_TUTORIAL) return;
@@ -34,7 +35,12 @@
   function resolveTarget(step){
     const selectors=[step.primary,step.fallback].filter(Boolean);
     for(const selector of selectors){const el=document.querySelector(selector);if(el&&isVisible(el))return {el,selector};}
-    for(const selector of selectors){const el=document.querySelector(selector);if(!el)continue;try{el.scrollIntoView({block:"center",inline:"nearest",behavior:"auto"})}catch{}if(isVisible(el))return {el,selector};}
+    for(const selector of selectors){
+      const el=document.querySelector(selector);
+      if(!el)continue;
+      try{el.scrollIntoView({block:"center",inline:"nearest",behavior:"auto"})}catch{}
+      return {el,selector};
+    }
     return {el:null,selector:null};
   }
   function clamp(value,min,max){return Math.min(Math.max(value,min),Math.max(min,max))}
@@ -65,7 +71,13 @@
     noteNode.textContent=resolved.el?`対象を確認中：${step.title}`:`対象が画面内に見つからないため、安全にTutorial操作へ戻しました。画面を再読込しても業務操作は実行されません。`;
     positionHighlight(resolved.el);backButton.disabled=index===0;nextButton.textContent=index===9?"完了":"次へ";
     writeState({step:index+1,status:"active"});showLauncher();
-    setTimeout(()=>{positionHighlight(resolved.el);clampCard();focusTarget(step,resolved)},0);
+    setTimeout(()=>{
+      const latest=resolveTarget(step);
+      positionHighlight(latest.el);
+      noteNode.textContent=latest.el?`対象を確認中：${step.title}`:`対象が画面内に見つからないため、安全にTutorial操作へ戻しました。画面を再読込しても業務操作は実行されません。`;
+      clampCard();
+      focusTarget(step,latest);
+    },60);
   }
   function goToStep(n){const step=clamp(Number(n)||1,1,10);writeState({step,status:"active"});renderStep()}
   function next(){const state=readState();if(state.step>=10){hideTutorial("completed");return}goToStep(state.step+1)}
