@@ -33,7 +33,7 @@ jobs:
           node --check tutorial.js
           test "$(grep -c 'id:\"CAR-' tutorial.js)" -eq 10
           grep -q 'DPRO-CAR-TUTORIAL-R3-V1.1-20260829' tutorial.js
-          grep -q 'R3 MOBILE TARGET SETTLE PATCH V1.2 / 20260829' tutorial.js
+          grep -q 'R3 MOBILE INSTANT TARGET SCROLL PATCH V1.3 / 20260829' tutorial.js
           grep -q 'dpro-tutorial-drag' tutorial.css
 
       - name: Append R3 loader to current config safely
@@ -103,16 +103,22 @@ jobs:
         run: |
           set -euo pipefail
           BASE='https://dpromstk2000-lab.github.io/dpro-used-car-line-liff'
+          LOCAL_JS_SHA="$(sha256sum tutorial.js | awk '{print $1}')"
+          LOCAL_CSS_SHA="$(sha256sum tutorial.css | awk '{print $1}')"
           ok=0
           for i in $(seq 1 72); do
             q="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${i}"
             if curl -fsS "$BASE/tutorial.js?qa=$q" -o /tmp/car-tutorial.js \
-              && curl -fsS "$BASE/config.js?qa=$q" -o /tmp/car-config.js \
-              && grep -q 'DPRO-CAR-TUTORIAL-R3-V1.1-20260829' /tmp/car-tutorial.js \
-              && grep -q 'R3 MOBILE TARGET SETTLE PATCH V1.2 / 20260829' /tmp/car-tutorial.js \
-              && grep -q 'R3 Tutorial loader / DPRO-CAR-TUTORIAL-R3-V1.1-20260829' /tmp/car-config.js; then
-              ok=1
-              break
+              && curl -fsS "$BASE/tutorial.css?qa=$q" -o /tmp/car-tutorial.css \
+              && curl -fsS "$BASE/config.js?qa=$q" -o /tmp/car-config.js; then
+              REMOTE_JS_SHA="$(sha256sum /tmp/car-tutorial.js | awk '{print $1}')"
+              REMOTE_CSS_SHA="$(sha256sum /tmp/car-tutorial.css | awk '{print $1}')"
+              if [ "$REMOTE_JS_SHA" = "$LOCAL_JS_SHA" ] \
+                && [ "$REMOTE_CSS_SHA" = "$LOCAL_CSS_SHA" ] \
+                && grep -q 'R3 Tutorial loader / DPRO-CAR-TUTORIAL-R3-V1.1-20260829' /tmp/car-config.js; then
+                ok=1
+                break
+              fi
             fi
             sleep 5
           done
