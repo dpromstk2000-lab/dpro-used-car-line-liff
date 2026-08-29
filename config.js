@@ -131,3 +131,27 @@ window.DPRO_CAR_CONFIG = Object.freeze({
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", removeTechnicalCopy, { once: true });
   else removeTechnicalCopy();
 })();
+
+/* R3 Tutorial loader / DPRO-CAR-TUTORIAL-R3-V1.1-20260829 */
+(() => {
+  "use strict";
+  const params = new URLSearchParams(location.search);
+  const file = location.pathname.split("/").filter(Boolean).pop() || "index.html";
+  const stateExists = (() => { try { return Boolean(localStorage.getItem("dpro_car_tutorial_v1")); } catch { return false; } })();
+  const enabled = params.get("demo") === "1" || params.get("tutorial") === "1" || file === "demo-guide.html" || stateExists;
+  if (!enabled) return;
+  if (!document.querySelector('link[data-dpro-tutorial-asset="css"]')) {
+    const css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "tutorial.css";
+    css.dataset.dproTutorialAsset = "css";
+    document.head.append(css);
+  }
+  if (!document.querySelector('script[data-dpro-tutorial-asset="js"]')) {
+    const script = document.createElement("script");
+    script.src = "tutorial.js";
+    script.defer = true;
+    script.dataset.dproTutorialAsset = "js";
+    document.head.append(script);
+  }
+})();
