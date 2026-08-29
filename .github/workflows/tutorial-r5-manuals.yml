@@ -264,21 +264,33 @@ jobs:
                   text=page.get_text('text')
                   assert len(text.strip())>120,(path,i,'blank text')
                   assert '\ufffd' not in text,(path,i,'replacement glyph')
-                  pix=page.get_pixmap(matrix=fitz.Matrix(1.45,1.45),alpha=False)
+                  scale=300/72
+                  pix=page.get_pixmap(matrix=fitz.Matrix(scale,scale),alpha=False)
                   png=f'r5-evidence/renders/{kind}-page-{i+1}.png'; pix.save(png)
                   im=Image.open(png).convert('RGB'); im.thumbnail((520,740)); im.save(f'r5-evidence/qa-thumbs/{kind}-page-{i+1}.jpg','JPEG',quality=35,optimize=True)
-                  gray=cv2.imread(png,cv2.IMREAD_GRAYSCALE)
+                  rendered=cv2.imread(png)
+                  gray=cv2.cvtColor(rendered,cv2.COLOR_BGR2GRAY) if rendered is not None else None
                   assert gray is not None and gray.mean()<254.8,(path,i,'accidental blank')
                   qrd=cv2.QRCodeDetector(); values=[]
-                  try:
-                      ok, decoded, points, _=qrd.detectAndDecodeMulti(cv2.imread(png))
-                      if ok: values=[v for v in decoded if v]
-                  except Exception:
-                      val,_,_=qrd.detectAndDecode(cv2.imread(png)); values=[val] if val else []
                   expected=[TUTORIAL,GUIDE] if i==0 else []
                   if expected:
+                      try:
+                          ok, decoded, points, _=qrd.detectAndDecodeMulti(rendered)
+                          if ok: values=[v for v in decoded if v]
+                      except Exception:
+                          values=[]
+                      if set(values)!=set(expected):
+                          values=[]
+                          qr_y=55 if kind=='quick' else 72
+                          qr_size=78; margin=12
+                          for qr_x in (55,315):
+                              x0=max(0,int((qr_x-margin)*scale)); x1=min(rendered.shape[1],int((qr_x+qr_size+margin)*scale))
+                              y0=max(0,int((A4_H-(qr_y+qr_size+margin))*scale)); y1=min(rendered.shape[0],int((A4_H-(qr_y-margin))*scale))
+                              crop=rendered[y0:y1,x0:x1]
+                              val,_,_=qrd.detectAndDecode(crop)
+                              if val: values.append(val)
                       assert set(values)==set(expected),(path,i,values,expected)
-                      for v in values: report['qr'].append({'pdf':path,'page':i+1,'decoded':v})
+                      for v in values: report['qr'].append({'pdf':path,'page':i+1,'decoded':v,'source':'rendered_png_300dpi'})
                   entry['page_checks'].append({'page':i+1,'A4_portrait':'PASS','rendered_png':png,'text_chars':len(text),'qr_decoded':values})
               report['pdfs'].append(entry)
           with open('r5-evidence/R5_RENDER_QR_QA.json','w',encoding='utf-8') as f: json.dump(report,f,ensure_ascii=False,indent=2)
