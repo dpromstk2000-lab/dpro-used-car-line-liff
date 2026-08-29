@@ -209,12 +209,20 @@ jobs:
             } else {
               const before=await page.locator('#dproTutorialCard').boundingBox();
               await page.evaluate(()=>{
-                const h=document.querySelector('#dproTutorialDrag'),r=h.getBoundingClientRect(),id=77;
+                const h=document.querySelector('#dproTutorialDrag');
+                const card=document.querySelector('#dproTutorialCard');
+                const r=h.getBoundingClientRect(),c=card.getBoundingClientRect(),id=77;
                 const fire=(type,x,y,buttons)=>h.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',isPrimary:true,button:0,buttons,clientX:x,clientY:y}));
-                fire('pointerdown',r.left+25,r.top+20,1);fire('pointermove',innerWidth+200,innerHeight+200,1);fire('pointerup',innerWidth+200,innerHeight+200,0);
+                const maxTop=Math.max(8,innerHeight-c.height-8);
+                const targetY=c.top>(8+maxTop)/2 ? -200 : innerHeight+200;
+                const maxLeft=Math.max(8,innerWidth-c.width-8);
+                const targetX=c.left>(8+maxLeft)/2 ? -200 : innerWidth+200;
+                fire('pointerdown',r.left+25,r.top+20,1);
+                fire('pointermove',targetX,targetY,1);
+                fire('pointerup',targetX,targetY,0);
               });
               const after=await page.locator('#dproTutorialCard').boundingBox();
-              assert(Math.abs(before.x-after.x)>2 || Math.abs(before.y-after.y)>2,`${v.name}: touch pointer drag did not move`);
+              assert(Math.abs(before.x-after.x)>2 || Math.abs(before.y-after.y)>2,`${v.name}: touch pointer drag did not move from ${JSON.stringify(before)} to ${JSON.stringify(after)}`);
               await geometry(page,`${v.name} touch drag clamp`);
             }
 
