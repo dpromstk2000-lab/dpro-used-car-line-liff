@@ -2,6 +2,7 @@
 /* R3 MOBILE TARGET SETTLE PATCH V1.2 / 20260829 */
 /* R3 MOBILE INSTANT TARGET SCROLL PATCH V1.3 / 20260829 */
 /* R3 MOBILE FORCED INSTANT SCROLL + RETRY PATCH V1.4 / 20260829 */
+/* R4 GUIDE CENTER ACTIVE-STATE HOLD PATCH V1.5 / 20260829 */
 (() => {
   "use strict";
   if (window.DPRO_CAR_TUTORIAL) return;
@@ -141,7 +142,7 @@
     const reposition=()=>{if(card&&!card.hidden){clampCard();const step=FIRST10[readState().step-1];positionHighlight(resolveTarget(step).el)}};addEventListener("resize",reposition);addEventListener("scroll",reposition,{passive:true});
     showLauncher();
     const params=new URLSearchParams(location.search),state=readState();
-    if(params.get("tutorial")==="1")start();else if(state.status==="active")renderStep();
+    if(params.get("tutorial")==="1")start();else if(state.status==="active"&&fileName()!=="demo-guide.html")renderStep();
   }
 
   window.DPRO_CAR_TUTORIAL=Object.freeze({version:VERSION,key:KEY,steps:FIRST10,start,resume,replay,skip,close:()=>hideTutorial("paused"),goToStep,getState:readState});
