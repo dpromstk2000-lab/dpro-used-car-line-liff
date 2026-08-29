@@ -1,5 +1,6 @@
 /* DPRO CAR TUTORIAL / R3 STANDARD V1.1 / 20260829 */
 /* R3 MOBILE TARGET SETTLE PATCH V1.2 / 20260829 */
+/* R3 MOBILE INSTANT TARGET SCROLL PATCH V1.3 / 20260829 */
 (() => {
   "use strict";
   if (window.DPRO_CAR_TUTORIAL) return;
@@ -32,14 +33,23 @@
   function fileName(){const p=location.pathname.split("/").filter(Boolean).pop()||"index.html";return p.includes(".")?p:"index.html"}
   function routeUrl(route){const params=new URLSearchParams(location.search);params.set("demo","1");params.delete("tutorial");return `${route}?${params.toString()}`}
   function isVisible(el){if(!el)return false;const style=getComputedStyle(el);if(style.display==="none"||style.visibility==="hidden"||Number(style.opacity)===0)return false;const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&r.bottom>0&&r.right>0&&r.top<innerHeight&&r.left<innerWidth}
+  function scrollTargetNow(el){
+    if(!el)return;
+    const scroller=document.scrollingElement||document.documentElement;
+    const r=el.getBoundingClientRect();
+    const currentTop=Number(scroller.scrollTop||scrollY||0);
+    const maxTop=Math.max(0,scroller.scrollHeight-innerHeight);
+    const targetTop=Math.max(0,Math.min(maxTop,currentTop+r.top-((innerHeight-r.height)/2)));
+    scroller.scrollTop=targetTop;
+  }
   function resolveTarget(step){
     const selectors=[step.primary,step.fallback].filter(Boolean);
     for(const selector of selectors){const el=document.querySelector(selector);if(el&&isVisible(el))return {el,selector};}
     for(const selector of selectors){
       const el=document.querySelector(selector);
       if(!el)continue;
-      try{el.scrollIntoView({block:"center",inline:"nearest",behavior:"auto"})}catch{}
-      return {el,selector};
+      try{scrollTargetNow(el)}catch{}
+      if(isVisible(el))return {el,selector};
     }
     return {el:null,selector:null};
   }
