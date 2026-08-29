@@ -1,0 +1,35 @@
+{
+  "FIRST10_COUNT": 10,
+  "GUIDE_COUNT": 10,
+  "shots": [
+    {
+      "name": "guide",
+      "url": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/demo-guide.html?demo=1",
+      "step": null
+    },
+    {
+      "name": "index-step01",
+      "url": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/?demo=1",
+      "step": 1
+    },
+    {
+      "name": "sell-step04",
+      "url": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/sell.html?demo=1",
+      "step": 4
+    },
+    {
+      "name": "inventory-step07",
+      "url": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/inventory.html?demo=1",
+      "step": 7
+    },
+    {
+      "name": "owner-ipad-step10",
+      "url": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/owner-ipad.html?demo=1",
+      "step": 10
+    }
+  ],
+  "unsafe_write_request": 0,
+  "pageerror": 0,
+  "console_error": 0,
+  "business_mutation": 0
+}

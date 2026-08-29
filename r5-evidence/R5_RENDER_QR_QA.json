@@ -1,0 +1,114 @@
+{
+  "R5": "PASS",
+  "QUICK_START_A4_PORTRAIT": "PASS",
+  "DETAILED_A4_PORTRAIT": "PASS",
+  "ALL_PDF_PAGES_RENDERED": "PASS",
+  "QR_DECODE_EVERY_RENDERED_QR": "PASS",
+  "QR_DESTINATION_EXACT_PUBLIC": "PASS",
+  "CLIPPING": 0,
+  "MISSING_GLYPH": 0,
+  "BROKEN_IMAGE": 0,
+  "OVERLAP": 0,
+  "UNREADABLE": 0,
+  "ACCIDENTAL_BLANK": 0,
+  "PII_SENSITIVE_DATA": 0,
+  "SECRETS_CREDENTIALS": 0,
+  "BUSINESS_MUTATION": 0,
+  "pdfs": [
+    {
+      "file": "DPRO_TUTORIAL_CAR_QUICK_START_V1.0.pdf",
+      "pages": 1,
+      "sha256": "619edb8eeb0c7dd296fd4f40ba6a815d56fb9567cb6c47df57c41fd8217c17d8",
+      "page_checks": [
+        {
+          "page": 1,
+          "A4_portrait": "PASS",
+          "rendered_png": "r5-evidence/renders/quick-page-1.png",
+          "text_chars": 584,
+          "qr_decoded": [
+            "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/?demo=1&tutorial=1",
+            "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/demo-guide.html?demo=1"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "DPRO_TUTORIAL_CAR_DETAILED_MANUAL_V1.0.pdf",
+      "pages": 6,
+      "sha256": "9e720284a56b17e72d3554d3dac6cc9c055e5efa2e1dcb7ae34adeb1a8349ae1",
+      "page_checks": [
+        {
+          "page": 1,
+          "A4_portrait": "PASS",
+          "rendered_png": "r5-evidence/renders/detail-page-1.png",
+          "text_chars": 417,
+          "qr_decoded": [
+            "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/?demo=1&tutorial=1",
+            "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/demo-guide.html?demo=1"
+          ]
+        },
+        {
+          "page": 2,
+          "A4_portrait": "PASS",
+          "rendered_png": "r5-evidence/renders/detail-page-2.png",
+          "text_chars": 319,
+          "qr_decoded": []
+        },
+        {
+          "page": 3,
+          "A4_portrait": "PASS",
+          "rendered_png": "r5-evidence/renders/detail-page-3.png",
+          "text_chars": 312,
+          "qr_decoded": []
+        },
+        {
+          "page": 4,
+          "A4_portrait": "PASS",
+          "rendered_png": "r5-evidence/renders/detail-page-4.png",
+          "text_chars": 307,
+          "qr_decoded": []
+        },
+        {
+          "page": 5,
+          "A4_portrait": "PASS",
+          "rendered_png": "r5-evidence/renders/detail-page-5.png",
+          "text_chars": 287,
+          "qr_decoded": []
+        },
+        {
+          "page": 6,
+          "A4_portrait": "PASS",
+          "rendered_png": "r5-evidence/renders/detail-page-6.png",
+          "text_chars": 393,
+          "qr_decoded": []
+        }
+      ]
+    }
+  ],
+  "qr": [
+    {
+      "pdf": "DPRO_TUTORIAL_CAR_QUICK_START_V1.0.pdf",
+      "page": 1,
+      "decoded": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/?demo=1&tutorial=1",
+      "source": "rendered_png_300dpi"
+    },
+    {
+      "pdf": "DPRO_TUTORIAL_CAR_QUICK_START_V1.0.pdf",
+      "page": 1,
+      "decoded": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/demo-guide.html?demo=1",
+      "source": "rendered_png_300dpi"
+    },
+    {
+      "pdf": "DPRO_TUTORIAL_CAR_DETAILED_MANUAL_V1.0.pdf",
+      "page": 1,
+      "decoded": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/?demo=1&tutorial=1",
+      "source": "rendered_png_300dpi"
+    },
+    {
+      "pdf": "DPRO_TUTORIAL_CAR_DETAILED_MANUAL_V1.0.pdf",
+      "page": 1,
+      "decoded": "https://dpromstk2000-lab.github.io/dpro-used-car-line-liff/demo-guide.html?demo=1",
+      "source": "rendered_png_300dpi"
+    }
+  ]
+}
