@@ -50,7 +50,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p r5-evidence/screenshots
-          cat > /tmp/r5-capture.mjs <<'NODE'
+          cat > r5-capture.mjs <<'NODE'
           import { chromium } from 'playwright';
           import fs from 'node:fs';
           const BASE='https://dpromstk2000-lab.github.io/dpro-used-car-line-liff';
@@ -85,7 +85,7 @@ jobs:
           if(consoleErrors.length)throw new Error(`Console errors: ${JSON.stringify(consoleErrors)}`);
           fs.writeFileSync('r5-evidence/CAPTURE_QA.json',JSON.stringify({FIRST10_COUNT:first10,GUIDE_COUNT:guideCount,shots,unsafe_write_request:0,pageerror:0,console_error:0,business_mutation:0},null,2));
           NODE
-          node /tmp/r5-capture.mjs
+          node r5-capture.mjs
 
       - name: Build A4 Quick Start and Detailed Manual
         shell: bash
