@@ -1,0 +1,88 @@
+name: "DPRO SHOP Fix 05 CAR"
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/dpro-shop-fix-05-car.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "dpro-shop-fix-05-car"
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify audited source SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          check() {
+            path="$1"; expected="$2"
+            test -f "$path" || { echo "Missing target: $path"; exit 31; }
+            got="$(git hash-object "$path")"
+            echo "$path  $got"
+            test "$got" = "$expected" || { echo "SOURCE SHA MISMATCH: $path expected=$expected got=$got"; exit 32; }
+          }
+          check 'owner.html' 'adb495c8363db1b02514f80a9ca334aff90aaba9'
+
+      - name: Apply narrow confirmed fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("owner.html")
+          text = path.read_text(encoding="utf-8")
+
+          def replace_once(source, old, new, label):
+              count = source.count(old)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected 1 exact match, found {count}")
+              return source.replace(old, new, 1)
+
+          # Sales journey only: lost / cancelled requires explicit confirmation.
+          old_sales = '''form.addEventListener("submit",async event=>{event.preventDefault();save.disabled=true;const fd=new FormData(form),iso=value=>value?new Date(value).toISOString():null;try{'''
+          new_sales = '''form.addEventListener("submit",async event=>{event.preventDefault();const fd=new FormData(form),iso=value=>value?new Date(value).toISOString():null;const nextLeadStatus=String(fd.get("status")||"");if(["lost","cancelled"].includes(nextLeadStatus)&&nextLeadStatus!==String(lead.status||"")&&!confirm(`商談状態を「${label("sales_lead",nextLeadStatus)}」へ変更しますか？`))return;save.disabled=true;try{'''
+          text = replace_once(text, old_sales, new_sales, "CAR sales journey terminal guard")
+
+          # Delivery journey only: sale-contract cancelled requires explicit confirmation.
+          old_delivery = '''form.addEventListener('submit',async event=>{event.preventDefault();save.disabled=true;const fd=new FormData(form),iso=value=>value?new Date(value).toISOString():null;try{const result=await api(`/api/admin/sale-contracts/${encodeURIComponent(c.id)}`,{method:'PATCH',body:JSON.stringify({status:fd.get('status'),'''
+          new_delivery = '''form.addEventListener('submit',async event=>{event.preventDefault();const fd=new FormData(form),iso=value=>value?new Date(value).toISOString():null;const nextContractStatus=String(fd.get('status')||'');if(nextContractStatus==='cancelled'&&nextContractStatus!==String(c.status||'')&&!confirm('販売契約をキャンセル状態へ変更しますか？'))return;save.disabled=true;try{const result=await api(`/api/admin/sale-contracts/${encodeURIComponent(c.id)}`,{method:'PATCH',body:JSON.stringify({status:fd.get('status'),'''
+          text = replace_once(text, old_delivery, new_delivery, "CAR delivery journey cancellation guard")
+
+          path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Validate source diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          git diff --stat
+          git diff -- "owner.html"
+          if git diff --quiet -- "owner.html"; then
+            echo "No source change was produced."
+            exit 41
+          fi
+
+      - name: Commit fix to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "owner.html"
+          git diff --cached --check
+          git commit -m "Fix used-car journey terminal guards"
+          git push origin HEAD:main
